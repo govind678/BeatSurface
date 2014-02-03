@@ -4,6 +4,45 @@
               bundleIdentifier="com.gtcmt.BeatSurface" includeBinaryInAppConfig="1"
               jucerVersion="3.1.0">
   <MAINGROUP id="kf7T85" name="BeatSurface">
+    <GROUP id="{2D464C1F-019F-B080-0E2A-FFB87AE1535C}" name="Source">
+      <GROUP id="{6D160A36-F00F-A0CE-E12C-F44B6310A9C1}" name="AudioMIDI">
+        <FILE id="ekkYPP" name="AudioFileIO.cpp" compile="1" resource="0" file="Source/AudioMIDI/AudioFileIO.cpp"/>
+        <FILE id="CKBWif" name="AudioFileIO.h" compile="0" resource="0" file="Source/AudioMIDI/AudioFileIO.h"/>
+        <FILE id="VwsswA" name="AudioPlayer.cpp" compile="1" resource="0" file="Source/AudioMIDI/AudioPlayer.cpp"/>
+        <FILE id="Fz158X" name="AudioPlayer.h" compile="0" resource="0" file="Source/AudioMIDI/AudioPlayer.h"/>
+        <FILE id="iYE4c7" name="AudioStream.cpp" compile="1" resource="0" file="Source/AudioMIDI/AudioStream.cpp"/>
+        <FILE id="AqQcS2" name="AudioStream.h" compile="0" resource="0" file="Source/AudioMIDI/AudioStream.h"/>
+        <FILE id="LzYoby" name="MidiOut.cpp" compile="1" resource="0" file="Source/AudioMIDI/MidiOut.cpp"/>
+        <FILE id="G1v48I" name="MidiOut.h" compile="0" resource="0" file="Source/AudioMIDI/MidiOut.h"/>
+      </GROUP>
+      <GROUP id="{92B471D6-3612-8304-4950-E377BA0AAF13}" name="Core">
+        <FILE id="IPgVJp" name="AudioFeatureExtraction.cpp" compile="1" resource="0"
+              file="Source/Core/AudioFeatureExtraction.cpp"/>
+        <FILE id="Ur1THW" name="AudioFeatureExtraction.h" compile="0" resource="0"
+              file="Source/Core/AudioFeatureExtraction.h"/>
+        <FILE id="euJgWZ" name="KNNClassifier.cpp" compile="1" resource="0"
+              file="Source/Core/KNNClassifier.cpp"/>
+        <FILE id="aonNN4" name="KNNClassifier.h" compile="0" resource="0" file="Source/Core/KNNClassifier.h"/>
+        <FILE id="i63MbQ" name="OnsetClassification.cpp" compile="1" resource="0"
+              file="Source/Core/OnsetClassification.cpp"/>
+        <FILE id="mdeT0l" name="OnsetClassification.h" compile="0" resource="0"
+              file="Source/Core/OnsetClassification.h"/>
+      </GROUP>
+      <GROUP id="{AF5AEF7E-B455-FCF0-38CC-A862B6CA8C1E}" name="Interface">
+        <FILE id="x4wgf9" name="Main.cpp" compile="1" resource="0" file="Source/Interface/Main.cpp"/>
+        <FILE id="gJb3I4" name="MainComponent.cpp" compile="1" resource="0"
+              file="Source/Interface/MainComponent.cpp"/>
+        <FILE id="tljMI1" name="MainComponent.h" compile="0" resource="0" file="Source/Interface/MainComponent.h"/>
+      </GROUP>
+      <GROUP id="{1B747A0B-2013-B831-9CD3-04F6C4E2913E}" name="Wrappers">
+        <FILE id="Zfmnrv" name="ShortTermFourierTransform.cpp" compile="1"
+              resource="0" file="Source/Wrappers/ShortTermFourierTransform.cpp"/>
+        <FILE id="sUwsgB" name="ShortTermFourierTransform.h" compile="0" resource="0"
+              file="Source/Wrappers/ShortTermFourierTransform.h"/>
+        <FILE id="FcjzQL" name="SVMModel.cpp" compile="1" resource="0" file="Source/Wrappers/SVMModel.cpp"/>
+        <FILE id="wUICZg" name="SVMModel.h" compile="0" resource="0" file="Source/Wrappers/SVMModel.h"/>
+      </GROUP>
+    </GROUP>
     <GROUP id="{358F01A5-C550-9D4A-99CB-C971EDACEE21}" name="Libraries">
       <GROUP id="{48456E3E-EC3F-12D7-CACD-FA55DE7619DA}" name="LibSVM">
         <FILE id="epQYwN" name="svm.cpp" compile="1" resource="0" file="../../../../Libraries/libsvm-3.17/svm.cpp"/>
@@ -12,43 +51,6 @@
       <GROUP id="{06EE809C-5E29-C825-4734-78350A2198E4}" name="AudioFFT">
         <FILE id="UtfH5h" name="AudioFFT.cpp" compile="1" resource="0" file="../../../../Libraries/AudioFFT/AudioFFT.cpp"/>
         <FILE id="NWnS1b" name="AudioFFT.h" compile="0" resource="0" file="../../../../Libraries/AudioFFT/AudioFFT.h"/>
-      </GROUP>
-    </GROUP>
-    <GROUP id="{E84B3FE3-A02E-DBBC-C5B4-AA1CD2329366}" name="Source">
-      <GROUP id="{C348CA96-1163-FD19-0F3E-A82BDB64E25A}" name="AudioMIDI">
-        <FILE id="KT6Boh" name="AudioPlayer.cpp" compile="1" resource="0" file="Source/AudioPlayer.cpp"/>
-        <FILE id="rED604" name="AudioPlayer.h" compile="0" resource="0" file="Source/AudioPlayer.h"/>
-        <FILE id="mITTSX" name="MidiOut.cpp" compile="1" resource="0" file="Source/MidiOut.cpp"/>
-        <FILE id="STkI9V" name="MidiOut.h" compile="0" resource="0" file="Source/MidiOut.h"/>
-        <FILE id="yDcd8M" name="AudioFileIO.cpp" compile="1" resource="0" file="Source/AudioFileIO.cpp"/>
-        <FILE id="RjruUH" name="AudioFileIO.h" compile="0" resource="0" file="Source/AudioFileIO.h"/>
-        <FILE id="CYXDft" name="AudioStream.cpp" compile="1" resource="0" file="Source/AudioStream.cpp"/>
-        <FILE id="GWA2HF" name="AudioStream.h" compile="0" resource="0" file="Source/AudioStream.h"/>
-      </GROUP>
-      <GROUP id="{BC48FD69-66AF-F34E-4177-2D536911D330}" name="Core">
-        <FILE id="OQG59k" name="SVMModel.cpp" compile="1" resource="0" file="Source/SVMModel.cpp"/>
-        <FILE id="GRE1pt" name="SVMModel.h" compile="0" resource="0" file="Source/SVMModel.h"/>
-        <FILE id="QwNBpA" name="AudioFeatureExtraction.cpp" compile="1" resource="0"
-              file="Source/AudioFeatureExtraction.cpp"/>
-        <FILE id="nlHLfU" name="AudioFeatureExtraction.h" compile="0" resource="0"
-              file="Source/AudioFeatureExtraction.h"/>
-        <FILE id="rccV7d" name="KNNClassifier.cpp" compile="1" resource="0"
-              file="Source/KNNClassifier.cpp"/>
-        <FILE id="wbvntM" name="KNNClassifier.h" compile="0" resource="0" file="Source/KNNClassifier.h"/>
-        <FILE id="CocFb9" name="OnsetClassification.cpp" compile="1" resource="0"
-              file="Source/OnsetClassification.cpp"/>
-        <FILE id="OqEi9b" name="OnsetClassification.h" compile="0" resource="0"
-              file="Source/OnsetClassification.h"/>
-        <FILE id="M6nBkN" name="ShortTermFourierTransform.cpp" compile="1"
-              resource="0" file="Source/ShortTermFourierTransform.cpp"/>
-        <FILE id="kWz2tL" name="ShortTermFourierTransform.h" compile="0" resource="0"
-              file="Source/ShortTermFourierTransform.h"/>
-      </GROUP>
-      <GROUP id="{14143707-24F6-F36C-895B-16C4F421E1E6}" name="Interface">
-        <FILE id="IrFbi4" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
-        <FILE id="cs7HYz" name="MainComponent.cpp" compile="1" resource="0"
-              file="Source/MainComponent.cpp"/>
-        <FILE id="BpguxT" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
       </GROUP>
     </GROUP>
   </MAINGROUP>
