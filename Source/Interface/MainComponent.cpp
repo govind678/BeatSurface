@@ -121,7 +121,7 @@ MainContentComponent::MainContentComponent()
 
 MainContentComponent::~MainContentComponent()
 {
-    mpAudioStream               = nullptr;
+//    mpAudioStream               = nullptr;
     
     audioToggleButton           = nullptr;
     loadTrainingButton          = nullptr;
@@ -180,22 +180,22 @@ void MainContentComponent::buttonClicked(Button* buttonThatWasClicked)
 {
     if (buttonThatWasClicked == audioToggleButton) {
         
-        if (mpAudioStream == nullptr)
-        {
-            mpAudioStream = new AudioStream(deviceManager, deviceSetup, 0);
-            audioToggleButton->setButtonText("Audio On");
-            audioToggleButton->setColour (TextButton::buttonColourId, Colours::lightgrey);
-            
-            velocitySensitivitySlider->setValue(mpAudioStream->onsetClassifier->getVelocitySensitivity());
-            decayTimeSensitivitySlider->setValue(mpAudioStream->onsetClassifier->getDecayTimeSensitivity());
-        }
-        
-        else
-        {
-            mpAudioStream = nullptr;
-            audioToggleButton->setButtonText("Audio Off");
-            audioToggleButton->setColour (TextButton::buttonColourId, Colours::darkgrey);
-        }
+//        if (mpAudioStream == nullptr)
+//        {
+//            mpAudioStream = new AudioStream(deviceManager, deviceSetup, 0);
+//            audioToggleButton->setButtonText("Audio On");
+//            audioToggleButton->setColour (TextButton::buttonColourId, Colours::lightgrey);
+//            
+//            velocitySensitivitySlider->setValue(mpAudioStream->onsetClassifier->getVelocitySensitivity());
+//            decayTimeSensitivitySlider->setValue(mpAudioStream->onsetClassifier->getDecayTimeSensitivity());
+//        }
+//        
+//        else
+//        {
+//            mpAudioStream = nullptr;
+//            audioToggleButton->setButtonText("Audio Off");
+//            audioToggleButton->setColour (TextButton::buttonColourId, Colours::darkgrey);
+//        }
         
     }
     
@@ -235,19 +235,19 @@ void MainContentComponent::buttonClicked(Button* buttonThatWasClicked)
     
     if (buttonThatWasClicked == trainClass1Button) {
         
-        if (mpAudioStream == nullptr)
-        {
-            mpAudioStream = new AudioStream(deviceManager, deviceSetup, 1);
-            trainClass1Button->setButtonText("Click When Done...");
-            trainClass1Button->setColour (TextButton::buttonColourId, Colours::lightgrey);
-        }
-        
-        else
-        {
-            mpAudioStream = nullptr;
-            trainClass1Button->setButtonText("Train Class 1");
-            trainClass1Button->setColour (TextButton::buttonColourId, Colours::darkgrey);
-        }
+//        if (mpAudioStream == nullptr)
+//        {
+//            mpAudioStream = new AudioStream(deviceManager, deviceSetup, 1);
+//            trainClass1Button->setButtonText("Click When Done...");
+//            trainClass1Button->setColour (TextButton::buttonColourId, Colours::lightgrey);
+//        }
+//        
+//        else
+//        {
+//            mpAudioStream = nullptr;
+//            trainClass1Button->setButtonText("Train Class 1");
+//            trainClass1Button->setColour (TextButton::buttonColourId, Colours::darkgrey);
+//        }
         
     }
     
@@ -255,19 +255,19 @@ void MainContentComponent::buttonClicked(Button* buttonThatWasClicked)
     
     if (buttonThatWasClicked == trainClass2Button) {
         
-        if (mpAudioStream == nullptr)
-        {
-            mpAudioStream = new AudioStream(deviceManager, deviceSetup, 2);
-            trainClass2Button->setButtonText("Click When Done...");
-            trainClass2Button->setColour (TextButton::buttonColourId, Colours::lightgrey);
-        }
-        
-        else
-        {
-            mpAudioStream = nullptr;
-            trainClass2Button->setButtonText("Train Class 2");
-            trainClass2Button->setColour (TextButton::buttonColourId, Colours::darkgrey);
-        }
+//        if (mpAudioStream == nullptr)
+//        {
+//            mpAudioStream = new AudioStream(deviceManager, deviceSetup, 2);
+//            trainClass2Button->setButtonText("Click When Done...");
+//            trainClass2Button->setColour (TextButton::buttonColourId, Colours::lightgrey);
+//        }
+//        
+//        else
+//        {
+//            mpAudioStream = nullptr;
+//            trainClass2Button->setButtonText("Train Class 2");
+//            trainClass2Button->setColour (TextButton::buttonColourId, Colours::darkgrey);
+//        }
         
     }
     
@@ -275,19 +275,19 @@ void MainContentComponent::buttonClicked(Button* buttonThatWasClicked)
     
     if (buttonThatWasClicked == trainClass3Button) {
         
-        if (mpAudioStream == nullptr)
-        {
-            mpAudioStream = new AudioStream(deviceManager, deviceSetup, 3);
-            trainClass3Button->setButtonText("Click When Done...");
-            trainClass3Button->setColour (TextButton::buttonColourId, Colours::lightgrey);
-        }
-        
-        else
-        {
-            mpAudioStream = nullptr;
-            trainClass3Button->setButtonText("Train Class 3");
-            trainClass3Button->setColour (TextButton::buttonColourId, Colours::darkgrey);
-        }
+//        if (mpAudioStream == nullptr)
+//        {
+//            mpAudioStream = new AudioStream(deviceManager, deviceSetup, 3);
+//            trainClass3Button->setButtonText("Click When Done...");
+//            trainClass3Button->setColour (TextButton::buttonColourId, Colours::lightgrey);
+//        }
+//        
+//        else
+//        {
+//            mpAudioStream = nullptr;
+//            trainClass3Button->setButtonText("Train Class 3");
+//            trainClass3Button->setColour (TextButton::buttonColourId, Colours::darkgrey);
+//        }
         
     }
     
@@ -329,19 +329,19 @@ void MainContentComponent::buttonClicked(Button* buttonThatWasClicked)
 
 void MainContentComponent::sliderValueChanged(Slider* sliderValueThatHasChanged)
 {
-    if(sliderValueThatHasChanged == velocitySensitivitySlider)
-    {
-        if (mpAudioStream != nullptr) {
-            mpAudioStream->onsetClassifier->setVelocitySensitivity(velocitySensitivitySlider->getValue());
-        }
-        
-    }
-    
-    else if(sliderValueThatHasChanged == decayTimeSensitivitySlider)
-    {
-        if (mpAudioStream != nullptr) {
-            mpAudioStream->onsetClassifier->setDecayTimeSensitivity(decayTimeSensitivitySlider->getValue());
-        }
-    }
+//    if(sliderValueThatHasChanged == velocitySensitivitySlider)
+//    {
+//        if (mpAudioStream != nullptr) {
+//            mpAudioStream->onsetClassifier->setVelocitySensitivity(velocitySensitivitySlider->getValue());
+//        }
+//        
+//    }
+//    
+//    else if(sliderValueThatHasChanged == decayTimeSensitivitySlider)
+//    {
+//        if (mpAudioStream != nullptr) {
+//            mpAudioStream->onsetClassifier->setDecayTimeSensitivity(decayTimeSensitivitySlider->getValue());
+//        }
+//    }
 }
 

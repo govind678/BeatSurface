@@ -39,18 +39,30 @@
               file="Source/Core/OnsetClassification.h"/>
       </GROUP>
       <GROUP id="{9CEC19B4-A885-4836-F23B-278DA0E0F986}" name="Interface">
+        <FILE id="H8oBmA" name="BeatSurface.cpp" compile="1" resource="0" file="Source/Interface/BeatSurface.cpp"/>
+        <FILE id="Gy0tDs" name="BeatSurface.h" compile="0" resource="0" file="Source/Interface/BeatSurface.h"/>
         <FILE id="zzA3o8" name="Main.cpp" compile="1" resource="0" file="Source/Interface/Main.cpp"/>
         <FILE id="AZAQla" name="MainComponent.cpp" compile="1" resource="0"
               file="Source/Interface/MainComponent.cpp"/>
         <FILE id="ZssnBo" name="MainComponent.h" compile="0" resource="0" file="Source/Interface/MainComponent.h"/>
       </GROUP>
       <GROUP id="{BD5527BA-A757-C118-4B4C-9F1C5970EE77}" name="Wrappers">
+        <FILE id="UzrPNN" name="ParseCSV.cpp" compile="1" resource="0" file="Source/Wrappers/ParseCSV.cpp"/>
+        <FILE id="noEi4E" name="ParseCSV.h" compile="0" resource="0" file="Source/Wrappers/ParseCSV.h"/>
+        <GROUP id="{859071F4-A2C7-CD34-E893-7E0F2A7536C0}" name="LibSVM">
+          <FILE id="NKoJeT" name="SVMBase.cpp" compile="1" resource="0" file="Source/Wrappers/LibSVM/SVMBase.cpp"/>
+          <FILE id="v4jgCQ" name="SVMBase.h" compile="0" resource="0" file="Source/Wrappers/LibSVM/SVMBase.h"/>
+          <FILE id="EvOCvP" name="SVMClassify.cpp" compile="1" resource="0" file="Source/Wrappers/LibSVM/SVMClassify.cpp"/>
+          <FILE id="t3AsKa" name="SVMClassify.h" compile="0" resource="0" file="Source/Wrappers/LibSVM/SVMClassify.h"/>
+          <FILE id="xOYDvY" name="SVMEvaluate.cpp" compile="1" resource="0" file="Source/Wrappers/LibSVM/SVMEvaluate.cpp"/>
+          <FILE id="UEhQHT" name="SVMEvaluate.h" compile="0" resource="0" file="Source/Wrappers/LibSVM/SVMEvaluate.h"/>
+          <FILE id="z7gUZA" name="SVMTrain.cpp" compile="1" resource="0" file="Source/Wrappers/LibSVM/SVMTrain.cpp"/>
+          <FILE id="WKmyA6" name="SVMTrain.h" compile="0" resource="0" file="Source/Wrappers/LibSVM/SVMTrain.h"/>
+        </GROUP>
         <FILE id="Dea1Q9" name="ShortTermFourierTransform.cpp" compile="1"
               resource="0" file="Source/Wrappers/ShortTermFourierTransform.cpp"/>
         <FILE id="vkQ81q" name="ShortTermFourierTransform.h" compile="0" resource="0"
               file="Source/Wrappers/ShortTermFourierTransform.h"/>
-        <FILE id="YIj5uU" name="SVMModel.cpp" compile="1" resource="0" file="Source/Wrappers/SVMModel.cpp"/>
-        <FILE id="Omi3V4" name="SVMModel.h" compile="0" resource="0" file="Source/Wrappers/SVMModel.h"/>
       </GROUP>
     </GROUP>
   </MAINGROUP>

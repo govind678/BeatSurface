@@ -68,6 +68,7 @@ public:
             setContentOwned (new MainContentComponent(), true);
 
             centreWithSize (getWidth(), getHeight());
+            setUsingNativeTitleBar(true);
             setVisible (true);
         }
 

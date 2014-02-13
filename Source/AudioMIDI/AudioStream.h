@@ -12,7 +12,6 @@
 #define AUDIOSTREAM_H_INCLUDED
 
 #include "JuceHeader.h"
-#include "OnsetClassification.h"
 
 
 
@@ -22,7 +21,7 @@ class AudioStream : public AudioIODeviceCallback,
     
 public:
     
-    AudioStream(AudioDeviceManager& deviceManager, AudioDeviceManager::AudioDeviceSetup deviceSetup, int training);
+    AudioStream(AudioDeviceManager& deviceManager, AudioDeviceManager::AudioDeviceSetup deviceSetup);
     ~AudioStream();
     
     void audioDeviceIOCallback(const float** inputChannelData,
@@ -36,7 +35,6 @@ public:
     
     void setMode(int currentMode);
     
-    OnsetClassification* onsetClassifier;
     
 private:
     
@@ -46,11 +44,6 @@ private:
     TimeSliceThread mAudioStreamThread;
     
     void timerCallback();
-    
-    int miPredictedClass;
-    int miOnsetCounter;
-    
-    int miMode;
     
 };
 

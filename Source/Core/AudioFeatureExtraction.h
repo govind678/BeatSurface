@@ -12,9 +12,10 @@
 #define AUDIOFEATUREEXTRACTION_H_INCLUDED
 
 #include <cmath>
+#include "OnsetClassification.h"
 
 
-class AudioFeatureExtraction
+class AudioFeatureExtraction 
 {
     
 public:

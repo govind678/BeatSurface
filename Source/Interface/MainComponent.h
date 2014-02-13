@@ -10,10 +10,7 @@
 #define MAINCOMPONENT_H_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "AudioStream.h"
-#include "AudioFileIO.h"
-
-#include <fstream>
+#include "BeatSurface.h"
 
 
 //==============================================================================
@@ -61,13 +58,15 @@ private:
     
     
     
+    //--- Interface ---//
+    BeatSurface* beatSurface;
+    
+    
     //--- Audio ---//
     int iNumInputChannels;
     int iNumOutputChannels;
     AudioDeviceManager deviceManager;
     AudioDeviceManager::AudioDeviceSetup deviceSetup;
-    
-    ScopedPointer<AudioStream> mpAudioStream;
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)

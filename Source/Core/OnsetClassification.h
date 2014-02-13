@@ -19,8 +19,8 @@
 #include <stdio.h>
 
 
-#include "ShortTermFourierTransform.h"
 #include "AudioFeatureExtraction.h"
+#include "ShortTermFourierTransform.h"
 #include "KNNClassifier.h"
 
 
@@ -89,7 +89,7 @@ private:
     
     
     ShortTermFourierTransform* stft;
-    AudioFeatureExtraction* audioFeature;
+//    AudioFeatureExtraction* audioFeature;
     KNNClassifier* knnClassifier;
 
     

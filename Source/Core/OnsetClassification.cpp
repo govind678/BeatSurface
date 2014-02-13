@@ -27,7 +27,7 @@ OnsetClassification::OnsetClassification(int blockSize, int numChannels, float s
     mpPreviousRealFFT   = new float[miBinSize];
     
     stft = new ShortTermFourierTransform(miBlockSize);
-    audioFeature = new AudioFeatureExtraction(miBlockSize);
+//    audioFeature = new AudioFeatureExtraction(miBlockSize);
     
     
     for (int bin = 0; bin < miBinSize; bin++) {
@@ -116,7 +116,7 @@ OnsetClassification::~OnsetClassification()
     
     
     delete stft;
-    delete audioFeature;
+//    delete audioFeature;
 
 }
 
@@ -197,7 +197,7 @@ bool OnsetClassification::detectOnset(const float **input)
     
     
     //--- Compute Spectral Flux ---//
-    mfNoveltyFunction = audioFeature->spectralFlux(mpPreviousRealFFT, mpCurrentRealFFT);
+//    mfNoveltyFunction = audioFeature->spectralFlux(mpPreviousRealFFT, mpCurrentRealFFT);
     
     
     

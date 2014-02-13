@@ -9,22 +9,18 @@
 */
 
 #include "AudioStream.h"
-#include <iostream>
-#include <stdio.h>
 
 
-AudioStream::AudioStream(AudioDeviceManager& deviceManager, AudioDeviceManager::AudioDeviceSetup deviceSetup, int training) :
+AudioStream::AudioStream(AudioDeviceManager& deviceManager, AudioDeviceManager::AudioDeviceSetup deviceSetup) :
                             mDeviceManager(deviceManager),
                             mAudioStreamThread("Audio IO")
 {
     deviceManager.addAudioCallback(this);
     mAudioStreamThread.startThread(8);       // Priority : 8/10
     
-    miMode = training;
-    
-    onsetClassifier = new OnsetClassification(deviceSetup.bufferSize, deviceSetup.inputChannels.toInteger(), deviceSetup.sampleRate);
-    
-    miOnsetCounter = 0;
+//    onsetClassifier = new OnsetClassification(deviceSetup.bufferSize, deviceSetup.inputChannels.toInteger(), deviceSetup.sampleRate);
+//    
+//    miOnsetCounter = 0;
 }
 
 
@@ -34,7 +30,7 @@ AudioStream::~AudioStream()
     mDeviceManager.removeAudioCallback(this);
     mAudioStreamThread.stopThread(20);
     
-    delete onsetClassifier;
+//    delete onsetClassifier;
 }
 
 
@@ -106,9 +102,9 @@ void AudioStream::audioDeviceIOCallback( const float** inputChannelData,
 //            break;
 //    }
     
-    if (onsetClassifier->process(inputChannelData) != 0) {
-        std::cout << "Bang" << std::endl;
-    }
+//    if (onsetClassifier->process(inputChannelData) != 0) {
+//        std::cout << "Bang" << std::endl;
+//    }
     
     
     
