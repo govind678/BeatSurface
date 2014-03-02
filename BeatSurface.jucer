@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="PLMz1Z" name="BeatSurface" projectType="guiapp" version="1.0.0"
+<JUCERPROJECT id="PLMz1Z" name="BeatSurface" projectType="guiapp" version="1.0.2"
               bundleIdentifier="com.gtcmt.BeatSurface" includeBinaryInAppConfig="1"
-              jucerVersion="3.1.0">
+              jucerVersion="3.1.0" companyName="GTCMT">
   <MAINGROUP id="i5OsMR" name="BeatSurface">
+    <GROUP id="{99C760B5-49A5-C6CC-B929-C97C863BD7F4}" name="Media">
+      <GROUP id="{AB1409C0-3623-F216-B48F-0F515C545AF2}" name="Images">
+        <FILE id="aHAdaI" name="DeleteClass128.png" compile="0" resource="1"
+              file="Media/Images/DeleteClass128.png"/>
+        <FILE id="l7wIV4" name="Stop128.png" compile="0" resource="1" file="Media/Images/Stop128.png"/>
+        <FILE id="CFdv1Y" name="AddClass128.png" compile="0" resource="1" file="Media/Images/AddClass128.png"/>
+        <FILE id="MxdPsn" name="Play128.png" compile="0" resource="1" file="Media/Images/Play128.png"/>
+        <FILE id="PPtdm4" name="Icon32.png" compile="0" resource="1" file="Media/Images/Icon32.png"/>
+        <FILE id="cU9Cy8" name="Icon64.png" compile="0" resource="1" file="Media/Images/Icon64.png"/>
+      </GROUP>
+    </GROUP>
     <GROUP id="{98997E0D-A27E-A0C0-0E31-0416ADC5D470}" name="Libraries">
       <GROUP id="{59C62F5D-2BB6-E120-81AD-51CE1283B8D8}" name="LibSVM">
         <FILE id="CiYsK1" name="svm.cpp" compile="1" resource="0" file="../../../../Libraries/libsvm-3.17/svm.cpp"/>
@@ -15,6 +26,40 @@
       </GROUP>
     </GROUP>
     <GROUP id="{F1FCD9B9-8C57-44CA-6B2F-0D3425B71DA6}" name="Source">
+      <GROUP id="{1C8FE2E2-4D8A-7A17-278A-C53E16AF9CAC}" name="Application">
+        <FILE id="BWoeMK" name="BeatSurfaceHeader.h" compile="0" resource="0"
+              file="Source/Application/BeatSurfaceHeader.h"/>
+        <FILE id="FvdbBj" name="CommandIDs.h" compile="0" resource="0" file="Source/Application/CommandIDs.h"/>
+        <FILE id="C6EU9R" name="Main.cpp" compile="1" resource="0" file="Source/Application/Main.cpp"/>
+        <FILE id="urD6bo" name="MainAppWindow.cpp" compile="1" resource="0"
+              file="Source/Application/MainAppWindow.cpp"/>
+        <FILE id="LSu9ZL" name="MainAppWindow.h" compile="0" resource="0" file="Source/Application/MainAppWindow.h"/>
+      </GROUP>
+      <GROUP id="{EAD3B3F9-7F87-F24A-7300-BCE9AC3A595F}" name="GUI">
+        <FILE id="B5mfaQ" name="MainComponent.cpp" compile="1" resource="0"
+              file="Source/GUI/MainComponent.cpp"/>
+        <FILE id="Y1ma4l" name="MainComponent.h" compile="0" resource="0" file="Source/GUI/MainComponent.h"/>
+        <FILE id="Ib18OB" name="PlayContentComponent.cpp" compile="1" resource="0"
+              file="Source/GUI/PlayContentComponent.cpp"/>
+        <FILE id="Q6qIHn" name="PlayContentComponent.h" compile="0" resource="0"
+              file="Source/GUI/PlayContentComponent.h"/>
+        <FILE id="WdFKkB" name="SettingsContentComponent.cpp" compile="1" resource="0"
+              file="Source/GUI/SettingsContentComponent.cpp"/>
+        <FILE id="UtMFJx" name="SettingsContentComponent.h" compile="0" resource="0"
+              file="Source/GUI/SettingsContentComponent.h"/>
+        <FILE id="Pr4tHv" name="TrainContentComponent.cpp" compile="1" resource="0"
+              file="Source/GUI/TrainContentComponent.cpp"/>
+        <FILE id="LV2yVN" name="TrainContentComponent.h" compile="0" resource="0"
+              file="Source/GUI/TrainContentComponent.h"/>
+        <FILE id="xIhDeE" name="AudioLiveScrollDisplay.h" compile="0" resource="0"
+              file="Source/GUI/AudioLiveScrollDisplay.h"/>
+        <FILE id="HKNJKK" name="CustomShapeButton.cpp" compile="1" resource="0"
+              file="Source/GUI/CustomShapeButton.cpp"/>
+        <FILE id="ho3fn6" name="CustomShapeButton.h" compile="0" resource="0"
+              file="Source/GUI/CustomShapeButton.h"/>
+        <FILE id="vQj2dc" name="TestGUI.cpp" compile="1" resource="0" file="Source/GUI/TestGUI.cpp"/>
+        <FILE id="IxC6z2" name="TestGUI.h" compile="0" resource="0" file="Source/GUI/TestGUI.h"/>
+      </GROUP>
       <GROUP id="{F642FE37-2F2F-BB70-114B-D2BFF408B59B}" name="AudioMIDI">
         <FILE id="kWr4XX" name="AudioFileIO.cpp" compile="1" resource="0" file="Source/AudioMIDI/AudioFileIO.cpp"/>
         <FILE id="bFaXVK" name="AudioFileIO.h" compile="0" resource="0" file="Source/AudioMIDI/AudioFileIO.h"/>
@@ -26,29 +71,23 @@
         <FILE id="IpJGT9" name="MidiOut.h" compile="0" resource="0" file="Source/AudioMIDI/MidiOut.h"/>
       </GROUP>
       <GROUP id="{CC107002-AE16-041F-9119-C10C5FC8992D}" name="Core">
-        <FILE id="caVcA0" name="AudioFeatureExtraction.cpp" compile="1" resource="0"
+        <FILE id="OSGBgM" name="AudioFeatureExtraction.cpp" compile="1" resource="0"
               file="Source/Core/AudioFeatureExtraction.cpp"/>
-        <FILE id="xOpOwR" name="AudioFeatureExtraction.h" compile="0" resource="0"
+        <FILE id="aVRo1y" name="AudioFeatureExtraction.h" compile="0" resource="0"
               file="Source/Core/AudioFeatureExtraction.h"/>
-        <FILE id="W7IUEX" name="KNNClassifier.cpp" compile="1" resource="0"
+        <FILE id="N0m9GY" name="BeatSurfaceEngine.cpp" compile="1" resource="0"
+              file="Source/Core/BeatSurfaceEngine.cpp"/>
+        <FILE id="Xxdxod" name="BeatSurfaceEngine.h" compile="0" resource="0"
+              file="Source/Core/BeatSurfaceEngine.h"/>
+        <FILE id="r6nRMT" name="KNNClassifier.cpp" compile="1" resource="0"
               file="Source/Core/KNNClassifier.cpp"/>
-        <FILE id="DxnDoO" name="KNNClassifier.h" compile="0" resource="0" file="Source/Core/KNNClassifier.h"/>
-        <FILE id="bTvw0I" name="OnsetClassification.cpp" compile="1" resource="0"
+        <FILE id="itXRft" name="KNNClassifier.h" compile="0" resource="0" file="Source/Core/KNNClassifier.h"/>
+        <FILE id="BFV6gv" name="OnsetClassification.cpp" compile="1" resource="0"
               file="Source/Core/OnsetClassification.cpp"/>
-        <FILE id="ylmkT2" name="OnsetClassification.h" compile="0" resource="0"
+        <FILE id="ejQnVP" name="OnsetClassification.h" compile="0" resource="0"
               file="Source/Core/OnsetClassification.h"/>
       </GROUP>
-      <GROUP id="{9CEC19B4-A885-4836-F23B-278DA0E0F986}" name="Interface">
-        <FILE id="H8oBmA" name="BeatSurface.cpp" compile="1" resource="0" file="Source/Interface/BeatSurface.cpp"/>
-        <FILE id="Gy0tDs" name="BeatSurface.h" compile="0" resource="0" file="Source/Interface/BeatSurface.h"/>
-        <FILE id="zzA3o8" name="Main.cpp" compile="1" resource="0" file="Source/Interface/Main.cpp"/>
-        <FILE id="AZAQla" name="MainComponent.cpp" compile="1" resource="0"
-              file="Source/Interface/MainComponent.cpp"/>
-        <FILE id="ZssnBo" name="MainComponent.h" compile="0" resource="0" file="Source/Interface/MainComponent.h"/>
-      </GROUP>
       <GROUP id="{BD5527BA-A757-C118-4B4C-9F1C5970EE77}" name="Wrappers">
-        <FILE id="UzrPNN" name="ParseCSV.cpp" compile="1" resource="0" file="Source/Wrappers/ParseCSV.cpp"/>
-        <FILE id="noEi4E" name="ParseCSV.h" compile="0" resource="0" file="Source/Wrappers/ParseCSV.h"/>
         <GROUP id="{859071F4-A2C7-CD34-E893-7E0F2A7536C0}" name="LibSVM">
           <FILE id="NKoJeT" name="SVMBase.cpp" compile="1" resource="0" file="Source/Wrappers/LibSVM/SVMBase.cpp"/>
           <FILE id="v4jgCQ" name="SVMBase.h" compile="0" resource="0" file="Source/Wrappers/LibSVM/SVMBase.h"/>
@@ -59,6 +98,8 @@
           <FILE id="z7gUZA" name="SVMTrain.cpp" compile="1" resource="0" file="Source/Wrappers/LibSVM/SVMTrain.cpp"/>
           <FILE id="WKmyA6" name="SVMTrain.h" compile="0" resource="0" file="Source/Wrappers/LibSVM/SVMTrain.h"/>
         </GROUP>
+        <FILE id="UzrPNN" name="ParseCSV.cpp" compile="1" resource="0" file="Source/Wrappers/ParseCSV.cpp"/>
+        <FILE id="noEi4E" name="ParseCSV.h" compile="0" resource="0" file="Source/Wrappers/ParseCSV.h"/>
         <FILE id="Dea1Q9" name="ShortTermFourierTransform.cpp" compile="1"
               resource="0" file="Source/Wrappers/ShortTermFourierTransform.cpp"/>
         <FILE id="vkQ81q" name="ShortTermFourierTransform.h" compile="0" resource="0"
@@ -67,7 +108,7 @@
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX">
+    <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="PPtdm4" bigIcon="cU9Cy8">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="default" osxArchitecture="default"
                        isDebug="1" optimisation="1" targetName="BeatSurface"/>
@@ -86,6 +127,7 @@
         <MODULEPATH id="juce_audio_devices" path="../../../../Libraries/JUCE/modules"/>
         <MODULEPATH id="juce_audio_formats" path="../../../../Libraries/JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../../Libraries/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
   </EXPORTFORMATS>
@@ -94,6 +136,7 @@
     <MODULES id="juce_audio_devices" showAllCode="1" useLocalCopy="1"/>
     <MODULES id="juce_audio_formats" showAllCode="1" useLocalCopy="1"/>
     <MODULES id="juce_audio_processors" showAllCode="1" useLocalCopy="1"/>
+    <MODULES id="juce_audio_utils" showAllCode="1" useLocalCopy="1"/>
     <MODULES id="juce_core" showAllCode="1" useLocalCopy="1"/>
     <MODULES id="juce_cryptography" showAllCode="1" useLocalCopy="1"/>
     <MODULES id="juce_data_structures" showAllCode="1" useLocalCopy="1"/>

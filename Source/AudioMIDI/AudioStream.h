@@ -13,7 +13,7 @@
 
 #include "JuceHeader.h"
 
-
+class OnsetClassification;
 
 class AudioStream : public AudioIODeviceCallback,
                     private Timer
@@ -21,7 +21,7 @@ class AudioStream : public AudioIODeviceCallback,
     
 public:
     
-    AudioStream(AudioDeviceManager& deviceManager, AudioDeviceManager::AudioDeviceSetup deviceSetup);
+    AudioStream();
     ~AudioStream();
     
     void audioDeviceIOCallback(const float** inputChannelData,
@@ -39,9 +39,10 @@ public:
 private:
     
     
-    AudioDeviceManager& mDeviceManager;
-    
     TimeSliceThread mAudioStreamThread;
+    
+    static const int miStopThreadTimeOut_ms = 20;
+    static const int miAudioThreadPriority  = 8;
     
     void timerCallback();
     

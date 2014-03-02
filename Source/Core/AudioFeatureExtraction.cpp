@@ -11,22 +11,17 @@
 #include "AudioFeatureExtraction.h"
 
 
-//AudioFeatureExtraction::AudioFeatureExtraction(int blockSize) 
-//{
-//    miBlockSize = blockSize;
-//    miBinSize = (miBlockSize/2) + 1;
-//    
-//    mfSpectralSum = 0;
-//    mfSpectralDifference = 0;
-//    
-//    kfLowpassEnvelope = 0.5;
-//    
-//}
-
 AudioFeatureExtraction::AudioFeatureExtraction(int blockSize)
 {
+    miBlockSize = blockSize;
+    miBinSize = (miBlockSize/2) + 1;
+    
+    mfSpectralSum = 0;
+    mfSpectralDifference = 0;
+
     
 }
+
 
 AudioFeatureExtraction::~AudioFeatureExtraction()
 {

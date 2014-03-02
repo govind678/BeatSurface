@@ -12,16 +12,15 @@
 #define AUDIOFEATUREEXTRACTION_H_INCLUDED
 
 #include <cmath>
-#include "OnsetClassification.h"
 
 
-class AudioFeatureExtraction 
+class AudioFeatureExtraction
 {
-    
 public:
     
     AudioFeatureExtraction(int blockSize);
     ~AudioFeatureExtraction();
+    
     
     float spectralFlux(float* previousRealFFT, float* currentRealFFT);
     
@@ -31,14 +30,11 @@ private:
     float mfSpectralSum;
     float mfSpectralDifference;
     
-    float kfLowpassEnvelope;
-    
     int miBlockSize;
     int miBinSize;
+
     
 };
-
-
 
 
 #endif  // AUDIOFEATUREEXTRACTION_H_INCLUDED

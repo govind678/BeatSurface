@@ -11,33 +11,25 @@
 #include "AudioStream.h"
 
 
-AudioStream::AudioStream(AudioDeviceManager& deviceManager, AudioDeviceManager::AudioDeviceSetup deviceSetup) :
-                            mDeviceManager(deviceManager),
-                            mAudioStreamThread("Audio IO")
+AudioStream::AudioStream() : mAudioStreamThread("Audio IO")
 {
-    deviceManager.addAudioCallback(this);
-    mAudioStreamThread.startThread(8);       // Priority : 8/10
-    
-//    onsetClassifier = new OnsetClassification(deviceSetup.bufferSize, deviceSetup.inputChannels.toInteger(), deviceSetup.sampleRate);
-//    
-//    miOnsetCounter = 0;
+    mAudioStreamThread.startThread(miAudioThreadPriority);
 }
 
 
 
 AudioStream::~AudioStream()
 {
-    mDeviceManager.removeAudioCallback(this);
-    mAudioStreamThread.stopThread(20);
-    
-//    delete onsetClassifier;
+    mAudioStreamThread.stopThread(miStopThreadTimeOut_ms);
 }
+
 
 
 void AudioStream::audioDeviceAboutToStart(AudioIODevice* device)
 {
     
 }
+
 
 
 void AudioStream::audioDeviceStopped()
@@ -47,73 +39,21 @@ void AudioStream::audioDeviceStopped()
 
 
 
+
 void AudioStream::audioDeviceIOCallback( const float** inputChannelData,
                                         int totalNumInputChannels,
                                         float** outputChannelData,
                                         int totalNumOutputChannels,
                                         int blockSize)
 {
+    //OnsetClassification::detectOnset(inputChannelData);
     
-    //AudioSampleBuffer sampleBuffer = AudioSampleBuffer(outputChannelData, totalNumOutputChannels, blockSize);
-    
-    
-    /*** Audio Processing ***/
-
-//    switch (miMode) {
-//        
-//        //--- Run ---//
-//        case 0:
-//            
-//            miPredictedClass = onsetClassifier->process(inputChannelData);
-//            
-//            if (miPredictedClass != 0) {
-//                std::cout << miPredictedClass << std::endl;
-//            }
-//            
-//            break;
-//            
-//        
-//        
-//        //--- Train ---//
-//            
-//        case 1:
-//            
-//            onsetClassifier->train(inputChannelData, miMode);
-//    
-//            break;
-//            
-//        
-//        case 2:
-//            
-//            onsetClassifier->train(inputChannelData, miMode);
-//            
-//            break;
-//            
-//            
-//        case 3:
-//            
-//            onsetClassifier->train(inputChannelData, miMode);
-//            
-//            break;
-//            
-//            
-//        default:
-//        
-//            break;
-//    }
-    
-//    if (onsetClassifier->process(inputChannelData) != 0) {
-//        std::cout << "Bang" << std::endl;
-//    }
-    
-    
-    
-    for (int sample = 0; sample < blockSize; sample++) {
+    for (int sample = 0; sample < blockSize; sample++)
+    {
         
-        for (int channel = 0; channel < totalNumOutputChannels; channel++) {
-            
+        for (int channel = 0; channel < totalNumOutputChannels; channel++)
+        {
             outputChannelData[channel][sample] = inputChannelData[channel][sample];
-        
         }
         
     }

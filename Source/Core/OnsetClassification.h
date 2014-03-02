@@ -19,9 +19,9 @@
 #include <stdio.h>
 
 
-#include "AudioFeatureExtraction.h"
 #include "ShortTermFourierTransform.h"
-#include "KNNClassifier.h"
+#include "AudioFeatureExtraction.h"
+//#include "KNNClassifier.h"
 
 
 #define MAX_DECAY_WINDOW_BLOCKS     25          // For Block Size of 512 ~ 250 ms
@@ -73,8 +73,8 @@ private:
     
     
     //--- Spectrum Bandwidth ---//
-    int miLowLimit;
-    int miHighLimit;
+    int miFrequencyBinLowLimit;
+    int miFrequencyBinHighLimit;
     int miNumFeatures;
     
     
@@ -89,8 +89,8 @@ private:
     
     
     ShortTermFourierTransform* stft;
-//    AudioFeatureExtraction* audioFeature;
-    KNNClassifier* knnClassifier;
+    AudioFeatureExtraction* audioFeature;
+//    KNNClassifier* knnClassifier;
 
     
     bool detectOnset(const float** input);
@@ -102,29 +102,29 @@ private:
     float mfSampleRate;
     
     
-    std::ofstream spTrainingFile1;
-    std::ofstream spTrainingFile2;
-    std::ofstream spTrainingFile3;
+//    std::ofstream spTrainingFile1;
+//    std::ofstream spTrainingFile2;
+//    std::ofstream spTrainingFile3;
     
-    std::ofstream spOutputFile;
+//    std::ofstream spOutputFile;
     
-    std::string sTrainingPath;
-    std::string sOutputFilePath;
+//    std::string sTrainingPath;
+//    std::string sOutputFilePath;
 
     
-    float** mpTrainingMatrix1;
-    float** mpTrainingMatrix2;
-    float** mpTrainingMatrix3;
+//    float** mpTrainingMatrix1;
+//    float** mpTrainingMatrix2;
+//    float** mpTrainingMatrix3;
 
     
-    int miNumOnsets1;
-    int miNumOnsets2;
-    int miNumOnsets3;
+//    int miNumOnsets1;
+//    int miNumOnsets2;
+//    int miNumOnsets3;
     
-    float** mpTrainingMatrix;
-    int* mpClassLabels;
-    float* mpTestVector;
-    int miK;
+//    float** mpTrainingMatrix;
+//    int* mpClassLabels;
+//    float* mpTestVector;
+//    int miK;
     
 
 };
