@@ -14,15 +14,6 @@
 
 PlayContentComponent::PlayContentComponent ()
 {
-    liveAudioScroller = new LiveScrollingAudioDisplay;
-    
-//    addAndMakeVisible (liveStreamToggleButton = new TextButton ("liveStreamToggleButton"));
-//    liveStreamToggleButton->setButtonText (TRANS("Audio Off"));
-//    liveStreamToggleButton->setClickingTogglesState(true);
-//    liveStreamToggleButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
-//    liveStreamToggleButton->setColour (TextButton::buttonColourId, Colour (0xff3b3b3b));
-//    liveStreamToggleButton->setColour (TextButton::buttonOnColourId, Colour (0xff797979));
-    
     
     addAndMakeVisible (audioStreamToggleButton = new ImageButton ("playButton"));
     audioStreamToggleButton->setClickingTogglesState(true);
@@ -32,16 +23,22 @@ PlayContentComponent::PlayContentComponent ()
                                 ImageCache::getFromMemory (BinaryData::Stop128_png, BinaryData::Stop128_pngSize), 1.0f, Colour (0x00000000));
     
     
-    addAndMakeVisible(liveAudioScroller);
+    addAndMakeVisible(liveAudioScroller = new LiveScrollingAudioDisplay);
     
-    setSize (BeatSurfaceBase::iDocumentInitWidth, BeatSurfaceBase::iDocumentInitHeight);
+    
+    addAndMakeVisible(shapeButtonArray = new ClassButtonArray);
+
+    
+    setSize (getParentWidth(), getParentHeight());
 
 }
 
 PlayContentComponent::~PlayContentComponent()
 {
-    audioStreamToggleButton  = nullptr;
-    liveAudioScroller       = nullptr;
+    audioStreamToggleButton     = nullptr;
+    liveAudioScroller           = nullptr;
+    shapeButtonArray            = nullptr;
+
 }
 
 
@@ -56,17 +53,6 @@ void PlayContentComponent::resized()
     //liveStreamToggleButton->setBounds ((getWidth() / 2) - ((120) / 2), (getHeight() / 2) - ((40) / 2), 120, 40);
     liveAudioScroller->setBounds(0, 0, proportionOfWidth (0.5000f), proportionOfHeight (0.2000f));
     audioStreamToggleButton->setBounds(5, getHeight()/2 , 64, 64);
+    shapeButtonArray->setBounds(getWidth()/2 - getHeight()/4, getHeight()/2 - getHeight()/4 + 30, getHeight()/2, getHeight()/2);
 }
 
-
-
-bool PlayContentComponent::keyPressed (const KeyPress& key)
-{
-    return false;  // Return true if your handler uses this key event, or false to allow it to be passed-on.
-}
-
-
-bool PlayContentComponent::keyStateChanged (const bool isKeyDown)
-{
-    return false;  // Return true if your handler uses this key event, or false to allow it to be passed-on.
-}

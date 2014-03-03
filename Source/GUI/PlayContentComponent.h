@@ -29,15 +29,13 @@ public:
 
     void paint (Graphics& g);
     void resized();
-//    void buttonClicked (Button* buttonThatWasClicked);
-    bool keyPressed (const KeyPress& key);
-    bool keyStateChanged (const bool isKeyDown);
     
     
     
 private:
     
-    //ScopedPointer<TextButton>                   liveStreamToggleButton;
+    ScopedPointer<ClassButtonArray>             shapeButtonArray;
+    
     ScopedPointer<ImageButton>                  audioStreamToggleButton;
     ScopedPointer<LiveScrollingAudioDisplay>    liveAudioScroller;
     

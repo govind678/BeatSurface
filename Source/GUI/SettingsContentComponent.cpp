@@ -76,7 +76,7 @@ SettingsContentComponent::SettingsContentComponent ()
     decayTimeSensitivityLabel->setColour (TextEditor::highlightColourId, Colour (0x00000000));
 
 
-    setSize (BeatSurfaceBase::iDocumentInitWidth, BeatSurfaceBase::iDocumentInitHeight);
+    setSize (getParentWidth(), getParentHeight());
 }
 
 

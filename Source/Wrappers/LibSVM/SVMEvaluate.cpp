@@ -26,23 +26,23 @@ SVMEvaluate::~SVMEvaluate()
 SVMBase::Error_t SVMEvaluate::crossValidationOnTrainingDataset()
 {
     if (!m_bIsInitialized) {
-        std::cout << "Error: Instance not initialized" << std::endl;
+        std::cout << "@SVMEvaluate: Error: Instance not initialized" << std::endl;
         return kNotInitializedError;
     }
     
     if (!m_pSVMProblem) {
-        std::cout << "Error: SVM Problem" << std::endl;
+        std::cout << "@SVMEvaluate: Error: SVM Problem" << std::endl;
         return kUnknownError;
     }
     
     if (m_pSVMProblem->l <= 1) {
-        std::cout << "Error: SVM Problem Not Initialized" << std::endl;
+        std::cout << "@SVMEvaluate: Error: SVM Problem Not Initialized" << std::endl;
         return kNotInitializedError;
     }
     
     // verify parameter
     if (svm_check_parameter (m_pSVMProblem, m_pSVMParameters)) {
-        std::cout << "Error: Fail SVM Parameter Check" << std::endl;
+        std::cout << "@SVMEvaluate: Error: Fail SVM Parameter Check" << std::endl;
         return kUnknownError;
     }
     
@@ -155,8 +155,8 @@ SVMBase::Error_t SVMEvaluate::evaluationOnTestDataset(float **ppfTestDataset, fl
     }
     
     
-    std::cout << "Accuracy: " << accuracy << std::endl;
-    std::cout << "Confusion Matrix: " << std::endl;
+    std::cout << "@SVMEvaluate: Accuracy: " << accuracy << std::endl;
+    std::cout << "@SVMEvaluate: Confusion Matrix: " << std::endl;
     for (int i=0; i < m_pSVMModel->nr_class; i++) {
         for (int j=0; j < m_pSVMModel->nr_class; j++) {
             std::cout << ppfConfusionMatrix[i][j] << "\t";

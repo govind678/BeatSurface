@@ -16,8 +16,12 @@ AudioFeatureExtraction::AudioFeatureExtraction(int blockSize)
     miBlockSize = blockSize;
     miBinSize = (miBlockSize/2) + 1;
     
-    mfSpectralSum = 0;
-    mfSpectralDifference = 0;
+    mfFlux_SpectralSum              = 0.0f;
+    mfFlux_SpectralDifference       = 0.0f;
+    
+    mfCentroid_Numerator            = 0.0f;
+    mfCentroid_Denominator          = 0.0f;
+    mfCentroid_Square               = 0.0f;
 
     
 }
@@ -31,16 +35,41 @@ AudioFeatureExtraction::~AudioFeatureExtraction()
 
 float AudioFeatureExtraction::spectralFlux(float *previousRealFFT, float *currentRealFFT)
 {
-    mfSpectralSum = 0;
+    mfFlux_SpectralSum = 0.0f;
     
     for (int k = 0; k < miBinSize; k++) {
         
-        mfSpectralDifference = fabsf(currentRealFFT[k]) - fabsf(previousRealFFT[k]);
+        mfFlux_SpectralDifference = fabsf(currentRealFFT[k]) - fabsf(previousRealFFT[k]);
         
-        if (mfSpectralDifference > 0) {
-            mfSpectralSum = mfSpectralSum + ((k * mfSpectralDifference) * (k * mfSpectralDifference));
+        if (mfFlux_SpectralDifference > 0) {
+            mfFlux_SpectralSum = mfFlux_SpectralSum + ((k * mfFlux_SpectralDifference) * (k * mfFlux_SpectralDifference));
         }
     }
     
-    return sqrt(mfSpectralSum/miBinSize);
+    return sqrt(mfFlux_SpectralSum/miBinSize);
+}
+
+
+
+
+float AudioFeatureExtraction::spectralCentroid(float *currentRealFFT)
+{
+    mfCentroid_Numerator            = 0.0f;
+    mfCentroid_Denominator          = 0.0f;
+    
+    for (int k = 0; k < miBinSize; k++) {
+        
+        mfCentroid_Square = currentRealFFT[k] * currentRealFFT[k];
+        
+        mfCentroid_Numerator += k * mfCentroid_Square;
+        mfCentroid_Denominator += mfCentroid_Square;
+    }
+    
+    if (mfCentroid_Denominator == 0.0f) {
+        return 0.0f;
+    }
+    
+    else {
+        return (mfCentroid_Numerator / mfCentroid_Denominator);
+    }
 }

@@ -84,13 +84,13 @@ SVMBase::Error_t SVMTrain::setTrainingDataAndTrain(float **ppfFeatureData, float
     int i, iCurrCol = 0;
     
     if (!ppfFeatureData || !pfTargets) {
-        std::cout << "Error: Invalid Function Parameter" << std::endl;
+        std::cout << "@SVMTrain: Error: Invalid Function Parameter" << std::endl;
         return kInvalidFunctionParamError;
     }
     
     
     if (iNumFeatures <= 0 || iNumObservations <= 0) {
-        std::cout << "Error: Invalid Function Parameter" << std::endl;
+        std::cout << "@SVMTrain: Error: Invalid Function Parameter" << std::endl;
         return kInvalidFunctionParamError;
     }
     
@@ -102,7 +102,7 @@ SVMBase::Error_t SVMTrain::setTrainingDataAndTrain(float **ppfFeatureData, float
     m_pSVMProblem->x  = new svm_node* [iNumObservations];
     
     if (!m_pSVMProblem->y || !m_pSVMProblem->x) {
-        std::cout << "Error: Memory Error" << std::endl;
+        std::cout << "@SVMTrain: Error: Memory Error" << std::endl;
         return kMemError;
     }
     
@@ -111,7 +111,7 @@ SVMBase::Error_t SVMTrain::setTrainingDataAndTrain(float **ppfFeatureData, float
     {
         m_pSVMProblem->x[i]   = new svm_node [iNumFeatures+1];
         if (!m_pSVMProblem->x[i]) {
-            std::cout << "Error: Memory Error" << std::endl;
+            std::cout << "@SVMTrain: Error: Memory Error" << std::endl;
             return kMemError;
         }
     }
@@ -178,9 +178,16 @@ SVMBase::Error_t SVMTrain::setTrainingDataAndTrain(float **ppfFeatureData, float
 SVMBase::Error_t SVMTrain::saveModelToDisk(std::string modelFilePath)
 {
     if(svm_save_model((char*)modelFilePath.c_str(), m_pSVMModel)) {
-        std::cout << "Error: Cannot Save Model" << std::endl;
+        std::cout << "@SVMTrain: Error: Cannot Save Model" << std::endl;
         return kUnknownError;
     }
     
     return kNoError;
+}
+
+
+
+svm_model* SVMTrain::getCurrentSVMModel()
+{
+    return m_pSVMModel;
 }

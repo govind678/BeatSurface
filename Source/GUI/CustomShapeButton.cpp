@@ -50,9 +50,6 @@ void CustomShapeButton::setShape (const Path& newShape,
     {
         Rectangle<float> newBounds (shape.getBounds());
         
-//        shape.applyTransform (AffineTransform::translation (-newBounds.getX(),
-//                                                            -newBounds.getY()));
-        
         setSize (1 + (int) (newBounds.getWidth()  + outlineWidth) + border.getLeftAndRight(),
                  1 + (int) (newBounds.getHeight() + outlineWidth) + border.getTopAndBottom());
     }
@@ -100,5 +97,5 @@ void CustomShapeButton::resized()
 
 void CustomShapeButton::clicked(const juce::ModifierKeys &modifier)
 {
-    std:: cout << "Right: " << modifier.isRightButtonDown() << std::endl;
+    
 }

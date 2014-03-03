@@ -60,7 +60,7 @@ void ParseCSV::parseMatrix(std::string filename, float** data, int numRows, int 
     
     else
     {
-        std::cout << "Error: Opening File: " << filename << std::endl;
+        std::cout << "@ParseCSV: Error: Opening File: " << filename << std::endl;
     }
     
 }
@@ -93,7 +93,7 @@ void ParseCSV::parseList(std::string filename, float* data, int numRows)
     
     else
     {
-        std::cout << "Error: Opening File: " << filename << std::endl;
+        std::cout << "@ParseCSV: Error: Opening File: " << filename << std::endl;
     }
     
     
@@ -136,7 +136,7 @@ void ParseCSV::getFileSize(std::string filename, int& numRows, int& numColumns)
     
     else
     {
-        std::cout << "Error: Opening File: " << filename << std::endl;
+        std::cout << "@ParseCSV: Error: Opening File: " << filename << std::endl;
     }
     
 }
@@ -183,7 +183,7 @@ void ParseCSV::getMaxElementInFile(std::string filename, int& maxElement)
     
     else
     {
-        std::cout << "Error: Opening File: " << filename << std::endl;
+        std::cout << "@ParseCSV: Error: Opening File: " << filename << std::endl;
     }
     
     
@@ -232,7 +232,7 @@ void ParseCSV::getMaxElementInFile(std::string filename, double& maxElement)
     
     else
     {
-        std::cout << "Error: Opening File: " << filename << std::endl;
+        std::cout << "@ParseCSV: Error: Opening File: " << filename << std::endl;
     }
     
     

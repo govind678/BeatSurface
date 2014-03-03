@@ -11,8 +11,10 @@
 #ifndef TRAINCONTENTCOMPONENT_H_INCLUDED
 #define TRAINCONTENTCOMPONENT_H_INCLUDED
 
-
 #include "BeatSurfaceHeader.h"
+
+
+//========================================================================================================================
 
 class TrainContentComponent  :      public Component
 {
@@ -28,21 +30,25 @@ public:
     
     void paint (Graphics& g);
     void resized();
-    bool keyPressed (const KeyPress& key);
-    bool keyStateChanged (const bool isKeyDown);
-    
     
     
 private:
     
-    ScopedPointer<TextButton>       saveTrainingButton;
-    ScopedPointer<TextButton>       loadTrainingButton;
+    ScopedPointer<ClassButtonArray> shapeButtonArray;
+    
+    ScopedPointer<Component>        toolbarButtons;
     
     ScopedPointer<ImageButton>      addClassButton;
     ScopedPointer<ImageButton>      deleteClassButton;
     
+    ScopedPointer<ImageButton>      saveTrainingButton;
+    ScopedPointer<ImageButton>      loadTrainingButton;
+    
     ScopedPointer<Label>            addClassLabel;
     ScopedPointer<Label>            deleteClassLabel;
+    
+    ScopedPointer<Label>            saveTrainingLabel;
+    ScopedPointer<Label>            loadTrainingLabel;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TrainContentComponent)
 };

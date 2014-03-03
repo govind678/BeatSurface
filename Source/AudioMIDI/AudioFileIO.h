@@ -12,7 +12,7 @@
 #define AUDIOFILEIO_H_INCLUDED
 
 #include "JuceHeader.h"
-#include "OnsetClassification.h"
+//#include "OnsetClassification.h"
 
 
 class AudioFileIO
@@ -25,7 +25,7 @@ public:
     
     void runDetectionAndClassification();
     
-    OnsetClassification* onsetClassifier;
+    //OnsetClassification* onsetClassifier;
     
     
 private:

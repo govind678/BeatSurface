@@ -23,6 +23,11 @@ SVMClassify::~SVMClassify()
 {
     m_bIsInitialized    = false;
     
+    if (m_pdProbability != NULL) {
+        delete [] m_pdProbability;
+    }
+    m_pdProbability     = NULL;
+    
 }
 
 
@@ -92,7 +97,7 @@ SVMBase::Error_t SVMClassify::loadModelFromDisk(std::string modelFilePath)
 {
     
     if((m_pSVMModel = svm_load_model((char*)modelFilePath.c_str())) == 0) {
-        std::cout << "Error: Cannot Load SVM model" << std::endl;
+        std::cout << "@SVMClassify: Error: Cannot Load SVM model" << std::endl;
         return kUnknownError;
     }
     
@@ -100,4 +105,13 @@ SVMBase::Error_t SVMClassify::loadModelFromDisk(std::string modelFilePath)
     memset (m_pdProbability, 0, sizeof(double)*m_pSVMModel->nr_class);
     
     return kNoError;
+}
+
+
+void SVMClassify::setCurrentSVMModel(svm_model *model)
+{
+    m_pSVMModel = model;
+    
+    m_pdProbability = new double [m_pSVMModel->nr_class];
+    memset (m_pdProbability, 0, sizeof(double)*m_pSVMModel->nr_class);
 }

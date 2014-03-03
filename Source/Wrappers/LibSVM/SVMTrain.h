@@ -27,6 +27,9 @@ public:
     Error_t setTrainingDataAndTrain(float **ppfFeatureData, float *pfLabels, int iNumFeatures, int iNumObservations);
     Error_t setParameters(const SvmParameter_t &stSvmParam);
     Error_t saveModelToDisk(std::string modelFilePath);
+    svm_model*    getCurrentSVMModel();
+    
+    void clearModel();
     
     
 private:

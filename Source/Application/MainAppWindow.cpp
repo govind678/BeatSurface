@@ -13,6 +13,13 @@
 
 ScopedPointer<ApplicationCommandManager> commandManager;
 ScopedPointer<AudioDeviceManager> sharedAudioDeviceManager;
+ScopedPointer<GlobalClock>  globalClock;
+ScopedPointer<GUIUpdater>   guiUpdater;
+
+
+//--- Document Window Init Size ---//
+static const int iDocumentInitWidth                 = 1024;
+static const int iDocumentInitHeight                = 680;
 
 
 MainAppWindow::MainAppWindow()  : DocumentWindow (JUCEApplication::getInstance()->getApplicationName(),
@@ -30,7 +37,7 @@ MainAppWindow::MainAppWindow()  : DocumentWindow (JUCEApplication::getInstance()
     setContentOwned(mainComponent, true);
     
     #if JUCE_MAC
-    centreWithSize (1024, 680);
+    centreWithSize (iDocumentInitWidth, iDocumentInitHeight);
     #endif
     
     addKeyListener (commandManager->getKeyMappings());
@@ -44,8 +51,8 @@ MainAppWindow::MainAppWindow()  : DocumentWindow (JUCEApplication::getInstance()
 MainAppWindow::~MainAppWindow()
 {
     clearContentComponent();
-    commandManager = nullptr;
-    sharedAudioDeviceManager = nullptr;
+//    commandManager              = nullptr;
+    
 }
 
 

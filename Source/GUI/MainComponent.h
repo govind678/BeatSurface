@@ -14,12 +14,10 @@
 #include "JuceHeader.h"
 #include "BeatSurfaceHeader.h"
 
-#include "CustomShapeButton.h"
+
 #include "PlayContentComponent.h"
 #include "TrainContentComponent.h"
 #include "SettingsContentComponent.h"
-
-#include "BeatSurfaceEngine.h"
 
 
 //========================================================================================================================
@@ -45,67 +43,88 @@ private:
 };
 
 
-//========================================================================================================================
-
-
-class ClassButtonArray  :   public Component
-{
-public:
-    
-    ClassButtonArray();
-    ~ClassButtonArray();
-    
-    void paint (Graphics& g);
-    void resized();
-    
-    void setNumClasses(int numClasses);
-    void setArrayAlpha(float* alphaValues);
-    
-    OwnedArray<CustomShapeButton> m_pcClassButton;
-    
-private:
-
-    int m_iNumClasses;
-    
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ClassButtonArray)
-};
-
-
 
 //========================================================================================================================
 
-class MainComponent    :       public Component,
-                               public ButtonListener,
-                               public SliderListener,
-                               public Timer
+class MainComponent    :        public Component,
+                                public ButtonListener,
+                                public SliderListener,
+                                public ApplicationCommandTarget,
+                                public Timer
 {
     
 public:
+    
+    //==============================================================================
+    // Constructor and Destructor
     
     MainComponent();
     ~MainComponent();
+    void initialize();
+    //==============================================================================
     
+    
+    //==============================================================================
+    // Component
     
     void paint (Graphics& g);
     void resized();
-    void buttonClicked (Button* buttonThatWasClicked);
-    void sliderValueChanged (Slider* sliderThatWasMoved);
     void focusGained (FocusChangeType cause);
     void focusLost (FocusChangeType cause);
+    //==============================================================================
+    
+    
+    //==============================================================================
+    // Button Listener
+    
+    void buttonClicked (Button* buttonThatWasClicked);
+    //==============================================================================
+    
+    
+    //==============================================================================
+    // Slider Listener
+    
+    void sliderValueChanged (Slider* sliderThatWasMoved);
+    //==============================================================================
+    
+    
+    //==============================================================================
+    // Timer
+    
     void timerCallback();
+    //==============================================================================
+    
+    
+    //==============================================================================
+    // Application Command Target
+    
+	ApplicationCommandTarget* getNextCommandTarget();
+	void getAllCommands (Array <CommandID>& commands);
+	void getCommandInfo (const CommandID commandID, ApplicationCommandInfo& result);
+	bool perform (const InvocationInfo& info);
+    ApplicationCommandManager* getCommandManager();
+    //==============================================================================
     
     
     
     
 private:
     
+    //==============================================================================
+    // Tabbed Component Methods
+    
     void currentTabChanged(int newCurrentTabIndex, const String& newCurrentTabName);
+    //==============================================================================
     
-    PlayContentComponent* playComponent;
-    TrainContentComponent* trainComponent;
-    SettingsContentComponent* settingsComponent;
     
+    
+    
+    //======================================================================
+    // GUI Components
+    
+    ScopedPointer<PlayContentComponent> playComponent;
+    ScopedPointer<TrainContentComponent> trainComponent;
+    ScopedPointer<SettingsContentComponent> settingsComponent;    
     
     ScopedPointer<TabbedComponent> tabbedComponent;
     
@@ -113,37 +132,27 @@ private:
     ScopedPointer<Label>       beatSurfaceLabel;
     ScopedPointer<Label>       gtcmtLabel;
     
-    ScopedPointer<Slider>      classProbSlider;
-    ScopedPointer<Slider>      classNumSelectorSlider;
     
     ScopedPointer<AudioSetupDisplay> audioSetup;
     
-    ScopedPointer<ClassButtonArray> shapeButtonArray;
+//    ScopedPointer<ClassButtonArray> shapeButtonArray;
     
     LookAndFeel_V3 lookAndFeelV3;
     
-    ScopedPointer<BeatSurfaceEngine> beatSurfaceEngine;
-
-    ScopedPointer<float> m_pfCurrentOnsetProbabilities;
+    //======================================================================
+    
+    
+    
+    
+    //======================================================================
+    // Beat Surface Engine - Internal Methods
+    
+    void addClass();
+    void deleteClass(int classIndex);
+    void launchPreferences();
     
     int     m_iNumClasses;
     int     m_iCurentSelectedClass;
-    
-    
-    
-    
-    
-    
-    //======================================================================
-    // Application Command Target Stuff
-    //======================================================================
-    
-//    ApplicationCommandTarget* getNextCommandTarget() override;
-//    void getAllCommands (Array<CommandID>& commands) override;
-//    void getCommandInfo (CommandID commandID, ApplicationCommandInfo& result) override;
-//    bool perform (const InvocationInfo& info) override;
-    
-    
     
     //======================================================================
 

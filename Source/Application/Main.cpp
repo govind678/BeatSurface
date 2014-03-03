@@ -40,29 +40,45 @@ public:
         
         Desktop::getInstance().setOrientationsEnabled (Desktop::allOrientations);
         
+        
+        // Command Manager for entire application
         commandManager = new ApplicationCommandManager();
         commandManager->registerAllCommandsForTarget (this);
         
         
+        // Device Manager used by entire application
         sharedAudioDeviceManager = new AudioDeviceManager();
         sharedAudioDeviceManager->initialise(BeatSurfaceBase::iNumInputChannels,
                                              BeatSurfaceBase::iNumOutputChannels, 0, true, String::empty, 0);
 
         
+        // Global Metronome
+        globalClock = new GlobalClock();
+        
+        
         
         // Place Beat Surface Interface / Engine Here ???
         
         
+        // Synchronus GUI Updater
+        guiUpdater  =   new GUIUpdater();
         
+        
+        
+        // Main Window
         mainWindow = new MainAppWindow();
     }
 
     void shutdown()
     {
         // Add your application's shutdown code here..
-        mainWindow = nullptr; // (deletes our window)
         
-        commandManager = nullptr;
+        mainWindow                  = nullptr;
+        
+        guiUpdater                  = nullptr;
+        commandManager              = nullptr;
+        sharedAudioDeviceManager    = nullptr;
+        globalClock                 = nullptr;
     }
 
     //==============================================================================
@@ -89,19 +105,18 @@ public:
     {
         const CommandID ids[] =
         {
-            CommandIDs::addClass,
-            CommandIDs::deleteClass,
-            CommandIDs::currentClass,
+            CommandIDs::AddClass,
+            CommandIDs::DeleteClass,
+            CommandIDs::CurrentClass,
             
-            CommandIDs::recordTraining,
-            CommandIDs::doneTraining,
+            CommandIDs::RecordTraining,
+            CommandIDs::DoneTraining,
             
-            CommandIDs::startAudio,
-            CommandIDs::stopAudio,
+//            CommandIDs::StartAudio,
+//            CommandIDs::StopAudio,
+//            CommandIDs::ToggleClock,
             
-            CommandIDs::applySettings,
-            
-            CommandIDs::goToKioskMode,
+            CommandIDs::GoToKioskMode,
             
             StandardApplicationCommandIDs::quit
         };
@@ -115,49 +130,49 @@ public:
     {
         switch (commandID)
         {
-            case CommandIDs::addClass:
+            case CommandIDs::AddClass:
                 result.setInfo ("Add New Class", "Adds a new class of sounds", CommandCategories::TrainCommands, 0);
                 result.addDefaultKeypress ('=', ModifierKeys::commandModifier);
                 break;
                 
-            case CommandIDs::deleteClass:
+            case CommandIDs::DeleteClass:
                 result.setInfo ("Delete Selected Class", "Deletes a selected class", CommandCategories::TrainCommands, 0);
                 result.addDefaultKeypress ('-', ModifierKeys::commandModifier);
                 break;
                 
-            case CommandIDs::currentClass:
+            case CommandIDs::CurrentClass:
                 result.setInfo ("Select Class", "Selects the current class", CommandCategories::CommonCommands, 0);
                 result.addDefaultKeypress ('t', ModifierKeys::commandModifier);
                 break;
                 
-            case CommandIDs::recordTraining:
+            case CommandIDs::RecordTraining:
                 result.setInfo ("Record Training", "Start currently selected class recording", CommandCategories::TrainCommands, 0);
                 result.addDefaultKeypress ('3', ModifierKeys::commandModifier);
                 break;
                 
-            case CommandIDs::doneTraining:
+            case CommandIDs::DoneTraining:
                 result.setInfo ("Finished Training", "Finished currently selected training", CommandCategories::TrainCommands, 0);
                 result.addDefaultKeypress ('4', ModifierKeys::commandModifier);
                 break;
                 
-            case CommandIDs::startAudio:
-                result.setInfo ("Start System", "Turns on detection and classification system", CommandCategories::PlayCommands, 0);
-                result.addDefaultKeypress ('1', ModifierKeys::commandModifier);
-                break;
+//            case CommandIDs::StartAudio:
+//                result.setInfo ("Start System", "Turns on detection and classification system", CommandCategories::PlayCommands, 0);
+//                result.addDefaultKeypress ('1', ModifierKeys::commandModifier);
+//                break;
+//                
+//            case CommandIDs::StopAudio:
+//                result.setInfo ("Stop System", "Turns off detection and classification system", CommandCategories::PlayCommands, 0);
+//                result.addDefaultKeypress ('2', ModifierKeys::commandModifier);
+//                break;
                 
-            case CommandIDs::stopAudio:
-                result.setInfo ("Stop System", "Turns off detection and classification system", CommandCategories::PlayCommands, 0);
-                result.addDefaultKeypress ('2', ModifierKeys::commandModifier);
-                break;
-                
-            case CommandIDs::applySettings:
-                result.setInfo ("Apply Settings", "Save and apply settings", CommandCategories::SettingsCommands, 0);
-                result.addDefaultKeypress ('5', ModifierKeys::commandModifier);
-                break;
+//            case CommandIDs::ToggleClock:
+//                result.setInfo ("Toggle Metronome", "Metronome default to 120BPM", CommandCategories::CommonCommands, 0);
+//                result.addDefaultKeypress (' ', ModifierKeys::noModifiers);
+//                break;
                 
                 
             #if ! JUCE_LINUX
-            case CommandIDs::goToKioskMode:
+            case CommandIDs::GoToKioskMode:
                 result.setInfo ("Show full-screen kiosk mode", String::empty, CommandCategories::CommonCommands, 0);
                 result.addDefaultKeypress ('f', ModifierKeys::commandModifier);
                 result.setTicked (Desktop::getInstance().getKioskModeComponent() != 0);
@@ -175,55 +190,58 @@ public:
     {
         switch (info.commandID)
         {
-            case CommandIDs::addClass:
+            case CommandIDs::AddClass:
                 // do something
-                std::cout << "Add class" << std::endl;
+                std::cout << "@Main, Add class" << std::endl;
                 break;
                 
-            case CommandIDs::deleteClass:
+            case CommandIDs::DeleteClass:
                 // do something
-                std::cout << "Delete class" << std::endl;
+                std::cout << "@Main, Delete class" << std::endl;
                 break;
                 
-            case CommandIDs::currentClass:
+            case CommandIDs::CurrentClass:
                 // do something
-                std::cout << "Current class" << std::endl;
-                break;
-                
-                
-                
-            case CommandIDs::recordTraining:
-                // do something
-                std::cout << "Record Training" << std::endl;
-                break;
-                
-            case CommandIDs::doneTraining:
-                // do something
-                std::cout << "Done Training" << std::endl;
+                std::cout << "@Main, Current class" << std::endl;
                 break;
                 
                 
                 
-            case CommandIDs::startAudio:
+            case CommandIDs::RecordTraining:
                 // do something
-                std::cout << "Start Audio" << std::endl;
+                std::cout << "@Main, Record Training" << std::endl;
                 break;
                 
-            case CommandIDs::stopAudio:
+            case CommandIDs::DoneTraining:
                 // do something
-                std::cout << "Stop Audio" << std::endl;
+                std::cout << "@Main, Done Training" << std::endl;
                 break;
                 
                 
                 
-            case CommandIDs::applySettings:
-                // do something
-                std::cout << "Apply Settings" << std::endl;
+//            case CommandIDs::StartAudio:
+//                // do something
+//                std::cout << "Start Audio" << std::endl;
+//                break;
+//                
+//            case CommandIDs::StopAudio:
+//                // do something
+//                std::cout << "Stop Audio" << std::endl;
+//                break;
+                
+//            case CommandIDs::ToggleClock:
+//                return false;
+//                break;
+                
+                
+            case CommandIDs::Preferences:
+                return false;
                 break;
+                
                 
                 
             #if ! JUCE_LINUX
-            case CommandIDs::goToKioskMode:
+            case CommandIDs::GoToKioskMode:
             {
 //                Desktop& desktop = Desktop::getInstance();
                 

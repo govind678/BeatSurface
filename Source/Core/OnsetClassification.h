@@ -16,11 +16,15 @@
 
 #include <algorithm>
 #include <fstream>
+#include <vector>
 #include <stdio.h>
 
 
 #include "ShortTermFourierTransform.h"
 #include "AudioFeatureExtraction.h"
+#include "SVMTrain.h"
+#include "SVMClassify.h"
+
 //#include "KNNClassifier.h"
 
 
@@ -29,25 +33,58 @@
 
 
 
+//========================================================================================================================
+
+using std::vector;
+
 class OnsetClassification
 {
     
 public:
     
+    //==============================================================================
+    // Constructor and Destructor
+    
     OnsetClassification(int blockSize, int numChannels, float sampleRate);
     ~OnsetClassification();
-    
-    int process(const float** inputBuffer);      // Returns '0' or '1' for Onset
-    void train(const float** inputBuffer, int classLabel);
-    void doneTraining();
+    //==============================================================================
     
     
-    //--- Set and Get Sensitivity Methods ---//
+    
+    //==============================================================================
+    // Process Methods
+    
+    bool detectOnsets(const float** inputBuffer);
+    double* classify();
+    void train(int classLabel);
+    //==============================================================================
+
+
+    
+    
+    //==============================================================================
+    // Set and Get Sensitivity Methods
+    
     void setVelocitySensitivity (float sensitivity);
-    float getVelocitySensitivity();
-    
     void setDecayTimeSensitivity (float sensitivity);
+    float getVelocitySensitivity();
     float getDecayTimeSensitivity();
+    //==============================================================================
+    
+    
+    
+    //==============================================================================
+    // Set Training Params
+    
+    void addClass();
+    void deleteClass(int classIndex);
+    void setCurrentClassIndex(int classIndex);
+    void userFinishedTraining();
+    
+    void saveTraining(std::string filePath);
+    void loadTraining(std::string filePath);
+    //==============================================================================
+    
     
 private:
     
@@ -90,16 +127,36 @@ private:
     
     ShortTermFourierTransform* stft;
     AudioFeatureExtraction* audioFeature;
+    SVMTrain*   svmTrainer;
+    SVMClassify* svmClassifier;
+    
+    svm_model* currentModel;
+    
 //    KNNClassifier* knnClassifier;
+    
+    
 
     
-    bool detectOnset(const float** input);
     
-    
+    //--- Audio Parameters ---//
     int miBinSize;
     int miBlockSize;
     int miNumChannels;
     float mfSampleRate;
+    
+    
+    
+    //--- Training Parameters ---//
+    int m_iNumClasses;
+    int m_iNumObservations;
+    int m_iCurrentClassIndex;
+    
+    float* m_pfTestingVector;
+    vector<vector<float>> m_ppfTrainingData;
+    vector<int> m_piClassLabels;
+    double* probabilityEstimates;
+    
+    
     
     
 //    std::ofstream spTrainingFile1;
@@ -129,6 +186,6 @@ private:
 
 };
 
-
+//========================================================================================================================
 
 #endif  // ONSETCLASSIFICATION_H_INCLUDED

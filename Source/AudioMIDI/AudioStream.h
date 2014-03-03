@@ -11,9 +11,9 @@
 #ifndef AUDIOSTREAM_H_INCLUDED
 #define AUDIOSTREAM_H_INCLUDED
 
-#include "JuceHeader.h"
+#include "BeatSurfaceHeader.h"
+#include "OnsetClassification.h"
 
-class OnsetClassification;
 
 class AudioStream : public AudioIODeviceCallback,
                     private Timer
@@ -33,11 +33,16 @@ public:
 	void audioDeviceAboutToStart (AudioIODevice* device);
     void audioDeviceStopped();
     
-    void setMode(int currentMode);
+    void setMode(BeatSurfaceBase::SystemMode newMode);
+    void setClassIndexToTrain(int newClassIndex);
+    
+    
+    ScopedPointer<OnsetClassification> onsetClassifier;
     
     
 private:
     
+    AudioDeviceManager::AudioDeviceSetup    deviceSetup;
     
     TimeSliceThread mAudioStreamThread;
     
@@ -45,6 +50,10 @@ private:
     static const int miAudioThreadPriority  = 8;
     
     void timerCallback();
+    
+    BeatSurfaceBase::SystemMode currentMode;
+    
+    int m_iCurrentClassIndexToTrain;
     
 };
 

@@ -9,9 +9,14 @@
 */
 
 #include "MainComponent.h"
+#include "BeatSurfaceEngine.h"
+
 #include <stdio.h>
 #include <iostream>
 #include <math.h>
+
+
+ScopedPointer<BeatSurfaceEngine> beatSurfaceEngine;
 
 
 MainComponent::MainComponent()
@@ -21,6 +26,8 @@ MainComponent::MainComponent()
     settingsComponent = new SettingsContentComponent();
     
     beatSurfaceEngine = new BeatSurfaceEngine();
+    
+    commandManager->registerAllCommandsForTarget (this);
     
     addAndMakeVisible (tabbedComponent = new TabbedComponent (TabbedButtonBar::TabsAtTop));
     tabbedComponent->setTabBarDepth (50);
@@ -37,6 +44,8 @@ MainComponent::MainComponent()
     
     trainComponent->addClassButton->addListener(this);
     trainComponent->deleteClassButton->addListener(this);
+    trainComponent->saveTrainingButton->addListener(this);
+    trainComponent->loadTrainingButton->addListener(this);
 
     settingsComponent->audioSetupButton->addListener(this);
     
@@ -48,9 +57,9 @@ MainComponent::MainComponent()
     addAndMakeVisible (beatSurfaceLogo = new ImageButton ("aboutButton"));
     beatSurfaceLogo->addListener (this);
     beatSurfaceLogo->setImages (false, true, true,
-                            ImageCache::getFromMemory (BinaryData::Icon64_png, BinaryData::Icon64_pngSize), 0.750f, Colour (0x00000000),
-                            ImageCache::getFromMemory (BinaryData::Icon64_png, BinaryData::Icon64_pngSize), 0.500f, Colour (0x00000000),
-                            ImageCache::getFromMemory (BinaryData::Icon64_png, BinaryData::Icon64_pngSize), 0.750f, Colour (0x44666666));
+                            ImageCache::getFromMemory (BinaryData::Icon128_png, BinaryData::Icon128_pngSize), 0.750f, Colour (0x00000000),
+                            ImageCache::getFromMemory (BinaryData::Icon128_png, BinaryData::Icon128_pngSize), 0.500f, Colour (0x00000000),
+                            ImageCache::getFromMemory (BinaryData::Icon128_png, BinaryData::Icon128_pngSize), 0.750f, Colour (0x44666666));
     
     
     
@@ -76,46 +85,19 @@ MainComponent::MainComponent()
     
     
     
-    addAndMakeVisible(classProbSlider = new Slider("class1Slider"));
-    classProbSlider->addListener(this);
-    classProbSlider->setRange (0, 1, 0.01);
-    classProbSlider->setSliderStyle (Slider::IncDecButtons);
-    classProbSlider->setTextBoxStyle (Slider::TextBoxBelow, false, 50, 20);
-    classProbSlider->setColour(Slider::backgroundColourId, Colour (0x7f363e45));
-    classProbSlider->setColour (Slider::thumbColourId, Colour (0xff363e46));
-    //numClassesSlider->setColour (Slider::rotarySliderFillColourId, Colour (0x7f363e45));
-    classProbSlider->setColour (Slider::textBoxTextColourId, Colour (0xff404952));
-    classProbSlider->setColour (Slider::textBoxBackgroundColourId, Colour (0x00000000));
-    classProbSlider->setColour (Slider::textBoxHighlightColourId, Colour (0x00000000));
-    classProbSlider->setColour (Slider::textBoxOutlineColourId, Colour (0x00808080));
-    
-    
-    addAndMakeVisible(classNumSelectorSlider = new Slider("classNumSelector"));
-    classNumSelectorSlider->addListener(this);
-    classNumSelectorSlider->setRange (1, 10, 1);
-    classNumSelectorSlider->setSliderStyle (Slider::IncDecButtons);
-    classNumSelectorSlider->setTextBoxStyle (Slider::TextBoxBelow, false, 50, 20);
-    classNumSelectorSlider->setColour(Slider::backgroundColourId, Colour (0x7f363e45));
-    classNumSelectorSlider->setColour (Slider::thumbColourId, Colour (0xff363e46));
-    //numClassesSlider->setColour (Slider::rotarySliderFillColourId, Colour (0x7f363e45));
-    classNumSelectorSlider->setColour (Slider::textBoxTextColourId, Colour (0xff404952));
-    classNumSelectorSlider->setColour (Slider::textBoxBackgroundColourId, Colour (0x00000000));
-    classNumSelectorSlider->setColour (Slider::textBoxHighlightColourId, Colour (0x00000000));
-    classNumSelectorSlider->setColour (Slider::textBoxOutlineColourId, Colour (0x00808080));
-    
-    
-    
     audioSetup = new AudioSetupDisplay;
     audioSetup->applyAudioSettingsButton->addListener(this);
     
     
-    
-    addAndMakeVisible(shapeButtonArray = new ClassButtonArray);
-    
     m_iCurentSelectedClass = 1;
     m_iNumClasses = 0;
     
-    setSize (BeatSurfaceBase::iDocumentInitWidth, BeatSurfaceBase::iDocumentInitHeight);
+    setSize(getParentWidth(), getParentHeight());
+    
+    
+    trainComponent->shapeButtonArray->setButtonFlashTime_ms(15);
+    
+    startTimer(BeatSurfaceBase::iGUITimerInterval);
     
 }
 
@@ -126,29 +108,22 @@ MainComponent::~MainComponent()
     
     sharedAudioDeviceManager->removeAudioCallback(playComponent->liveAudioScroller);
     
-    
-    tabbedComponent             = nullptr;
-    beatSurfaceLogo             = nullptr;
-    beatSurfaceLabel            = nullptr;
-    gtcmtLabel                  = nullptr;
-    
     playComponent               = nullptr;
     trainComponent              = nullptr;
     settingsComponent           = nullptr;
     
+    tabbedComponent             = nullptr;
+    
+    beatSurfaceLogo             = nullptr;
+    beatSurfaceLabel            = nullptr;
+    gtcmtLabel                  = nullptr;
+    
+    
+    
     beatSurfaceEngine           = nullptr;
     
     audioSetup                  = nullptr;
-    
-    shapeButtonArray            = nullptr;
-    
-    classNumSelectorSlider      = nullptr;
-    classProbSlider             = nullptr;
 
-    
-    if (m_pfCurrentOnsetProbabilities != nullptr) {
-        m_pfCurrentOnsetProbabilities   =   nullptr;
-    }
     
     deleteAllChildren();
     
@@ -170,37 +145,34 @@ void MainComponent::resized()
     
     beatSurfaceLabel->setBounds (getWidth() - 130, getHeight() - 45 - 24, 128, 24);
     gtcmtLabel->setBounds (getWidth() - 38 - 64, getHeight() - 25 - 20, 64, 20);
-    
-    classProbSlider->setBounds(getWidth() - 140, getHeight()/2 + 0, 120, 64);
-    classNumSelectorSlider->setBounds(getWidth() - 140, getHeight()/2 + 64, 120, 64);
-    
-    shapeButtonArray->setBounds(getWidth()/2 - getHeight()/4, getHeight()/2 - getHeight()/4 + 30, getHeight()/2, getHeight()/2);
+}
+
+
+
+void MainComponent::focusGained (FocusChangeType cause)
+{
     
 }
 
 
+void MainComponent::focusLost (FocusChangeType cause)
+{
+    
+}
+
+
+
+
+//==============================================================================
+// Button Listener
+//==============================================================================
 
 void MainComponent::buttonClicked (Button* buttonThatWasClicked)
 {
     
     if(buttonThatWasClicked == settingsComponent->audioSetupButton)
     {
-        DialogWindow::LaunchOptions options;
-        options.componentToCentreAround = nullptr;
-        options.content.setNonOwned (audioSetup);
-        Rectangle<int> area (0, 0, 420, 390);
-
-        options.content->setSize (area.getWidth(), area.getHeight());
-
-
-        options.dialogTitle                   = "Audio Preferences";
-        options.dialogBackgroundColour        = Colour (0xBB24272D);
-        options.escapeKeyTriggersCloseButton  = true;
-        options.useNativeTitleBar             = false;
-        options.resizable                     = true;
-        
-        options.launchAsync();
-        
+        launchPreferences();
     }
     
     
@@ -212,29 +184,7 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
     
     if (buttonThatWasClicked == trainComponent->addClassButton)
     {
-        m_iNumClasses++;
-        
-        shapeButtonArray->setNumClasses(m_iNumClasses);
-        
-        
-        if (m_pfCurrentOnsetProbabilities != nullptr) {
-            m_pfCurrentOnsetProbabilities   =   nullptr;
-        }
-        
-        
-        if (m_iNumClasses > 0)
-        {
-            m_pfCurrentOnsetProbabilities   = new float [m_iNumClasses];
-            
-            for (int i = 0; i < m_iNumClasses; i++)
-            {
-                shapeButtonArray->m_pcClassButton.getUnchecked(i)->addListener(this);
-                m_pfCurrentOnsetProbabilities[i] = 0.0f;
-            }
-        }
-        
-        shapeButtonArray->setArrayAlpha(m_pfCurrentOnsetProbabilities);
-        
+        addClass();
     }
     
     
@@ -252,64 +202,49 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
         pop.showMenuAsync (PopupMenu::Options().withTargetComponent (trainComponent->deleteClassButton), nullptr);
        
         
-        m_iNumClasses--;
-        
-        if (m_iNumClasses < 0) {
-            m_iNumClasses = 0;
-        }
-        
-        shapeButtonArray->setNumClasses(m_iNumClasses);
-        
-        
-        if (m_pfCurrentOnsetProbabilities != nullptr) {
-            m_pfCurrentOnsetProbabilities   =   nullptr;
-        }
-        
-        
-        if (m_iNumClasses > 0)
-        {
-            m_pfCurrentOnsetProbabilities   = new float [m_iNumClasses];
-            
-            for (int i = 0; i < m_iNumClasses; i++)
-            {
-                shapeButtonArray->m_pcClassButton.getUnchecked(i)->addListener(this);
-                m_pfCurrentOnsetProbabilities[i] = 0.0f;
-            }
-        }
-        
-        shapeButtonArray->setArrayAlpha(m_pfCurrentOnsetProbabilities);
-        
+        deleteClass(0);
     }
+    
     
     
     if (buttonThatWasClicked == playComponent->audioStreamToggleButton)
     {
         if (playComponent->audioStreamToggleButton->getToggleState()) {
-            //playComponent->audioStreamToggleButton->setButtonText (TRANS("Audio On"));
-            //beatSurfaceInterface->liveAudioStreamButtonClicked(true);
-            sharedAudioDeviceManager->addAudioCallback(playComponent->liveAudioScroller);
+            beatSurfaceEngine->liveAudioStreamButtonClicked(true);
+//            sharedAudioDeviceManager->addAudioCallback(playComponent->liveAudioScroller);
         }
         
         else {
-            //beatSurfaceInterface->liveAudioStreamButtonClicked(false);
-            sharedAudioDeviceManager->removeAudioCallback(playComponent->liveAudioScroller);
-            //playComponent->audioStreamToggleButton->setButtonText (TRANS("Audio Off"));
+            beatSurfaceEngine->liveAudioStreamButtonClicked(false);
+//            sharedAudioDeviceManager->removeAudioCallback(playComponent->liveAudioScroller);
         }
-        
         
     }
     
     
     if (buttonThatWasClicked == trainComponent->loadTrainingButton)
     {
+        FileChooser fc ("Choose Training File To Load...",
+                        File::getCurrentWorkingDirectory(), "*.csv", false);
         
+        if(fc.browseForFileToOpen())
+        {
+            beatSurfaceEngine->loadTraining(fc.getResult().getFullPathName());
+        }
     }
     
 
     if (buttonThatWasClicked == trainComponent->saveTrainingButton)
     {
+        FileChooser fc ("Save Current Training...", File::getCurrentWorkingDirectory(), "*.csv", false);
+        
+        if (fc.browseForFileToSave (true))
+        {
+            beatSurfaceEngine->saveTraining(fc.getResult().getFullPathName());
+        }
         
     }
+    
     
     
     if (buttonThatWasClicked == beatSurfaceLogo)
@@ -343,8 +278,9 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
     if (m_iNumClasses > 0)
     {
         for (int i = 0; i < m_iNumClasses; i++) {
-            if (buttonThatWasClicked == shapeButtonArray->m_pcClassButton.getUnchecked(i)) {
-                std::cout << "Class: " << i+1 << std::endl;
+            if (buttonThatWasClicked == trainComponent->shapeButtonArray->m_pcClassButton.getUnchecked(i)) {
+                beatSurfaceEngine->trainClassButtonClicked(i+1);
+                trainComponent->shapeButtonArray->m_pcClassButton.getUnchecked(i)->setAlpha(0.2f);
             }
         }
     }
@@ -353,65 +289,334 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
 }
 
 
-
+//==============================================================================
+// Slider Listener
+//==============================================================================
 
 void MainComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 {
     if (sliderThatWasMoved == settingsComponent->velocitySensitivitySlider)
     {
-        
+        beatSurfaceEngine->parametersChanged(BeatSurfaceBase::VelocitySensitivity,
+                                             settingsComponent->velocitySensitivitySlider->getValue());
     }
     
-    else if (sliderThatWasMoved == settingsComponent->decayTimeSensitivitySlider)
+    if (sliderThatWasMoved == settingsComponent->decayTimeSensitivitySlider)
     {
-        
+        beatSurfaceEngine->parametersChanged(BeatSurfaceBase::DecayTimeSensitivity,
+                                             settingsComponent->decayTimeSensitivitySlider->getValue());
     }
-    
-    
-    else if (sliderThatWasMoved == classProbSlider)
-    {
-        m_pfCurrentOnsetProbabilities[m_iCurentSelectedClass - 1] = classProbSlider->getValue();
-        shapeButtonArray->setArrayAlpha(m_pfCurrentOnsetProbabilities);
-    }
-    
-    
-    else if (sliderThatWasMoved == classNumSelectorSlider)
-    {
-        m_iCurentSelectedClass = int(classNumSelectorSlider->getValue());
-    }
-    
 }
 
 
 
-
-
-void MainComponent::focusGained (FocusChangeType cause)
-{
-
-}
-
-
-void MainComponent::focusLost (FocusChangeType cause)
-{
-    
-}
+//==============================================================================
+// Check Current Selected Tab
+//==============================================================================
 
 void MainComponent::currentTabChanged(int newCurrentTabIndex, const juce::String &newCurrentTabName)
 {
-    std::cout << newCurrentTabIndex << ": " << newCurrentTabName << std::endl;
+    std::cout << "@MainComponent: " << newCurrentTabIndex << ": " << newCurrentTabName << std::endl;
 }
 
 
+
+
+//==============================================================================
+// Timer Callback to Update GUI
+//==============================================================================
+
 void MainComponent::timerCallback()
 {
+    if (guiUpdater->DisplayTrainingOnset) {
+        trainComponent->shapeButtonArray->flashButton(guiUpdater->getCurrentTrainingClass() - 1, 0.2f);
+        guiUpdater->DisplayTrainingOnset = false;
+    }
+    
+    
+    if (guiUpdater->DoneTraining) {
+        if (m_iNumClasses > 0) {
+            trainComponent->shapeButtonArray->resetAlpha();
+        }
+        guiUpdater->DoneTraining = false;
+    }
+    
+    if(guiUpdater->DisplayOnsetProbabilities) {
+        
+        playComponent->shapeButtonArray->flashArray(guiUpdater->getOnsetProbabilities());
+        guiUpdater->DisplayOnsetProbabilities = false;
+    }
     
 }
 
 
 
+
+//==============================================================================
+// Component - Internal Methods
+//==============================================================================
+
+void MainComponent::addClass()
+{
+    m_iNumClasses++;
+    
+    playComponent->shapeButtonArray->setNumClasses(m_iNumClasses);
+    trainComponent->shapeButtonArray->setNumClasses(m_iNumClasses);
+    
+    
+    
+    if (m_iNumClasses > 0)
+    {
+        
+        for (int i = 0; i < m_iNumClasses; i++)
+        {
+            trainComponent->shapeButtonArray->m_pcClassButton.getUnchecked(i)->addListener(this);
+        }
+    }
+    
+//    playComponent->shapeButtonArray->flashArray(m_pfCurrentOnsetProbabilities);
+    playComponent->shapeButtonArray->setZeroAlpha();
+    
+    beatSurfaceEngine->addClass();
+    
+}
+
+
+void MainComponent::deleteClass(int classIndex)
+{
+    m_iNumClasses--;
+    
+    if (m_iNumClasses < 0) {
+        m_iNumClasses = 0;
+    }
+    
+    playComponent->shapeButtonArray->setNumClasses(m_iNumClasses);
+    trainComponent->shapeButtonArray->setNumClasses(m_iNumClasses);
+    
+
+    
+    if (m_iNumClasses > 0)
+    {
+        for (int i = 0; i < m_iNumClasses; i++)
+        {
+            trainComponent->shapeButtonArray->m_pcClassButton.getUnchecked(i)->addListener(this);
+            playComponent->shapeButtonArray->m_pcClassButton.getUnchecked(i)->setEnabled(false);
+        }
+    }
+    
+    playComponent->shapeButtonArray->setZeroAlpha();
+    beatSurfaceEngine->deleteClass(classIndex);
+}
+
+
+
+void MainComponent::launchPreferences()
+{
+    DialogWindow::LaunchOptions options;
+    options.componentToCentreAround = nullptr;
+    options.content.setNonOwned (audioSetup);
+    Rectangle<int> area (0, 0, 420, 390);
+    
+    options.content->setSize (area.getWidth(), area.getHeight());
+    
+    
+    options.dialogTitle                   = "Audio Preferences";
+    options.dialogBackgroundColour        = Colour (0xBB24272D);
+    options.escapeKeyTriggersCloseButton  = true;
+    options.useNativeTitleBar             = false;
+    options.resizable                     = true;
+    
+    options.launchAsync();
+    
+}
+
+
+
+//==============================================================================
+// Application Command Target
+//==============================================================================
+
+ApplicationCommandTarget* MainComponent::getNextCommandTarget()
+{
+	return findFirstTargetParentComponent();
+}
+
+void MainComponent::getAllCommands (Array <CommandID>& commands)
+{
+	const CommandID ids[] =
+    {
+        CommandIDs::AddClass,
+        CommandIDs::DeleteClass,
+        CommandIDs::CurrentClass,
+        CommandIDs::RecordTraining,
+        CommandIDs::DoneTraining,
+        CommandIDs::ToggleAudio,
+        CommandIDs::ToggleClock,
+        CommandIDs::Preferences,
+        CommandIDs::GoToKioskMode,
+    };
+	
+	commands.addArray (ids, numElementsInArray (ids));
+}
+
+
+void MainComponent::getCommandInfo (const CommandID commandID, ApplicationCommandInfo& result)
+{
+    
+    //within 'setInfo()' below, the name sets the String that appears in the Menu bar,
+    //and the description sets what would appear in the tooltip if the command is set to a button
+    //and the tooltip parameter is set to 'true'
+	
+    switch (commandID)
+    {
+        case CommandIDs::AddClass:
+            result.setInfo ("Add New Class", "Adds a new class of sounds", CommandCategories::TrainCommands, 0);
+            result.addDefaultKeypress ('=', ModifierKeys::commandModifier);
+            break;
+            
+        case CommandIDs::DeleteClass:
+            result.setInfo ("Delete Selected Class", "Deletes a selected class", CommandCategories::TrainCommands, 0);
+            result.addDefaultKeypress ('-', ModifierKeys::commandModifier);
+            break;
+            
+        case CommandIDs::CurrentClass:
+            result.setInfo ("Select Class", "Selects the current class", CommandCategories::CommonCommands, 0);
+            result.addDefaultKeypress ('t', ModifierKeys::commandModifier);
+            break;
+            
+        case CommandIDs::RecordTraining:
+            result.setInfo ("Record Training", "Start currently selected class recording", CommandCategories::TrainCommands, 0);
+            result.addDefaultKeypress ('3', ModifierKeys::commandModifier);
+            break;
+            
+        case CommandIDs::DoneTraining:
+            result.setInfo ("Finished Training", "Finished currently selected training", CommandCategories::TrainCommands, 0);
+            result.addDefaultKeypress ('4', ModifierKeys::commandModifier);
+            break;
+            
+        case CommandIDs::ToggleAudio:
+            result.setInfo ("Start/Stop System", "Turns on/off detection and classification system", CommandCategories::PlayCommands, 0);
+            result.addDefaultKeypress ('1', ModifierKeys::commandModifier);
+            break;
+            
+        case CommandIDs::ToggleClock:
+            result.setInfo ("Start Metronome", "Metronome default to 120BPM", CommandCategories::CommonCommands, 0);
+            result.addDefaultKeypress (' ', ModifierKeys::noModifiers);
+            break;
+            
+        case CommandIDs::Preferences:
+            result.setInfo ("Open Preferences Panel", "Audio, MIDI and other Preferences", CommandCategories::SettingsCommands, 0);
+            result.addDefaultKeypress (',', ModifierKeys::commandModifier);
+            break;
+            
+            
+        #if ! JUCE_LINUX
+        case CommandIDs::GoToKioskMode:
+            result.setInfo ("Show full-screen kiosk mode", String::empty, CommandCategories::CommonCommands, 0);
+            result.addDefaultKeypress ('f', ModifierKeys::commandModifier);
+            result.setTicked (Desktop::getInstance().getKioskModeComponent() != 0);
+            break;
+        #endif
+            
+        default:
+            break;
+    }
+}
+
+
+
+bool MainComponent::perform (const InvocationInfo& info)
+{
+	switch (info.commandID)
+    {
+        case CommandIDs::AddClass:
+            addClass();
+            break;
+            
+        case CommandIDs::DeleteClass:
+            // do something
+            std::cout << "@MainComponent: Delete class" << std::endl;
+            break;
+            
+        case CommandIDs::CurrentClass:
+            // do something
+            std::cout << "@MainComponent: Current class" << std::endl;
+            break;
+            
+            
+            
+        case CommandIDs::RecordTraining:
+            // do something
+            std::cout << "@MainComponent: Record Training" << std::endl;
+            break;
+            
+        case CommandIDs::DoneTraining:
+            // do something
+            std::cout << "@MainComponent: Done Training" << std::endl;
+            break;
+            
+            
+            
+        case CommandIDs::ToggleAudio:
+            // do something
+            
+            break;
+            
+            
+        case CommandIDs::ToggleClock:
+            if (!globalClock->getMetronomeStatus()) {
+                globalClock->startClock();
+            } else {
+                globalClock->stopClock();
+            }
+            break;
+            
+            
+            
+        case CommandIDs::Preferences:
+            // do something
+            launchPreferences();
+            break;
+            
+            
+        #if ! JUCE_LINUX
+        case CommandIDs::GoToKioskMode:
+        {
+            Desktop& desktop = Desktop::getInstance();
+            
+            if (desktop.getKioskModeComponent() == nullptr)
+                desktop.setKioskModeComponent (getTopLevelComponent());
+            else
+                desktop.setKioskModeComponent (nullptr);
+            
+            break;
+        }
+        #endif
+            
+        default:
+            return false;
+    }
+
+    return true;
+	
+}
+
+
+ApplicationCommandManager* MainComponent::getCommandManager()
+{
+    return commandManager;
+}
+
+
 //========================================================================================================================
-// Audio Setup Display
+
+
+
+
+
+
+
+//======================================== Audio Setup Display ===========================================================
 // Component that holds Audio Device Selector Component
 //========================================================================================================================
 
@@ -465,117 +670,4 @@ void AudioSetupDisplay::resized()
 }
 
 
-
-
-
 //========================================================================================================================
-// Class Button Array
-// Use extended Shape Button to dynamically create pie-shaped buttons based on number of classes
-//========================================================================================================================
-
-ClassButtonArray::ClassButtonArray()
-{
-    m_iNumClasses = 0;
-    m_pcClassButton.clear(true);
-}
-
-
-ClassButtonArray::~ClassButtonArray()
-{
-    
-}
-
-
-void ClassButtonArray::paint(juce::Graphics &g)
-{
-    
-    if (m_iNumClasses > 0) {
-        
-        
-        for (int side = 1; side <= m_iNumClasses; side++)
-        {
-            Path pie;
-            
-            float fromRadians   = float((side - 1.0f) * 2.0f * M_PI) / float(m_iNumClasses);
-            float toRadians     = float(side * 2.0f * M_PI) / float(m_iNumClasses);
-            
-            pie.addPieSegment(0.0f, 0.0f, getWidth(), getHeight(), fromRadians, toRadians, 0.0f);
-            pie.closeSubPath();
-            g.setColour(Colours::black);
-            g.strokePath(pie, PathStrokeType(1.0f));
-        }
-        
-        
-    }
-}
-
-
-void ClassButtonArray::resized()
-{
-    if (m_iNumClasses > 0)
-    {
-        for (int side = 1; side <= m_iNumClasses; side++)
-        {
-            Path pie;
-            
-            float fromRadians   = float((side - 1.0f) * 2.0f * M_PI) / float(m_iNumClasses);
-            float toRadians     = float(side * 2.0f * M_PI) / float(m_iNumClasses);
-            
-            pie.addPieSegment(0.0f, 0.0f, getWidth(), getHeight(), fromRadians, toRadians, 0.0f);
-            pie.closeSubPath();
-            
-            m_pcClassButton.getUnchecked(side-1)->setShape(pie, true, true);
-            m_pcClassButton.getUnchecked(side-1)->setBounds(0, 0, getWidth(), getHeight());
-        }
-    }
-}
-
-
-void ClassButtonArray::setNumClasses(int numClasses)
-{
-    m_iNumClasses = numClasses;
-    
-    if(m_pcClassButton.size() > 0)
-    {
-        m_pcClassButton.clear(true);
-    }
-    
-    
-    
-    if (m_iNumClasses > 0) {
-        
-        
-        for (int side = 1; side <= m_iNumClasses; side++) {
-            
-            m_pcClassButton.add(new CustomShapeButton(String(side),
-                                                      Colour(float(side)/float(m_iNumClasses), 0.75f, 0.9f, 1.0f),
-                                                      Colour(float(side)/float(m_iNumClasses), 0.75f, 0.7f, 1.0f),
-                                                      Colour(float(side)/float(m_iNumClasses), 0.75f, 0.5f, 1.0f)));
-            
-            Path pie;
-            
-            float fromRadians   = float((side - 1.0f) * 2.0f * M_PI) / float(m_iNumClasses);
-            float toRadians     = float(side * 2.0f * M_PI) / float(m_iNumClasses);
-            
-            pie.addPieSegment(0.0f, 0.0f, getWidth(), getHeight(), fromRadians, toRadians, 0.0f);
-            pie.closeSubPath();
-            
-            m_pcClassButton.getUnchecked(side-1)->setShape(pie, true, true);
-            addAndMakeVisible(m_pcClassButton.getUnchecked(side-1));
-            m_pcClassButton.getUnchecked(side-1)->setBounds(0, 0, getWidth(), getHeight());
-        }
-        
-        
-    }
-}
-
-
-void ClassButtonArray::setArrayAlpha(float* alphaValues)
-{
-    if (m_iNumClasses > 0)
-    {
-        for (int i=0; i < m_iNumClasses; i++) {
-            m_pcClassButton.getUnchecked(i)->setAlpha(alphaValues[i]);
-        }
-    }
-}

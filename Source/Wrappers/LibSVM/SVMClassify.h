@@ -31,6 +31,7 @@ public:
     int getNumSvElements( std::string strSvString );
     
     Error_t loadModelFromDisk(std::string modelFilePath);
+    void setCurrentSVMModel(svm_model* model);
     
 private:
     

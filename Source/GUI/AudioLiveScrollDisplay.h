@@ -80,6 +80,27 @@ public:
         }
 
 
+        void pushSample (const float newSample)
+        {
+            accumulator += newSample;
+    
+            if (subSample == 0)
+            {
+                const int inputSamplesPerPixel = 200;
+        
+                samples[nextSample] = accumulator / inputSamplesPerPixel;
+                nextSample = (nextSample + 1) % numElementsInArray (samples);
+                subSample = inputSamplesPerPixel;
+                accumulator = 0;
+            }
+    
+            else
+            {
+                --subSample;
+            }
+        }
+
+
         int miChannelNoToDraw = 0;
 
 
@@ -122,26 +143,6 @@ private:
             repaint();
         }
 
-
-        void pushSample (const float newSample)
-        {
-            accumulator += newSample;
-    
-            if (subSample == 0)
-            {
-                const int inputSamplesPerPixel = 200;
-        
-                samples[nextSample] = accumulator / inputSamplesPerPixel;
-                nextSample = (nextSample + 1) % numElementsInArray (samples);
-                subSample = inputSamplesPerPixel;
-                accumulator = 0;
-            }
-            
-            else
-            {
-                --subSample;
-            }
-        }
 
 
 JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LiveScrollingAudioDisplay);

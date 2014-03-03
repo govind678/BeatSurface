@@ -6,13 +6,15 @@
   <MAINGROUP id="i5OsMR" name="BeatSurface">
     <GROUP id="{99C760B5-49A5-C6CC-B929-C97C863BD7F4}" name="Media">
       <GROUP id="{AB1409C0-3623-F216-B48F-0F515C545AF2}" name="Images">
+        <FILE id="O3iFgH" name="Load128.png" compile="0" resource="1" file="Media/Images/Load128.png"/>
+        <FILE id="xMREmV" name="Save128.png" compile="0" resource="1" file="Media/Images/Save128.png"/>
+        <FILE id="qtMFbj" name="Icon128.png" compile="0" resource="1" file="Media/Images/Icon128.png"/>
+        <FILE id="EXg4mf" name="Icon256.png" compile="0" resource="1" file="Media/Images/Icon256.png"/>
         <FILE id="aHAdaI" name="DeleteClass128.png" compile="0" resource="1"
               file="Media/Images/DeleteClass128.png"/>
         <FILE id="l7wIV4" name="Stop128.png" compile="0" resource="1" file="Media/Images/Stop128.png"/>
         <FILE id="CFdv1Y" name="AddClass128.png" compile="0" resource="1" file="Media/Images/AddClass128.png"/>
         <FILE id="MxdPsn" name="Play128.png" compile="0" resource="1" file="Media/Images/Play128.png"/>
-        <FILE id="PPtdm4" name="Icon32.png" compile="0" resource="1" file="Media/Images/Icon32.png"/>
-        <FILE id="cU9Cy8" name="Icon64.png" compile="0" resource="1" file="Media/Images/Icon64.png"/>
       </GROUP>
     </GROUP>
     <GROUP id="{98997E0D-A27E-A0C0-0E31-0416ADC5D470}" name="Libraries">
@@ -57,10 +59,10 @@
               file="Source/GUI/CustomShapeButton.cpp"/>
         <FILE id="ho3fn6" name="CustomShapeButton.h" compile="0" resource="0"
               file="Source/GUI/CustomShapeButton.h"/>
-        <FILE id="vQj2dc" name="TestGUI.cpp" compile="1" resource="0" file="Source/GUI/TestGUI.cpp"/>
-        <FILE id="IxC6z2" name="TestGUI.h" compile="0" resource="0" file="Source/GUI/TestGUI.h"/>
       </GROUP>
       <GROUP id="{F642FE37-2F2F-BB70-114B-D2BFF408B59B}" name="AudioMIDI">
+        <FILE id="HQvD5t" name="GlobalClock.cpp" compile="1" resource="0" file="Source/AudioMIDI/GlobalClock.cpp"/>
+        <FILE id="jcrXMk" name="GlobalClock.h" compile="0" resource="0" file="Source/AudioMIDI/GlobalClock.h"/>
         <FILE id="kWr4XX" name="AudioFileIO.cpp" compile="1" resource="0" file="Source/AudioMIDI/AudioFileIO.cpp"/>
         <FILE id="bFaXVK" name="AudioFileIO.h" compile="0" resource="0" file="Source/AudioMIDI/AudioFileIO.h"/>
         <FILE id="gk1UX5" name="AudioPlayer.cpp" compile="1" resource="0" file="Source/AudioMIDI/AudioPlayer.cpp"/>
@@ -71,6 +73,8 @@
         <FILE id="IpJGT9" name="MidiOut.h" compile="0" resource="0" file="Source/AudioMIDI/MidiOut.h"/>
       </GROUP>
       <GROUP id="{CC107002-AE16-041F-9119-C10C5FC8992D}" name="Core">
+        <FILE id="HTfXCJ" name="GUIUpdater.cpp" compile="1" resource="0" file="Source/Core/GUIUpdater.cpp"/>
+        <FILE id="USDdpQ" name="GUIUpdater.h" compile="0" resource="0" file="Source/Core/GUIUpdater.h"/>
         <FILE id="OSGBgM" name="AudioFeatureExtraction.cpp" compile="1" resource="0"
               file="Source/Core/AudioFeatureExtraction.cpp"/>
         <FILE id="aVRo1y" name="AudioFeatureExtraction.h" compile="0" resource="0"
@@ -79,9 +83,6 @@
               file="Source/Core/BeatSurfaceEngine.cpp"/>
         <FILE id="Xxdxod" name="BeatSurfaceEngine.h" compile="0" resource="0"
               file="Source/Core/BeatSurfaceEngine.h"/>
-        <FILE id="r6nRMT" name="KNNClassifier.cpp" compile="1" resource="0"
-              file="Source/Core/KNNClassifier.cpp"/>
-        <FILE id="itXRft" name="KNNClassifier.h" compile="0" resource="0" file="Source/Core/KNNClassifier.h"/>
         <FILE id="BFV6gv" name="OnsetClassification.cpp" compile="1" resource="0"
               file="Source/Core/OnsetClassification.cpp"/>
         <FILE id="ejQnVP" name="OnsetClassification.h" compile="0" resource="0"
@@ -108,7 +109,7 @@
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="PPtdm4" bigIcon="cU9Cy8">
+    <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="qtMFbj" bigIcon="EXg4mf">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="default" osxArchitecture="default"
                        isDebug="1" optimisation="1" targetName="BeatSurface"/>

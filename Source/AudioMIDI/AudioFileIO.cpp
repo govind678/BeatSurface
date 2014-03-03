@@ -24,7 +24,7 @@ AudioFileIO::AudioFileIO(File audioFile, int blockSize)
     {
         //--- Allocating Memory Based on File ---//
         
-        onsetClassifier = new OnsetClassification(miBlockSize, mpReader->numChannels, mpReader->sampleRate);
+        //onsetClassifier = new OnsetClassification(miBlockSize, mpReader->numChannels, mpReader->sampleRate);
         
         inputBuffer = new const float*[mpReader->numChannels];
         
@@ -48,7 +48,7 @@ AudioFileIO::~AudioFileIO()
 {
     delete [] inputBuffer;
     delete [] mpOnsets;
-    delete onsetClassifier;
+    //delete onsetClassifier;
 }
 
 
@@ -103,19 +103,19 @@ void AudioFileIO::runDetectionAndClassification()
                 inputBuffer[channel] = buffer.getSampleData(channel, sample);
             }
             
-            mpOnsets[miCurrentBlock] = onsetClassifier->process(inputBuffer);
+            //mpOnsets[miCurrentBlock] = onsetClassifier->process(inputBuffer);
             
         }
         
         
         
         
-        std::ofstream outputOnsetTxtFile;
-        outputOnsetTxtFile.open("/Users/govindarampingali/Documents/GaTech/Masters Project/MATLAB/outputOnsetsFile.txt");
-        for (int64 i=0; i < miNumBlocks; i++) {
-            outputOnsetTxtFile << mpOnsets[i] << std::endl;
-        }
-        outputOnsetTxtFile.close();
+        //std::ofstream outputOnsetTxtFile;
+        //outputOnsetTxtFile.open("/Users/govindarampingali/Documents/GaTech/Masters Project/MATLAB/outputOnsetsFile.txt");
+        //for (int64 i=0; i < miNumBlocks; i++) {
+        //    outputOnsetTxtFile << mpOnsets[i] << std::endl;
+        //}
+        //outputOnsetTxtFile.close();
 
         
     }

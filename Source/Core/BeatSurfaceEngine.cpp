@@ -15,6 +15,7 @@
 
 BeatSurfaceEngine::BeatSurfaceEngine()
 {
+    
     sharedAudioDeviceManager->getAudioDeviceSetup(deviceSetup);
     
     mfSamplingRate          = deviceSetup.sampleRate;
@@ -22,29 +23,44 @@ BeatSurfaceEngine::BeatSurfaceEngine()
     miNumOutputChannels     = deviceSetup.outputChannels.toInteger();
     miBlockSize             = deviceSetup.bufferSize;
     
-    //liveAudioStream = new AudioStream();
+    liveAudioStream         = new AudioStream();
+    
+    m_iTrainingTime         = 10000;    // 10 seconds
+    m_bTrainingState        = false;
 }
 
 
 BeatSurfaceEngine::~BeatSurfaceEngine()
 {
-    //deviceManager.removeAudioCallback(liveAudioStream);
+    sharedAudioDeviceManager->removeAudioCallback(liveAudioStream);
     
-    onsetClassifier = nullptr;
-    //liveAudioStream = nullptr;
+//    onsetClassifier = nullptr;
+    liveAudioStream = nullptr;
 }
 
 
 void BeatSurfaceEngine::liveAudioStreamButtonClicked(bool toggleState)
 {
     if (toggleState) {
+        liveAudioStream->setMode(BeatSurfaceBase::PlayMode);
+        m_bTrainingState    =   false;
         sharedAudioDeviceManager->addAudioCallback(liveAudioStream);
     }
     
     else {
+        liveAudioStream->setMode(BeatSurfaceBase::IdleMode);
         sharedAudioDeviceManager->removeAudioCallback(liveAudioStream);
     }
-    
+}
+
+
+void BeatSurfaceEngine::trainClassButtonClicked(int classIndex)
+{
+    liveAudioStream->setMode(BeatSurfaceBase::TrainMode);
+    liveAudioStream->setClassIndexToTrain(classIndex);
+    sharedAudioDeviceManager->addAudioCallback(liveAudioStream);
+    m_bTrainingState    =   true;
+    startTimer(m_iTrainingTime);
 }
 
 
@@ -56,21 +72,21 @@ void BeatSurfaceEngine::audioDeviceSettingsChanged()
     miNumInputChannels      = deviceSetup.inputChannels.toInteger();
     miNumOutputChannels     = deviceSetup.outputChannels.toInteger();
     miBlockSize             = deviceSetup.bufferSize;
-    
-    std::cout << miBlockSize <<std::endl;
 }
 
 
-void BeatSurfaceEngine::parametersChanged(int parameterID, float parameterValue)
+
+void BeatSurfaceEngine::parametersChanged(BeatSurfaceBase::ParameterID parameterID, float parameterValue)
 {
-    switch (parameterID) {
+    switch (parameterID)
+    {
             
-        case 0:
-            onsetClassifier->setVelocitySensitivity(parameterValue);
+        case BeatSurfaceBase::VelocitySensitivity :
+            liveAudioStream->onsetClassifier->setVelocitySensitivity(parameterValue);
             break;
             
-        case 1:
-            onsetClassifier->setDecayTimeSensitivity(parameterValue);
+        case BeatSurfaceBase::DecayTimeSensitivity :
+            liveAudioStream->onsetClassifier->setDecayTimeSensitivity(parameterValue);
             break;
             
         default:
@@ -79,3 +95,39 @@ void BeatSurfaceEngine::parametersChanged(int parameterID, float parameterValue)
 }
 
 
+
+void BeatSurfaceEngine::timerCallback()
+{
+    if (m_bTrainingState) {
+        sharedAudioDeviceManager->removeAudioCallback(liveAudioStream);
+        guiUpdater->doneTraining();
+        stopTimer();
+        m_bTrainingState = false;
+        
+        liveAudioStream->onsetClassifier->userFinishedTraining();
+    }
+}
+
+
+void BeatSurfaceEngine::addClass()
+{
+    liveAudioStream->onsetClassifier->addClass();
+    
+}
+
+
+void BeatSurfaceEngine::deleteClass(int classIndex)
+{
+    liveAudioStream->onsetClassifier->deleteClass(classIndex);
+}
+
+
+void BeatSurfaceEngine::saveTraining(juce::String filePath)
+{
+    liveAudioStream->onsetClassifier->saveTraining(filePath.toStdString());
+}
+
+void BeatSurfaceEngine::loadTraining(juce::String filePath)
+{
+    liveAudioStream->onsetClassifier->loadTraining(filePath.toStdString());
+}

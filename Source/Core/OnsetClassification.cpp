@@ -9,7 +9,8 @@
 */
 
 #include "OnsetClassification.h"
-
+#include <stdio.h>
+#include <iostream>
 
 OnsetClassification::OnsetClassification(int blockSize, int numChannels, float sampleRate)
 {
@@ -44,8 +45,8 @@ OnsetClassification::OnsetClassification(int blockSize, int numChannels, float s
     
     //--- Initializing Variables ---//
     
-    miFrequencyBinHighLimit = 19;
-    miFrequencyBinLowLimit = 1;
+    miFrequencyBinHighLimit = 15;
+    miFrequencyBinLowLimit = 5;
     miNumFeatures = miFrequencyBinHighLimit - miFrequencyBinLowLimit + 1;
     
     mfNoveltyFunction = 0;
@@ -86,6 +87,23 @@ OnsetClassification::OnsetClassification(int blockSize, int numChannels, float s
     
     
 //    miK = 1;
+    
+    
+    //--- Train Parameters ---//
+    m_iCurrentClassIndex = 0;
+    m_iNumClasses = 0;
+    m_iNumObservations = 0;
+    m_ppfTrainingData.resize(miNumFeatures);
+    
+    probabilityEstimates    = nullptr;
+    svmTrainer              = nullptr;
+    svmClassifier           = nullptr;
+    
+    m_pfTestingVector = new float[miNumFeatures];
+    
+    svmClassifier = new SVMClassify();
+    
+    
 }
 
 
@@ -102,6 +120,8 @@ OnsetClassification::~OnsetClassification()
     delete [] mpCurrentImgFFT;
     delete [] mpPreviousRealFFT;
     
+    delete [] m_pfTestingVector;
+    
 
 //    delete [] mpTrainingMatrix1;
 //    delete [] mpTrainingMatrix2;
@@ -114,81 +134,40 @@ OnsetClassification::~OnsetClassification()
 //
 //    delete knnClassifier;
     
+    if (probabilityEstimates != nullptr) {
+        delete [] probabilityEstimates;
+    }
+    probabilityEstimates = nullptr;
+    
+    if(svmClassifier != nullptr)
+    {
+        delete svmClassifier;
+    }
+    svmClassifier = nullptr;
+    
+    
+    if (svmTrainer != nullptr) {
+        delete svmTrainer;
+    }
+    svmTrainer = nullptr;
+    
     
     delete stft;
-//    delete audioFeature;
+    delete audioFeature;
 
 }
 
 
 
-int OnsetClassification::process(const float **inputBuffer)
-{
-    
-    // Write Input
-//    for (int i=0; i < miBlockSize; i++) {
-////        spInputTxtFile << inputBuffer[0][i] << std::endl;
-//    }
-    
-//    int index = 0;
-//    if (detectOnset(inputBuffer)) {
-//        
-//        for (int bin = miLowLimit; bin < miHighLimit; bin++, index++) {
-//            mpTestVector[index] = mpCurrentRealFFT[bin];
-//        }
-//
-//        return 1;
-//        return (knnClassifier->predict(mpTestVector));
-//    }
-   
-    return 0;
-    
-}
+
+//====================================== Process Methods ============================================
 
 
-
-
-void OnsetClassification::train(const float** input, int classLabel)
-{
-//    if (detectOnset(input)) {
-//        
-//        if (classLabel == 1) {
-//            
-//            for (int bin = 0; bin < miNumFeatures; bin++) {
-////                spTrainingFile1 << mpCurrentRealFFT[bin] << "\t";
-//                mpTrainingMatrix1[miNumOnsets1][bin] = mpCurrentRealFFT[bin+miLowLimit];
-//            }
-//            miNumOnsets1++;
-////            spTrainingFile1 << std::endl;
-//            
-//        } else if (classLabel == 2) {
-//            
-//            for (int bin = miLowLimit; bin <= miHighLimit; bin++) {
-////                spTrainingFile2 << mpCurrentRealFFT[bin] << "\t";
-//                mpTrainingMatrix1[miNumOnsets2][bin] = mpCurrentRealFFT[bin+miLowLimit];
-//            }
-////            spTrainingFile2 << std::endl;
-//            miNumOnsets2++;
-//            
-//        } else if (classLabel == 3) {
-//            
-//            for (int bin = miLowLimit; bin <= miHighLimit; bin++) {
-////                spTrainingFile3 << mpCurrentRealFFT[bin] << "\t";
-//                mpTrainingMatrix3[miNumOnsets2][bin] = mpCurrentRealFFT[bin+miLowLimit];
-//            }
-////            spTrainingFile3 << std::endl;
-//            miNumOnsets3++;
-//        }
-//    
-//    }
-    
-}
-
-
-
-//-- Return True if Audio Block Consists of an Onset --//
-
-bool OnsetClassification::detectOnset(const float** input)
+//==============================================================================
+// Return True if Audio Block Consists of an Onset
+// !!! Running on Audio Thread
+//==============================================================================
+bool OnsetClassification::detectOnsets(const float** input)
 {
     
     //--- Compute STFT on 1st channel ---//
@@ -205,7 +184,7 @@ bool OnsetClassification::detectOnset(const float** input)
     mfAdaptiveThreshold = mfDeltaThreshold + (mfNoveltyFunction + mfAdaptiveThreshold) / 2;
     
     
-    
+
     //--- Store Current FFT ---//
     for (int bin = 0; bin < miBinSize; bin++) {
         mpPreviousRealFFT[bin] = mpCurrentRealFFT[bin];
@@ -240,38 +219,66 @@ bool OnsetClassification::detectOnset(const float** input)
 
 
 
-
-void OnsetClassification::doneTraining()
+//==============================================================================
+// Classify Current Audio Block if Onset Detected
+// !!! Running on Audio Thread
+//==============================================================================
+double* OnsetClassification::classify()
 {
-//    int iTotalOnsets = miNumOnsets1 + miNumOnsets2 + miNumOnsets3;
-//    mpTrainingMatrix = new float*[iTotalOnsets];
-//    mpClassLabels   = new int [iTotalOnsets];
-//    
-//    for (int sample = 0; sample < miNumOnsets1; sample++) {
-//        mpTrainingMatrix[sample] = mpTrainingMatrix1[sample];
-//        mpClassLabels[sample] = 1;
-//    }
-//    
-//    int index = 0;
-//    for (int sample = miNumOnsets1; sample < miNumOnsets2; sample++, index++) {
-//        mpTrainingMatrix[sample] = mpTrainingMatrix2[index];
-//        mpClassLabels[sample] = 2;
-//    }
-//    
-//    index = 0;
-//    for (int sample = miNumOnsets2; sample < miNumOnsets3; sample++, index++) {
-//        mpTrainingMatrix[sample] = mpTrainingMatrix3[index];
-//        mpClassLabels[sample] = 3;
-//    }
-//    
-//    
-//    knnClassifier = new KNNClassifier(mpTrainingMatrix, mpClassLabels, iTotalOnsets, miNumFeatures, miK);
-//    
-//    
+    for (int feature = 0; feature < miNumFeatures; feature++) {
+        m_pfTestingVector[feature] = mpCurrentRealFFT[miFrequencyBinLowLimit + feature];
+    }
+    
+    probabilityEstimates = svmClassifier->classify(m_pfTestingVector, miNumFeatures);
+    
+    std::cout << "Out: ";
+    for (int i=0; i < m_iNumClasses; i++) {
+        std::cout << probabilityEstimates[i] << "  ";
+    }
+    std::cout << std::endl;
+    
+    return probabilityEstimates;
+    
 }
 
 
 
+//==============================================================================
+// Add Training Sample if block consists of Onset
+// !!! Running on Audio Thread
+//==============================================================================
+void OnsetClassification::train(int classLabel)
+{
+    //    testTraining.push_back(audioFeature->spectralCentroid(mpCurrentRealFFT));
+    
+    for (int feature = 0; feature < miNumFeatures; feature++) {
+        m_ppfTrainingData[feature].push_back(mpCurrentRealFFT[miFrequencyBinLowLimit + feature]);
+    }
+    
+    m_piClassLabels.push_back(classLabel);
+    
+    m_iNumObservations++;
+    
+}
+
+
+
+//===================================================================================================
+
+
+
+
+
+
+
+
+
+//====================================== Parameter Methods ============================================
+
+
+//==============================================================================
+// Set Audio Parameters - Not Running on Audio Thread
+//==============================================================================
 
 void OnsetClassification::setVelocitySensitivity(float sensitivity)
 {
@@ -295,3 +302,114 @@ float OnsetClassification::getDecayTimeSensitivity()
 {
     return (miDecayBlockWindow / MAX_DECAY_WINDOW_BLOCKS);
 }
+
+
+
+
+
+//==============================================================================
+// Set Training Parameters - Not Running on Audio Thread
+//==============================================================================
+
+void OnsetClassification::addClass()
+{
+    m_iNumClasses++;
+}
+
+void OnsetClassification::deleteClass(int classIndex)
+{
+    m_iNumClasses--;
+    
+    if (m_iNumClasses < 0) {
+        m_iNumClasses = 0;
+    }
+    
+}
+
+void OnsetClassification::setCurrentClassIndex(int classIndex)
+{
+    m_iCurrentClassIndex = classIndex;
+}
+
+
+void OnsetClassification::userFinishedTraining()
+{
+    if (svmTrainer != nullptr) {
+        delete svmTrainer;
+        svmTrainer = nullptr;
+    }
+    
+    svmTrainer = new SVMTrain();
+    
+    
+//    if (svmClassifier) {
+//        delete svmClassifier;
+//        svmClassifier = nullptr;
+//    }
+    
+//    svmClassifier = new SVMClassify();
+
+    
+    // Recreate Probability Estimates
+    if (probabilityEstimates != nullptr) {
+        delete [] probabilityEstimates;
+    }
+    
+    probabilityEstimates = new double [m_iNumClasses];
+    
+    float** ppfTrainingData     = new float* [m_iNumObservations];
+    float*  pfTrainingLabels    = new float [m_iNumObservations];
+    
+    
+    for (int i=0; i < m_iNumObservations; i++) {
+        ppfTrainingData[i] = new float [miNumFeatures];
+    }
+    
+    
+//    std::cout << "Training Data for " << m_iNumObservations << " Observations: \n\n" << std::endl;
+    
+    for (int observation = 0; observation < m_iNumObservations; observation++)
+    {
+//        std::cout << "Class: " << m_piClassLabels[observation] << std::endl;
+        
+        pfTrainingLabels[observation] = m_piClassLabels[observation];
+        
+        for (int feature = 0; feature < miNumFeatures; feature++)
+        {
+            ppfTrainingData[observation][feature] = m_ppfTrainingData[feature][observation];
+            
+//            std::cout << m_ppfTrainingData[feature][observation] << "\t";
+        }
+        
+//        std::cout << std::endl;
+    }
+    
+    svmTrainer->setTrainingDataAndTrain(ppfTrainingData, pfTrainingLabels, miNumFeatures, m_iNumObservations);
+    svmClassifier->setCurrentSVMModel(svmTrainer->getCurrentSVMModel());
+
+    
+    for (int i=0; i < m_iNumObservations; i++) {
+        delete [] ppfTrainingData[i];
+    }
+    
+    delete [] ppfTrainingData;
+    delete [] pfTrainingLabels;
+    
+}
+
+
+
+void OnsetClassification::saveTraining(std::string filePath)
+{
+    svmTrainer->saveModelToDisk(filePath);
+}
+
+
+void OnsetClassification::loadTraining(std::string filePath)
+{
+    svmClassifier->loadModelFromDisk(filePath);
+}
+
+
+//===================================================================================================
+

@@ -23,12 +23,17 @@ public:
     
     
     float spectralFlux(float* previousRealFFT, float* currentRealFFT);
+    float spectralCentroid(float* currentRealFFT);
     
     
 private:
     
-    float mfSpectralSum;
-    float mfSpectralDifference;
+    float mfFlux_SpectralSum;
+    float mfFlux_SpectralDifference;
+    
+    float mfCentroid_Numerator;
+    float mfCentroid_Denominator;
+    float mfCentroid_Square;
     
     int miBlockSize;
     int miBinSize;

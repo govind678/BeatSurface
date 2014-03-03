@@ -11,15 +11,13 @@
 #ifndef BEATSURFACEENGINE_H_INCLUDED
 #define BEATSURFACEENGINE_H_INCLUDED
 
-#include "BeatSurfaceHeader.h"
 
 #include "AudioStream.h"
-#include "AudioFileIO.h"
-#include "OnsetClassification.h"
+//#include "AudioFileIO.h"
+#include "BeatSurfaceHeader.h"
 
 
-
-class BeatSurfaceEngine
+class BeatSurfaceEngine     :   public Timer
 {
     
 public:
@@ -28,8 +26,15 @@ public:
     ~BeatSurfaceEngine();
     
     void liveAudioStreamButtonClicked(bool toggleState);
+    void trainClassButtonClicked(int classIndex);
     void audioDeviceSettingsChanged();
-    void parametersChanged(int parameterID, float parameterValue);
+    void parametersChanged(BeatSurfaceBase::ParameterID parameterID, float parameterValue);
+    
+    void addClass();
+    void deleteClass(int classIndex);
+    
+    void saveTraining(String filePath);
+    void loadTraining(String filePath);
     
     
 private:
@@ -37,13 +42,19 @@ private:
     AudioDeviceManager::AudioDeviceSetup    deviceSetup;
     
     ScopedPointer<AudioStream>              liveAudioStream;
-    ScopedPointer<OnsetClassification>      onsetClassifier;
+
     
     
     float   mfSamplingRate;
     int     miNumInputChannels;
     int     miNumOutputChannels;
     int     miBlockSize;
+    
+    int m_iTrainingTime;
+    bool m_bTrainingState;
+    
+    
+    void timerCallback();
     
     
 };

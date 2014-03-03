@@ -52,12 +52,14 @@ SVMBase::~SVMBase()
     
     
     
-    delete [] m_pdProbability;
-    m_pdProbability     = 0;
     
     
-    delete m_pSVMProblem;
-    m_pSVMProblem = 0;
+    
+    if (m_pSVMProblem != NULL) {
+        delete m_pSVMProblem;
+    }
+    
+    m_pSVMProblem = NULL;
     
     
     
