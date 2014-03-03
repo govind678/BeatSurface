@@ -92,8 +92,6 @@
         <GROUP id="{859071F4-A2C7-CD34-E893-7E0F2A7536C0}" name="LibSVM">
           <FILE id="NKoJeT" name="SVMBase.cpp" compile="1" resource="0" file="Source/Wrappers/LibSVM/SVMBase.cpp"/>
           <FILE id="v4jgCQ" name="SVMBase.h" compile="0" resource="0" file="Source/Wrappers/LibSVM/SVMBase.h"/>
-          <FILE id="EvOCvP" name="SVMClassify.cpp" compile="1" resource="0" file="Source/Wrappers/LibSVM/SVMClassify.cpp"/>
-          <FILE id="t3AsKa" name="SVMClassify.h" compile="0" resource="0" file="Source/Wrappers/LibSVM/SVMClassify.h"/>
           <FILE id="xOYDvY" name="SVMEvaluate.cpp" compile="1" resource="0" file="Source/Wrappers/LibSVM/SVMEvaluate.cpp"/>
           <FILE id="UEhQHT" name="SVMEvaluate.h" compile="0" resource="0" file="Source/Wrappers/LibSVM/SVMEvaluate.h"/>
           <FILE id="z7gUZA" name="SVMTrain.cpp" compile="1" resource="0" file="Source/Wrappers/LibSVM/SVMTrain.cpp"/>

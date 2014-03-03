@@ -25,7 +25,7 @@ BeatSurfaceEngine::BeatSurfaceEngine()
     
     liveAudioStream         = new AudioStream();
     
-    m_iTrainingTime         = 10000;    // 10 seconds
+    m_iTrainingTime         = 5000;    // 10 seconds
     m_bTrainingState        = false;
 }
 

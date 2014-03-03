@@ -26,10 +26,16 @@ public:
     
     Error_t setTrainingDataAndTrain(float **ppfFeatureData, float *pfLabels, int iNumFeatures, int iNumObservations);
     Error_t setParameters(const SvmParameter_t &stSvmParam);
-    Error_t saveModelToDisk(std::string modelFilePath);
-    svm_model*    getCurrentSVMModel();
     
-    void clearModel();
+    
+    double* classify(float *pfFeatures, int iNumFeatures);
+    double getResult (double *pdProbability = 0);
+    double* getProbability();
+    
+    int getNumSvElements( std::string strSvString );
+    
+    Error_t saveModelToDisk(std::string modelFilePath);
+    Error_t loadModelFromDisk(std::string modelFilePath);
     
     
 private:

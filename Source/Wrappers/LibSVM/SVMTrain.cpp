@@ -25,7 +25,12 @@ SVMTrain::SVMTrain()
 
 SVMTrain::~SVMTrain()
 {
+    m_bIsInitialized    = false;
     
+    if (m_pdProbability != NULL) {
+        delete [] m_pdProbability;
+    }
+    m_pdProbability     = NULL;
 }
 
 
@@ -168,6 +173,15 @@ SVMBase::Error_t SVMTrain::setTrainingDataAndTrain(float **ppfFeatureData, float
     m_pSVMModel   = svm_train(m_pSVMProblem, m_pSVMParameters);
     
     
+    
+    if (m_pdProbability != nullptr) {
+        delete [] m_pdProbability;
+    }
+    
+    m_pdProbability = new double [m_pSVMModel->nr_class];
+    memset (m_pdProbability, 0, sizeof(double)*m_pSVMModel->nr_class);
+    
+    
     return kNoError;
 }
 
@@ -187,7 +201,80 @@ SVMBase::Error_t SVMTrain::saveModelToDisk(std::string modelFilePath)
 
 
 
-svm_model* SVMTrain::getCurrentSVMModel()
+double* SVMTrain::classify(float *pfFeatures, int iNumFeatures)
 {
-    return m_pSVMModel;
+    
+    if (!m_bIsInitialized)
+        return 0;
+    
+    int         iNodeIdx        = 0;
+    svm_node    *pSvmFeatures   = new svm_node [iNumFeatures + 1];
+    
+    // copy feature data to svm array
+    for (int i = 0; i < iNumFeatures; i++)
+    {
+        // libsvm expects "sparse" vectors e.g. elements with a value of 0 are left out
+        if (pfFeatures[i] == 0)
+            continue;
+        pSvmFeatures[iNodeIdx].index    = i;
+        pSvmFeatures[iNodeIdx].value    = pfFeatures[i];
+        iNodeIdx++;
+    }
+    pSvmFeatures[iNodeIdx].index    = -1;
+    
+    
+    m_dResult  = svm_predict_probability (m_pSVMModel, pSvmFeatures, m_pdProbability);
+    
+    delete [] pSvmFeatures;
+    
+    return m_pdProbability;
+}
+
+
+
+
+double SVMTrain::getResult( double *pdProbability /*= 0*/ )
+{
+    if (pdProbability)
+        memcpy (pdProbability, m_pdProbability, sizeof(double)*m_pSVMModel->nr_class);
+    
+    return m_dResult;
+}
+
+
+
+double* SVMTrain::getProbability()
+{
+    return m_pdProbability;
+}
+
+
+
+int SVMTrain::getNumSvElements(std::string strSvString )
+{
+    int iNumElements = 0;
+    for (unsigned int i=0; i<strSvString.size(); i++)
+    {
+        if (strSvString[i] == ':') iNumElements++;
+    }
+    return iNumElements;
+}
+
+
+SVMBase::Error_t SVMTrain::loadModelFromDisk(std::string modelFilePath)
+{
+    
+    if((m_pSVMModel = svm_load_model((char*)modelFilePath.c_str())) == 0) {
+        std::cout << "@SVMClassify: Error: Cannot Load SVM model" << std::endl;
+        return kUnknownError;
+    }
+    
+    if (m_pdProbability != nullptr) {
+        delete [] m_pdProbability;
+    }
+    
+    m_pdProbability = new double [m_pSVMModel->nr_class];
+    memset (m_pdProbability, 0, sizeof(double)*m_pSVMModel->nr_class);
+    
+    return kNoError;
 }

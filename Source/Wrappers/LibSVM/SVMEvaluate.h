@@ -13,10 +13,10 @@
 
 
 #include <iostream>
-#include "SVMClassify.h"
+#include "SVMTrain.h"
 
 
-class SVMEvaluate : public SVMClassify
+class SVMEvaluate : public SVMTrain
 {
     
 public:

@@ -97,11 +97,8 @@ OnsetClassification::OnsetClassification(int blockSize, int numChannels, float s
     
     probabilityEstimates    = nullptr;
     svmTrainer              = nullptr;
-    svmClassifier           = nullptr;
     
     m_pfTestingVector = new float[miNumFeatures];
-    
-    svmClassifier = new SVMClassify();
     
     
 }
@@ -134,16 +131,10 @@ OnsetClassification::~OnsetClassification()
 //
 //    delete knnClassifier;
     
-    if (probabilityEstimates != nullptr) {
-        delete [] probabilityEstimates;
-    }
-    probabilityEstimates = nullptr;
-    
-    if(svmClassifier != nullptr)
-    {
-        delete svmClassifier;
-    }
-    svmClassifier = nullptr;
+//    if (probabilityEstimates != nullptr) {
+//        delete [] probabilityEstimates;
+//    }
+//    probabilityEstimates = nullptr;
     
     
     if (svmTrainer != nullptr) {
@@ -229,7 +220,7 @@ double* OnsetClassification::classify()
         m_pfTestingVector[feature] = mpCurrentRealFFT[miFrequencyBinLowLimit + feature];
     }
     
-    probabilityEstimates = svmClassifier->classify(m_pfTestingVector, miNumFeatures);
+    probabilityEstimates = svmTrainer->classify(m_pfTestingVector, miNumFeatures);
     
     std::cout << "Out: ";
     for (int i=0; i < m_iNumClasses; i++) {
@@ -339,6 +330,14 @@ void OnsetClassification::userFinishedTraining()
         svmTrainer = nullptr;
     }
     
+    // Recreate Probability Estimates
+    if (probabilityEstimates != nullptr) {
+        delete [] probabilityEstimates;
+    }
+    
+    probabilityEstimates = new double [m_iNumClasses];
+    
+    
     svmTrainer = new SVMTrain();
     
     
@@ -350,12 +349,7 @@ void OnsetClassification::userFinishedTraining()
 //    svmClassifier = new SVMClassify();
 
     
-    // Recreate Probability Estimates
-    if (probabilityEstimates != nullptr) {
-        delete [] probabilityEstimates;
-    }
-    
-    probabilityEstimates = new double [m_iNumClasses];
+   
     
     float** ppfTrainingData     = new float* [m_iNumObservations];
     float*  pfTrainingLabels    = new float [m_iNumObservations];
@@ -385,7 +379,6 @@ void OnsetClassification::userFinishedTraining()
     }
     
     svmTrainer->setTrainingDataAndTrain(ppfTrainingData, pfTrainingLabels, miNumFeatures, m_iNumObservations);
-    svmClassifier->setCurrentSVMModel(svmTrainer->getCurrentSVMModel());
 
     
     for (int i=0; i < m_iNumObservations; i++) {
@@ -407,7 +400,7 @@ void OnsetClassification::saveTraining(std::string filePath)
 
 void OnsetClassification::loadTraining(std::string filePath)
 {
-    svmClassifier->loadModelFromDisk(filePath);
+    svmTrainer->loadModelFromDisk(filePath);
 }
 
 

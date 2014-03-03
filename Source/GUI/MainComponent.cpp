@@ -343,7 +343,8 @@ void MainComponent::timerCallback()
     
     if(guiUpdater->DisplayOnsetProbabilities) {
         
-        playComponent->shapeButtonArray->flashArray(guiUpdater->getOnsetProbabilities());
+        float* probabilities = guiUpdater->getOnsetProbabilities();
+        playComponent->shapeButtonArray->flashArray(probabilities);
         guiUpdater->DisplayOnsetProbabilities = false;
     }
     
@@ -362,7 +363,7 @@ void MainComponent::addClass()
     
     playComponent->shapeButtonArray->setNumClasses(m_iNumClasses);
     trainComponent->shapeButtonArray->setNumClasses(m_iNumClasses);
-    
+    guiUpdater->setNumClasses(m_iNumClasses);
     
     
     if (m_iNumClasses > 0)

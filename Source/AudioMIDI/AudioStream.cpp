@@ -76,11 +76,9 @@ void AudioStream::audioDeviceIOCallback( const float** inputChannelData,
     
     if (currentMode == BeatSurfaceBase::PlayMode)
     {
-        
         if(onsetClassifier->detectOnsets(inputChannelData))
         {
-            onsetClassifier->classify();
-            guiUpdater->displayTrainingOnset(m_iCurrentClassIndexToTrain);
+            guiUpdater->displayOnsetProbabilities(onsetClassifier->classify());
         }
     }
     

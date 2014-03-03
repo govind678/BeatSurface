@@ -23,7 +23,6 @@
 #include "ShortTermFourierTransform.h"
 #include "AudioFeatureExtraction.h"
 #include "SVMTrain.h"
-#include "SVMClassify.h"
 
 //#include "KNNClassifier.h"
 
@@ -128,9 +127,6 @@ private:
     ShortTermFourierTransform* stft;
     AudioFeatureExtraction* audioFeature;
     SVMTrain*   svmTrainer;
-    SVMClassify* svmClassifier;
-    
-    svm_model* currentModel;
     
 //    KNNClassifier* knnClassifier;
     
