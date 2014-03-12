@@ -467,8 +467,7 @@ void MainComponent::timerCallback()
     
     if(guiUpdater->DisplayOnsetProbabilities)
     {
-        m_pfOnsetProbabilities = guiUpdater->getOnsetProbabilities();
-        playComponent->shapeButtonArray->flashArray(m_pfOnsetProbabilities);
+        playComponent->shapeButtonArray->flashArray(guiUpdater->getOnsetProbabilities());
         guiUpdater->DisplayOnsetProbabilities = false;
     }
     

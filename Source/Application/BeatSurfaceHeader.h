@@ -109,7 +109,7 @@ public:
     ClassButtonArray()
     {
         m_iNumButtons = 0;
-        m_iButtonFlashTime_ms = 20;    // Default 20 ms
+        m_iButtonFlashTime_ms = 40;    // Default 20 ms
         m_fFinalAlpha   =   0.2f;
         m_bFlashArray = false;
         m_pcClassButton.clear(true);

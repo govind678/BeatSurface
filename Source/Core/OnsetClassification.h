@@ -102,7 +102,6 @@ public:
     
     bool detectOnsets(const float** inputBuffer);
     int classify();
-    double* getProbabilityEstimates();
     void train(int classLabel);
     float rootMeanSquare(const float** inputBuffer);
     //==============================================================================
@@ -146,6 +145,7 @@ public:
     
     
     vector<float> getCurrentSpectrum();
+    vector<double> getCurrentProbabilityEstimates();
     
     float getCurrentSpectralCentroid();
     

@@ -233,6 +233,8 @@ int OnsetClassification::classify()
 //        }
         
         m_pcSvmTrainer->classify(m_pfTestingVector.data(), m_sTrainingParameters.iNumFeatures);
+        
+        
         return int(m_pcSvmTrainer->getResult());
     }
     
@@ -244,14 +246,14 @@ int OnsetClassification::classify()
 }
 
 
-double* OnsetClassification::getProbabilityEstimates()
+std::vector<double> OnsetClassification::getCurrentProbabilityEstimates()
 {
-    return m_pdProbabilityEstimates.data();
+    return m_pcSvmTrainer->getProbability();
 }
 
 
 //==============================================================================
-// Add Training Sample if block consists of Onset
+// Add Training sample if block consists of Onset
 // !!! Running on Audio Thread
 //==============================================================================
 void OnsetClassification::train(int classLabel)

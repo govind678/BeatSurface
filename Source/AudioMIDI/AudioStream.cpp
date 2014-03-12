@@ -120,7 +120,7 @@ void AudioStream::audioDeviceIOCallback( const float** inputChannelData,
             if(m_pcOnsetClassifier->getNumClasses() > 0)
             {
                 m_iCurrentClassificationResult  =  m_pcOnsetClassifier->classify();
-//                guiUpdater->displayOnsetProbabilities(m_pcOnsetClassifier->classify());
+                guiUpdater->displayOnsetProbabilities(m_pcOnsetClassifier->getCurrentProbabilityEstimates());
                 m_pcMidiOut->makeNoteAndSend(1, m_iCurrentClassificationResult + 35, int((m_fCurrentRMS * 120.0f) / 0.6f), 250);
             }
             

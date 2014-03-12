@@ -46,7 +46,7 @@ public:
     
     //==============================================================================
     // Display Onset Class Probabilities during Play Mode
-    void displayOnsetProbabilities(vector<float> probabilities);
+    void displayOnsetProbabilities(vector<double> probabilities);
     vector<float> getOnsetProbabilities();
     //==============================================================================
     

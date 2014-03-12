@@ -80,11 +80,11 @@ int GUIUpdater::getCurrentTrainingClass()
 //==============================================================================
 // Flash Class Probabilities
 
-void GUIUpdater::displayOnsetProbabilities(vector<float> probabilities)
+void GUIUpdater::displayOnsetProbabilities(vector<double> probabilities)
 {
     for (int i = 0; i < m_iNumClasses; i++)
     {
-        if (probabilities.size() == 0)
+        if (probabilities.size() != 0)
         {
 //            m_pfOnsetProbabilities.set(i, probabilities[i]);
 //            m_pfOnsetProbabilities.add(probabilities[i]);
