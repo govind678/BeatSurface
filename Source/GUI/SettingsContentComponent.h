@@ -26,12 +26,7 @@ public:
     
     
     void paint (Graphics& g);
-    void resized();
-//    void sliderValueChanged (Slider* sliderThatWasMoved);
-//    void buttonClicked (Button* buttonThatWasClicked);
-    bool keyPressed (const KeyPress& key);
-    bool keyStateChanged (const bool isKeyDown);
-    
+    void resized();    
     
     
 private:
@@ -42,6 +37,13 @@ private:
     ScopedPointer<Label>            velocitySensitivityLabel;
     ScopedPointer<Label>            decayTimeSensitivityLabel;
     ScopedPointer<TextButton>       audioSetupButton;
+    
+    ScopedPointer<Label>            tempoNumBox;
+    ScopedPointer<Label>            numeratorNumBox;
+    ScopedPointer<Label>            denominatorNumBox;
+    
+    ScopedPointer<Label>            tempoLabel;
+    ScopedPointer<Label>            meterLabel;
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SettingsContentComponent)

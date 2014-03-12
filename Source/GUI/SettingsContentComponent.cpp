@@ -16,7 +16,6 @@ SettingsContentComponent::SettingsContentComponent ()
     addAndMakeVisible (audioSetupButton = new TextButton ("audioSetupButton"));
     audioSetupButton->setButtonText (TRANS("Audio Setup"));
     audioSetupButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
-//    audioSetupButton->addListener (TabbedContentComponent);
     audioSetupButton->setColour (TextButton::buttonColourId, Colour (0xff3b3b3b));
     audioSetupButton->setColour (TextButton::buttonOnColourId, Colour (0xff797979));
     
@@ -33,7 +32,6 @@ SettingsContentComponent::SettingsContentComponent ()
     velocitySensitivitySlider->setColour (Slider::textBoxOutlineColourId, Colour (0x00808080));
     velocitySensitivitySlider->setVelocityBasedMode(true);
     velocitySensitivitySlider->setVelocityModeParameters(0.01,1,0.0,true);
-//    velocitySensitivitySlider->addListener (this);
     
     
     addAndMakeVisible (decayTimeSensitivitySlider = new Slider ("decayTimeSensitivitySlider"));
@@ -48,7 +46,7 @@ SettingsContentComponent::SettingsContentComponent ()
     decayTimeSensitivitySlider->setColour (Slider::textBoxOutlineColourId, Colour (0x00808080));
     decayTimeSensitivitySlider->setVelocityBasedMode(true);
     decayTimeSensitivitySlider->setVelocityModeParameters(0.01,1,0.0,true);
-//    decayTimeSensitivitySlider->addListener (this);
+    
     
     
     
@@ -74,7 +72,68 @@ SettingsContentComponent::SettingsContentComponent ()
     decayTimeSensitivityLabel->setColour (TextEditor::textColourId, Colour (0xff3d4248));
     decayTimeSensitivityLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     decayTimeSensitivityLabel->setColour (TextEditor::highlightColourId, Colour (0x00000000));
+    
+    
 
+    
+    addAndMakeVisible (tempoNumBox = new Label ("tempoNumBox", TRANS("120.00")));
+    tempoNumBox->setFont (Font ("Myriad Pro", 16.00f, Font::bold));
+    tempoNumBox->setJustificationType (Justification::centred);
+    tempoNumBox->setEditable (true, false, false);
+    tempoNumBox->setColour(Label::textColourId, Colour (0xFF000000));
+    tempoNumBox->setColour(Label::backgroundColourId, Colour(0xDD999999));
+    tempoNumBox->setColour(Label::outlineColourId, Colour(0xFF000000));
+    tempoNumBox->setColour(TextEditor::textColourId, Colour (0xFF000000));
+    tempoNumBox->setColour(TextEditor::backgroundColourId, Colour (0xDD999999));
+    tempoNumBox->setColour(TextEditor::highlightColourId, Colour (0xFFDDDDDD));
+    tempoNumBox->setBorderSize(0, 0);
+    
+    
+    addAndMakeVisible (numeratorNumBox = new Label ("numeratorNumBox", TRANS("4")));
+    numeratorNumBox->setFont (Font ("Myriad Pro", 15.00f, Font::bold));
+    numeratorNumBox->setJustificationType (Justification::centred);
+    numeratorNumBox->setEditable (true, false, false);
+    numeratorNumBox->setColour(Label::textColourId, Colour (0xFF000000));
+    numeratorNumBox->setColour(Label::backgroundColourId, Colour(0xDD999999));
+    numeratorNumBox->setColour(Label::outlineColourId, Colour(0xFF000000));
+    numeratorNumBox->setColour(TextEditor::textColourId, Colour (0xFF000000));
+    numeratorNumBox->setColour(TextEditor::backgroundColourId, Colour (0xDD999999));
+    numeratorNumBox->setColour(TextEditor::highlightColourId, Colour (0xFFDDDDDD));
+    numeratorNumBox->setBorderSize(0, 0);
+    
+    
+    addAndMakeVisible (denominatorNumBox = new Label ("denominatorNumBox", TRANS("4")));
+    denominatorNumBox->setFont (Font ("Myriad Pro", 15.00f, Font::bold));
+    denominatorNumBox->setJustificationType (Justification::centred);
+    denominatorNumBox->setEditable (true, false, false);
+    denominatorNumBox->setColour(Label::textColourId, Colour (0xFF000000));
+    denominatorNumBox->setColour(Label::backgroundColourId, Colour(0xDD999999));
+    denominatorNumBox->setColour(Label::outlineColourId, Colour(0xFF000000));
+    denominatorNumBox->setColour(TextEditor::textColourId, Colour (0xFF000000));
+    denominatorNumBox->setColour(TextEditor::backgroundColourId, Colour (0xDD999999));
+    denominatorNumBox->setColour(TextEditor::highlightColourId, Colour (0xFFDDDDDD));
+    denominatorNumBox->setBorderSize(0, 0);
+    
+    
+    
+    addAndMakeVisible (tempoLabel = new Label ("tempoLabel", TRANS("Tempo")));
+    tempoLabel->setFont (Font ("Myriad Pro", 14.00f, Font::bold));
+    tempoLabel->setJustificationType (Justification::right);
+    tempoLabel->setEditable (false, false, false);
+    tempoLabel->setColour (Label::textColourId, Colour (0xFF667788));
+    tempoLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    tempoLabel->setColour (TextEditor::highlightColourId, Colour (0x00000000));
+    
+    
+    addAndMakeVisible (meterLabel = new Label ("meterLabel", TRANS("Meter")));
+    meterLabel->setFont (Font ("Myriad Pro", 14.00f, Font::bold));
+    meterLabel->setJustificationType (Justification::right);
+    meterLabel->setEditable (false, false, false);
+    meterLabel->setColour (Label::textColourId, Colour (0xFF667788));
+    meterLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    meterLabel->setColour (TextEditor::highlightColourId, Colour (0x00000000));
+    
+    
 
     setSize (getParentWidth(), getParentHeight());
 }
@@ -88,6 +147,13 @@ SettingsContentComponent::~SettingsContentComponent()
     velocitySensitivityLabel    = nullptr;
     decayTimeSensitivityLabel   = nullptr;
     audioSetupButton            = nullptr;
+    tempoNumBox                 = nullptr;
+    numeratorNumBox             = nullptr;
+    denominatorNumBox           = nullptr;
+    tempoLabel                  = nullptr;
+    meterLabel                  = nullptr;
+    
+    deleteAllChildren();
 }
 
 
@@ -105,19 +171,11 @@ void SettingsContentComponent::resized()
     decayTimeSensitivitySlider->setBounds ((getWidth() / 2) + 90 - ((90) / 2), (getHeight() / 2) + 90 - ((90) / 2), 90, 90);
     velocitySensitivityLabel->setBounds ((getWidth() / 2) + -90 - ((150) / 2), (getHeight() / 2) + 145 - ((20) / 2), 150, 20);
     decayTimeSensitivityLabel->setBounds ((getWidth() / 2) + 90 - ((150) / 2), (getHeight() / 2) + 145 - ((20) / 2), 150, 20);
-}
-
-
-
-
-
-bool SettingsContentComponent::keyPressed (const KeyPress& key)
-{
-    return false;  // Return true if your handler uses this key event, or false to allow it to be passed-on.
-}
-
-
-bool SettingsContentComponent::keyStateChanged (const bool isKeyDown)
-{
-    return false;  // Return true if your handler uses this key event, or false to allow it to be passed-on.
+    
+    tempoNumBox          -> setBounds(getWidth() - 80, 90, 60, 20);
+    numeratorNumBox      -> setBounds(getWidth() - 80, 110, 25, 20);
+    denominatorNumBox    -> setBounds(getWidth() - 45, 110, 25, 20);
+    
+    tempoLabel           -> setBounds(getWidth() - 140, 90, 60, 20);
+    meterLabel           -> setBounds(getWidth() - 140, 110, 60, 20);
 }

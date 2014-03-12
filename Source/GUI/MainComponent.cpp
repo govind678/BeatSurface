@@ -21,11 +21,15 @@ ScopedPointer<BeatSurfaceEngine> beatSurfaceEngine;
 
 MainComponent::MainComponent()
 {
-    playComponent = new PlayContentComponent();
-    trainComponent = new TrainContentComponent();
-    settingsComponent = new SettingsContentComponent();
     
-    beatSurfaceEngine = new BeatSurfaceEngine();
+    m_eCurrentMode              = BeatSurfaceBase::IdleMode;
+    
+    
+    playComponent               = new PlayContentComponent();
+    settingsComponent           = new SettingsContentComponent();
+    
+    beatSurfaceEngine           = new BeatSurfaceEngine();
+    globalClock->setBeatSurfaceEngine(beatSurfaceEngine);
     
     commandManager->registerAllCommandsForTarget (this);
     
@@ -33,24 +37,27 @@ MainComponent::MainComponent()
     tabbedComponent->setTabBarDepth (50);
     
     tabbedComponent->addTab (TRANS("Play"),     Colour (0xff2b2b2b), playComponent,     true);
-    tabbedComponent->addTab (TRANS("Train"),    Colour (0xff2b2b2b), trainComponent,    true);
     tabbedComponent->addTab (TRANS("Settings"), Colour (0xff2b2b2b), settingsComponent, true);
     tabbedComponent->setCurrentTabIndex (0);
     
     
     
     
-    playComponent->audioStreamToggleButton->addListener(this);
-    
-    trainComponent->addClassButton->addListener(this);
-    trainComponent->deleteClassButton->addListener(this);
-    trainComponent->saveTrainingButton->addListener(this);
-    trainComponent->loadTrainingButton->addListener(this);
+    playComponent->toolBarControls->audioStreamToggleButton->addListener(this);
+    playComponent->toolBarControls->recordToggleButton->addListener(this);
+    playComponent->toolBarControls->addClassButton->addListener(this);
+    playComponent->toolBarControls->deleteClassButton->addListener(this);
+    playComponent->toolBarControls->saveTrainingButton->addListener(this);
+    playComponent->toolBarControls->loadTrainingButton->addListener(this);
+    playComponent->trainingTimeinBarsSlider->addListener(this);
+
 
     settingsComponent->audioSetupButton->addListener(this);
-    
     settingsComponent->velocitySensitivitySlider->addListener(this);
     settingsComponent->decayTimeSensitivitySlider->addListener(this);
+    settingsComponent->tempoNumBox->addListener(this);
+    settingsComponent->numeratorNumBox->addListener(this);
+    settingsComponent->denominatorNumBox->addListener(this);
     
     
     
@@ -88,6 +95,10 @@ MainComponent::MainComponent()
     audioSetup = new AudioSetupDisplay;
     audioSetup->applyAudioSettingsButton->addListener(this);
     
+    addAndMakeVisible(clockDisplay = new ClockDisplayComponent);
+    clockDisplay->setClickingTogglesState(true);
+    clockDisplay->addListener(this);
+    
     
     m_iCurentSelectedClass = 1;
     m_iNumClasses = 0;
@@ -95,7 +106,7 @@ MainComponent::MainComponent()
     setSize(getParentWidth(), getParentHeight());
     
     
-    trainComponent->shapeButtonArray->setButtonFlashTime_ms(15);
+    playComponent->shapeButtonArray->setButtonFlashTime_ms(15);
     
     startTimer(BeatSurfaceBase::iGUITimerInterval);
     
@@ -105,11 +116,10 @@ MainComponent::MainComponent()
 
 MainComponent::~MainComponent()
 {
+    m_pfOnsetProbabilities.clear();
     
-    sharedAudioDeviceManager->removeAudioCallback(playComponent->liveAudioScroller);
     
     playComponent               = nullptr;
-    trainComponent              = nullptr;
     settingsComponent           = nullptr;
     
     tabbedComponent             = nullptr;
@@ -123,6 +133,8 @@ MainComponent::~MainComponent()
     beatSurfaceEngine           = nullptr;
     
     audioSetup                  = nullptr;
+    
+    clockDisplay                = nullptr;
 
     
     deleteAllChildren();
@@ -145,6 +157,8 @@ void MainComponent::resized()
     
     beatSurfaceLabel->setBounds (getWidth() - 130, getHeight() - 45 - 24, 128, 24);
     gtcmtLabel->setBounds (getWidth() - 38 - 64, getHeight() - 25 - 20, 64, 20);
+    
+    clockDisplay->setBounds(getWidth() - 80, 60, 64, 64);
 }
 
 
@@ -170,26 +184,28 @@ void MainComponent::focusLost (FocusChangeType cause)
 void MainComponent::buttonClicked (Button* buttonThatWasClicked)
 {
     
+    //--- Launch Audio Preferences ---//
     if(buttonThatWasClicked == settingsComponent->audioSetupButton)
     {
         launchPreferences();
     }
     
-    
+    //--- Apply Current Audio Settings ---//
     if (buttonThatWasClicked == audioSetup->applyAudioSettingsButton)
     {
         beatSurfaceEngine->audioDeviceSettingsChanged();
     }
 
     
-    if (buttonThatWasClicked == trainComponent->addClassButton)
+    //--- Add Class ---//
+    if (buttonThatWasClicked == playComponent->toolBarControls->addClassButton)
     {
         addClass();
     }
     
     
-    
-    if (buttonThatWasClicked == trainComponent->deleteClassButton)
+    //--- Delete Class ---//
+    if (buttonThatWasClicked == playComponent->toolBarControls->deleteClassButton)
     {
         PopupMenu pop;
         
@@ -199,7 +215,7 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
             }
         }
         
-        pop.showMenuAsync (PopupMenu::Options().withTargetComponent (trainComponent->deleteClassButton), nullptr);
+        pop.showMenuAsync (PopupMenu::Options().withTargetComponent (playComponent->toolBarControls->deleteClassButton), nullptr);
        
         
         deleteClass(0);
@@ -207,22 +223,58 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
     
     
     
-    if (buttonThatWasClicked == playComponent->audioStreamToggleButton)
+    
+    //--- Play Button Clicked ---//
+    if (buttonThatWasClicked == playComponent->toolBarControls->audioStreamToggleButton)
     {
-        if (playComponent->audioStreamToggleButton->getToggleState()) {
+        if (playComponent->toolBarControls->recordToggleButton->getToggleState())
+        {
+            playComponent->toolBarControls->recordToggleButton->setToggleState(false, dontSendNotification);
+        }
+        
+        
+        if (playComponent->toolBarControls->audioStreamToggleButton->getToggleState())
+        {
             beatSurfaceEngine->liveAudioStreamButtonClicked(true);
-//            sharedAudioDeviceManager->addAudioCallback(playComponent->liveAudioScroller);
+            playComponent->shapeButtonArray->setZeroAlpha();
+            m_eCurrentMode  = BeatSurfaceBase::PlayMode;
         }
         
-        else {
+        else
+        {
             beatSurfaceEngine->liveAudioStreamButtonClicked(false);
-//            sharedAudioDeviceManager->removeAudioCallback(playComponent->liveAudioScroller);
+            playComponent->shapeButtonArray->resetAlpha();
+            beatSurfaceEngine->setMode(m_eCurrentMode);
+            m_eCurrentMode  = BeatSurfaceBase::IdleMode;
         }
-        
     }
     
     
-    if (buttonThatWasClicked == trainComponent->loadTrainingButton)
+    //--- Record Button Clicked ---//
+    if (buttonThatWasClicked == playComponent->toolBarControls->recordToggleButton)
+    {
+        if (playComponent->toolBarControls->audioStreamToggleButton->getToggleState())
+        {
+            beatSurfaceEngine->liveAudioStreamButtonClicked(false);
+            playComponent->toolBarControls->audioStreamToggleButton->setToggleState(false, dontSendNotification);
+        }
+        
+        if (playComponent->toolBarControls->recordToggleButton->getToggleState())
+        {
+            m_eCurrentMode  = BeatSurfaceBase::TrainMode;
+            beatSurfaceEngine->setMode(m_eCurrentMode);
+        }
+        
+        else
+        {
+            m_eCurrentMode  = BeatSurfaceBase::IdleMode;
+            beatSurfaceEngine->setMode(m_eCurrentMode);
+        }
+    }
+    
+  
+    //--- Load Training ---//
+    if (buttonThatWasClicked == playComponent->toolBarControls->loadTrainingButton)
     {
         FileChooser fc ("Choose Training File To Load...",
                         File::getCurrentWorkingDirectory(), "*.csv", false);
@@ -234,7 +286,8 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
     }
     
 
-    if (buttonThatWasClicked == trainComponent->saveTrainingButton)
+    //--- Save Training ---//
+    if (buttonThatWasClicked == playComponent->toolBarControls->saveTrainingButton)
     {
         FileChooser fc ("Save Current Training...", File::getCurrentWorkingDirectory(), "*.csv", false);
         
@@ -246,7 +299,7 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
     }
     
     
-    
+    //--- Beat Surface Logo Clicked ---//
     if (buttonThatWasClicked == beatSurfaceLogo)
     {
         String dialogBoxText;
@@ -275,18 +328,53 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
     }
     
     
+    //--- Metronome Button Clicked ---//
+    if (buttonThatWasClicked == clockDisplay)
+    {
+        if(clockDisplay->getToggleState())
+        {
+            globalClock->startClock();
+        }
+        
+        else
+        {
+            globalClock->stopClock();
+        }
+        
+    }
+    
+    
+    //--- Training Class Button Clicked ---//
     if (m_iNumClasses > 0)
     {
-        for (int i = 0; i < m_iNumClasses; i++) {
-            if (buttonThatWasClicked == trainComponent->shapeButtonArray->m_pcClassButton.getUnchecked(i)) {
-                beatSurfaceEngine->trainClassButtonClicked(i+1);
-                trainComponent->shapeButtonArray->m_pcClassButton.getUnchecked(i)->setAlpha(0.2f);
+        for (int i = 0; i < m_iNumClasses; i++)
+        {
+            if (buttonThatWasClicked == playComponent->shapeButtonArray->m_pcClassButton.getUnchecked(i))
+            {
+                if (m_eCurrentMode == BeatSurfaceBase::PlayMode)
+                {
+                    
+                }
+                
+                else if (m_eCurrentMode == BeatSurfaceBase::TrainMode)
+                {
+                    beatSurfaceEngine->trainClassButtonClicked(i+1);
+                    playComponent->shapeButtonArray->m_pcClassButton.getUnchecked(i)->setAlpha(0.2f);
+                }
+                
+                else if (m_eCurrentMode == BeatSurfaceBase::IdleMode)
+                {
+                    beatSurfaceEngine->idleModeClassButtonClicked(i+1);
+                }
+                
             }
         }
     }
     
     
 }
+
+
 
 
 //==============================================================================
@@ -306,7 +394,40 @@ void MainComponent::sliderValueChanged (Slider* sliderThatWasMoved)
         beatSurfaceEngine->parametersChanged(BeatSurfaceBase::DecayTimeSensitivity,
                                              settingsComponent->decayTimeSensitivitySlider->getValue());
     }
+    
+    
+    if (sliderThatWasMoved == playComponent->trainingTimeinBarsSlider)
+    {
+        beatSurfaceEngine->setTrainingTimeinBars(int(playComponent->trainingTimeinBarsSlider->getValue()));
+        
+    }
 }
+
+
+
+//==============================================================================
+// Label Listener
+//==============================================================================
+
+void MainComponent::labelTextChanged (Label *labelThatHasChanged)
+{
+    if (labelThatHasChanged == settingsComponent->tempoNumBox)
+    {
+        globalClock->setTempo(settingsComponent->tempoNumBox->getText().getFloatValue());
+    }
+    
+    if (labelThatHasChanged == settingsComponent->numeratorNumBox)
+    {
+        globalClock->setNumerator(settingsComponent->numeratorNumBox->getText().getIntValue());
+    }
+    
+    if (labelThatHasChanged == settingsComponent->denominatorNumBox)
+    {
+        globalClock->setDenominator(settingsComponent->denominatorNumBox->getText().getIntValue());
+    }
+    
+}
+
 
 
 
@@ -328,28 +449,68 @@ void MainComponent::currentTabChanged(int newCurrentTabIndex, const juce::String
 
 void MainComponent::timerCallback()
 {
-    if (guiUpdater->DisplayTrainingOnset) {
-        trainComponent->shapeButtonArray->flashButton(guiUpdater->getCurrentTrainingClass() - 1, 0.2f);
+    if (guiUpdater->DisplayTrainingOnset)
+    {
+        playComponent->shapeButtonArray->flashButton(guiUpdater->getCurrentTrainingClass() - 1, 0.2f);
         guiUpdater->DisplayTrainingOnset = false;
     }
     
     
-    if (guiUpdater->DoneTraining) {
-        if (m_iNumClasses > 0) {
-            trainComponent->shapeButtonArray->resetAlpha();
+    if (guiUpdater->DoneTraining)
+    {
+        if (m_iNumClasses > 0)
+        {
+            playComponent->shapeButtonArray->resetAlpha();
         }
         guiUpdater->DoneTraining = false;
     }
     
-    if(guiUpdater->DisplayOnsetProbabilities) {
-        
-        float* probabilities = guiUpdater->getOnsetProbabilities();
-        playComponent->shapeButtonArray->flashArray(probabilities);
+    if(guiUpdater->DisplayOnsetProbabilities)
+    {
+        m_pfOnsetProbabilities = guiUpdater->getOnsetProbabilities();
+        playComponent->shapeButtonArray->flashArray(m_pfOnsetProbabilities);
         guiUpdater->DisplayOnsetProbabilities = false;
+    }
+    
+    if(guiUpdater->DrawWaveform)
+    {
+        playComponent->waveformLiveScroller->getSampleToDraw(guiUpdater->getSampleToDrawWaveform());
+        
+//        float sample = guiUpdater->getSampleToDrawWaveform();
+//        playComponent->liveAudioScroller->pushSample(sample);
+//        playComponent->liveAudioScroller->repaint();
+        guiUpdater->DrawWaveform = false;
+    }
+    
+    if(guiUpdater->DrawSpectrum)
+    {
+        playComponent->spectrumLiveScroller->setPointToDisplayInTime(guiUpdater->getSpectralCentroidToDraw());
+        playComponent->spectrumLiveScroller->setArrayToDraw(guiUpdater->getArrayToDrawSpectrum());
+        guiUpdater->DrawSpectrum = false;
     }
     
 }
 
+
+
+//==============================================================================
+// Action Listener
+//==============================================================================
+
+void MainComponent::actionListenerCallback(const String &message)
+{
+    if (message.startsWith("BEAT"))
+    {
+        clockDisplay->flashBeat(message.getLastCharacters(1).getIntValue());
+    }
+    
+    if (message == "UPDATE_TRANSPORT")
+    {
+        playComponent->waveformLiveScroller->updateScrollLineSpacing();
+        playComponent->spectrumLiveScroller->updateScrollLineSpacing();
+    }
+    
+}
 
 
 
@@ -362,7 +523,6 @@ void MainComponent::addClass()
     m_iNumClasses++;
     
     playComponent->shapeButtonArray->setNumClasses(m_iNumClasses);
-    trainComponent->shapeButtonArray->setNumClasses(m_iNumClasses);
     guiUpdater->setNumClasses(m_iNumClasses);
     
     
@@ -371,16 +531,21 @@ void MainComponent::addClass()
         
         for (int i = 0; i < m_iNumClasses; i++)
         {
-            trainComponent->shapeButtonArray->m_pcClassButton.getUnchecked(i)->addListener(this);
+            playComponent->shapeButtonArray->m_pcClassButton.getUnchecked(i)->addListener(this);
         }
     }
-    
-//    playComponent->shapeButtonArray->flashArray(m_pfCurrentOnsetProbabilities);
-    playComponent->shapeButtonArray->setZeroAlpha();
+
+    if (m_eCurrentMode == BeatSurfaceBase::PlayMode)
+    {
+        playComponent->shapeButtonArray->setZeroAlpha();
+    }
     
     beatSurfaceEngine->addClass();
     
+    m_pfOnsetProbabilities.resize(m_iNumClasses);
+    
 }
+
 
 
 void MainComponent::deleteClass(int classIndex)
@@ -392,7 +557,6 @@ void MainComponent::deleteClass(int classIndex)
     }
     
     playComponent->shapeButtonArray->setNumClasses(m_iNumClasses);
-    trainComponent->shapeButtonArray->setNumClasses(m_iNumClasses);
     
 
     
@@ -400,13 +564,18 @@ void MainComponent::deleteClass(int classIndex)
     {
         for (int i = 0; i < m_iNumClasses; i++)
         {
-            trainComponent->shapeButtonArray->m_pcClassButton.getUnchecked(i)->addListener(this);
-            playComponent->shapeButtonArray->m_pcClassButton.getUnchecked(i)->setEnabled(false);
+            playComponent->shapeButtonArray->m_pcClassButton.getUnchecked(i)->addListener(this);
         }
     }
     
-    playComponent->shapeButtonArray->setZeroAlpha();
+    if (m_eCurrentMode == BeatSurfaceBase::PlayMode)
+    {
+        playComponent->shapeButtonArray->setZeroAlpha();
+    }
+    
     beatSurfaceEngine->deleteClass(classIndex);
+    
+    m_pfOnsetProbabilities.resize(m_iNumClasses);
 }
 
 
@@ -536,6 +705,7 @@ bool MainComponent::perform (const InvocationInfo& info)
             
         case CommandIDs::DeleteClass:
             // do something
+            deleteClass(0);
             std::cout << "@MainComponent: Delete class" << std::endl;
             break;
             
@@ -569,6 +739,7 @@ bool MainComponent::perform (const InvocationInfo& info)
                 globalClock->startClock();
             } else {
                 globalClock->stopClock();
+                clockDisplay->repaint();
             }
             break;
             

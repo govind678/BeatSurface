@@ -11,35 +11,30 @@
 #ifndef AUDIOPLAYER_H_INCLUDED
 #define AUDIOPLAYER_H_INCLUDED
 
-#include "JuceHeader.h"
+#include "BeatSurfaceHeader.h"
 
 
-class AudioPlayer   : public Timer
+class AudioPlayer
 {
     
 public:
     
-    AudioPlayer(AudioDeviceManager& deviceManager, AudioDeviceManager::AudioDeviceSetup deviceSetup);
+    AudioPlayer();
     ~AudioPlayer();
     
     void loadFileIntoTransport(const File& audioFile);
-    
-    AudioTransportSource transportSource;
-    
+    void play(int velocity);
     
     
 private:
     
     AudioFormatManager formatManager;
-    AudioDeviceManager &deviceManager;
     
-    AudioSourcePlayer sourcePlayer;
-    ScopedPointer<AudioFormatReaderSource> currentAudioFileSource;
+    AudioSourcePlayer                           sourcePlayer;
+    AudioTransportSource                        transportSource;
+    ScopedPointer<AudioFormatReaderSource>      currentAudioFileSource;
     
-    
-    TimeSliceThread audioPlayerThread;
-    
-    void timerCallback();
+    TimeSliceThread                             thread;
     
 };
 

@@ -13,7 +13,11 @@
 
 #include "JuceHeader.h"
 
-class GlobalClock   :   public Timer
+class MainComponent;
+class BeatSurfaceEngine;
+
+class GlobalClock   :   public Timer,
+                        public ActionBroadcaster
 {
     
 public:
@@ -24,13 +28,23 @@ public:
     void startClock();
     void stopClock();
     void setTempo(float newTempo);
-    void setMeter(int numerator, int denominator);
+    void setNumerator(int numerator);
+    void setDenominator(int denominator);
     void setQuantizationLevel(int quantization);
+    
     bool getMetronomeStatus();
+    float getTempo();
+    int getNumerator();
+    float getTimeInterval();
+    
+    void timerCallback();
+    
+    void setMainComponent(MainComponent* component);
+    void setBeatSurfaceEngine(BeatSurfaceEngine* engine);
     
 private:
     
-    void timerCallback();
+    void updateTimer();
     
     float m_fTempo;
     int m_iNumerator;
@@ -43,6 +57,9 @@ private:
     int m_iBar;
     
     bool m_bMetronomeStatus;
+    
+    MainComponent* mainComponent;
+    BeatSurfaceEngine* beatSurfaceEngine;
     
 };
 

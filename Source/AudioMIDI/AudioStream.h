@@ -13,6 +13,8 @@
 
 #include "BeatSurfaceHeader.h"
 #include "OnsetClassification.h"
+#include "MidiOut.h"
+//#include "AudioPlayer.h"
 
 
 class AudioStream : public AudioIODeviceCallback,
@@ -34,27 +36,48 @@ public:
     void audioDeviceStopped();
     
     void setMode(BeatSurfaceBase::SystemMode newMode);
+    BeatSurfaceBase::SystemMode getMode();
+    
     void setClassIndexToTrain(int newClassIndex);
+    void audioDeviceSettingsChanged();
     
+    void playTrainingDataAtClass(int classIndex);
     
-    ScopedPointer<OnsetClassification> onsetClassifier;
+    ScopedPointer<OnsetClassification> m_pcOnsetClassifier;
     
     
 private:
     
-    AudioDeviceManager::AudioDeviceSetup    deviceSetup;
+    void stopCurrentClassPlayback();
     
-    TimeSliceThread mAudioStreamThread;
+    AudioDeviceManager::AudioDeviceSetup        deviceSetup;
+    OnsetClassification::AudioDeviceSettings    deviceSettings;
     
-    static const int miStopThreadTimeOut_ms = 20;
-    static const int miAudioThreadPriority  = 8;
+    
+    TimeSliceThread m_AudioStreamThread;
+    
+    ScopedPointer<MidiOut> m_pcMidiOut;
+    
+//    OwnedArray<AudioPlayer> m_acAudioPlayer;
+    
+    static const int m_iStopThreadTimeOut_ms = 20;
+    static const int m_iAudioThreadPriority  = 8;
     
     void timerCallback();
     
-    BeatSurfaceBase::SystemMode currentMode;
+    BeatSurfaceBase::SystemMode m_eCurrentMode;
     
     int m_iCurrentClassIndexToTrain;
+    int m_iCurrentClassificationResult;
+    float m_fCurrentRMS;
     
+    Array<float>                                m_pfOnsetProbabilities;
+    
+    OwnedArray<AudioSampleBuffer>               m_ppfOnsetAudio;
+
+    Array<int>                                  m_piClassLabels;
+    
+    int                                         m_iCurrentIndexToPlay;
 };
 
 

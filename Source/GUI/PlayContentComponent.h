@@ -13,7 +13,50 @@
 
 
 #include "BeatSurfaceHeader.h"
-#include "AudioLiveScrollDisplay.h"
+
+#include "LiveScrollDisplay.h"
+
+
+
+class ToolBarControls       :   public Component
+{
+    
+public:
+    
+    ToolBarControls();
+    ~ToolBarControls();
+    
+    
+    void paint (Graphics& g);
+    void resized();
+    
+    
+    ScopedPointer<ImageButton>                  audioStreamToggleButton;
+    ScopedPointer<ImageButton>                  recordToggleButton;
+    
+    ScopedPointer<ImageButton>                  addClassButton;
+    ScopedPointer<ImageButton>                  deleteClassButton;
+    
+    ScopedPointer<ImageButton>                  saveTrainingButton;
+    ScopedPointer<ImageButton>                  loadTrainingButton;
+    
+private:
+    
+    ScopedPointer<Label>                        trainClassLabel;
+    ScopedPointer<Label>                        playLabel;
+    
+    ScopedPointer<Label>                        addClassLabel;
+    ScopedPointer<Label>                        deleteClassLabel;
+    
+    ScopedPointer<Label>                        saveTrainingLabel;
+    ScopedPointer<Label>                        loadTrainingLabel;
+};
+
+
+
+
+//========================================================================================================================
+
 
 
 class PlayContentComponent  :   public Component
@@ -36,8 +79,15 @@ private:
     
     ScopedPointer<ClassButtonArray>             shapeButtonArray;
     
-    ScopedPointer<ImageButton>                  audioStreamToggleButton;
-    ScopedPointer<LiveScrollingAudioDisplay>    liveAudioScroller;
+    ScopedPointer<LiveScrollDisplay>            waveformLiveScroller;
+    ScopedPointer<LiveScrollDisplay>            spectrumLiveScroller;
+    
+    ScopedPointer<ToolBarControls>              toolBarControls;
+    
+    ScopedPointer<Label>            trainingTimeinBarsLabel;
+    ScopedPointer<Slider>           trainingTimeinBarsSlider;
+    
+    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PlayContentComponent)
 };
