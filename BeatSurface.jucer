@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="PLMz1Z" name="BeatSurface" projectType="guiapp" version="1.0.2"
+<JUCERPROJECT id="PLMz1Z" name="Beat Surface" projectType="guiapp" version="1.0.2"
               bundleIdentifier="com.gtcmt.BeatSurface" includeBinaryInAppConfig="1"
               jucerVersion="3.1.0" companyName="GTCMT">
-  <MAINGROUP id="i5OsMR" name="BeatSurface">
+  <MAINGROUP id="i5OsMR" name="Beat Surface">
     <GROUP id="{99C760B5-49A5-C6CC-B929-C97C863BD7F4}" name="Media">
+      <GROUP id="{D2A868D2-335F-7661-87E4-44645D11B7A5}" name="Sounds">
+        <FILE id="DGahzf" name="Tick.wav" compile="0" resource="1" file="Media/Sounds/Tick.wav"/>
+        <FILE id="Th9zwm" name="Tock.wav" compile="0" resource="1" file="Media/Sounds/Tock.wav"/>
+      </GROUP>
       <GROUP id="{AB1409C0-3623-F216-B48F-0F515C545AF2}" name="Images">
+        <FILE id="jlvfgz" name="Stop128.png" compile="0" resource="1" file="Media/Images/Stop128.png"/>
+        <FILE id="PvcMr6" name="RecordOff128.png" compile="0" resource="1"
+              file="Media/Images/RecordOff128.png"/>
+        <FILE id="pYB1AC" name="RecordOn128.png" compile="0" resource="1" file="Media/Images/RecordOn128.png"/>
         <FILE id="O3iFgH" name="Load128.png" compile="0" resource="1" file="Media/Images/Load128.png"/>
         <FILE id="xMREmV" name="Save128.png" compile="0" resource="1" file="Media/Images/Save128.png"/>
         <FILE id="qtMFbj" name="Icon128.png" compile="0" resource="1" file="Media/Images/Icon128.png"/>
         <FILE id="EXg4mf" name="Icon256.png" compile="0" resource="1" file="Media/Images/Icon256.png"/>
         <FILE id="aHAdaI" name="DeleteClass128.png" compile="0" resource="1"
               file="Media/Images/DeleteClass128.png"/>
-        <FILE id="l7wIV4" name="Stop128.png" compile="0" resource="1" file="Media/Images/Stop128.png"/>
         <FILE id="CFdv1Y" name="AddClass128.png" compile="0" resource="1" file="Media/Images/AddClass128.png"/>
         <FILE id="MxdPsn" name="Play128.png" compile="0" resource="1" file="Media/Images/Play128.png"/>
       </GROUP>
@@ -38,6 +45,8 @@
         <FILE id="LSu9ZL" name="MainAppWindow.h" compile="0" resource="0" file="Source/Application/MainAppWindow.h"/>
       </GROUP>
       <GROUP id="{EAD3B3F9-7F87-F24A-7300-BCE9AC3A595F}" name="GUI">
+        <FILE id="NoAnDg" name="LiveScrollDisplay.h" compile="0" resource="0"
+              file="Source/GUI/LiveScrollDisplay.h"/>
         <FILE id="B5mfaQ" name="MainComponent.cpp" compile="1" resource="0"
               file="Source/GUI/MainComponent.cpp"/>
         <FILE id="Y1ma4l" name="MainComponent.h" compile="0" resource="0" file="Source/GUI/MainComponent.h"/>
@@ -49,12 +58,8 @@
               file="Source/GUI/SettingsContentComponent.cpp"/>
         <FILE id="UtMFJx" name="SettingsContentComponent.h" compile="0" resource="0"
               file="Source/GUI/SettingsContentComponent.h"/>
-        <FILE id="Pr4tHv" name="TrainContentComponent.cpp" compile="1" resource="0"
-              file="Source/GUI/TrainContentComponent.cpp"/>
-        <FILE id="LV2yVN" name="TrainContentComponent.h" compile="0" resource="0"
-              file="Source/GUI/TrainContentComponent.h"/>
-        <FILE id="xIhDeE" name="AudioLiveScrollDisplay.h" compile="0" resource="0"
-              file="Source/GUI/AudioLiveScrollDisplay.h"/>
+        <FILE id="xIhDeE" name="LiveScrollAudioDisplay.h" compile="0" resource="0"
+              file="Source/GUI/LiveScrollAudioDisplay.h"/>
         <FILE id="HKNJKK" name="CustomShapeButton.cpp" compile="1" resource="0"
               file="Source/GUI/CustomShapeButton.cpp"/>
         <FILE id="ho3fn6" name="CustomShapeButton.h" compile="0" resource="0"

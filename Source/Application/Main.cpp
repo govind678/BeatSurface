@@ -50,10 +50,6 @@ public:
         sharedAudioDeviceManager = new AudioDeviceManager();
         sharedAudioDeviceManager->initialise(BeatSurfaceBase::iNumInputChannels,
                                              BeatSurfaceBase::iNumOutputChannels, 0, true, String::empty, 0);
-
-        
-        // Global Metronome
-        globalClock = new GlobalClock();
         
         
         
@@ -61,7 +57,11 @@ public:
         
         
         // Synchronus GUI Updater
-        guiUpdater  =   new GUIUpdater();
+        guiUpdater      =   new GUIUpdater();
+        
+    
+        // Global Clock
+        globalClock     =   new GlobalClock();
         
         
         

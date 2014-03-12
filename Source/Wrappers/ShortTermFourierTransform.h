@@ -15,6 +15,7 @@
 
 
 #include <cmath>
+#include <vector>
 #include "AudioFFT.h"
 
 
@@ -23,11 +24,13 @@ class ShortTermFourierTransform
     
 public:
     
-    ShortTermFourierTransform(int blockSize);
+    ShortTermFourierTransform();
     ~ShortTermFourierTransform();
     
     void computeFFT(const float* input, float* realFFT, float* imgFFT);
     void computeIFFT(float* realFFT, float* imgFFT, float* output);
+    
+    void setBufferSize(int bufferSize);
     
     
 private:
@@ -36,10 +39,10 @@ private:
     
     void hannWindow(const float* input, int blockSize);
     
-    int miBinSize;
-    int miBlockSize;
+    int m_iBinSize;
+    int m_iBlockSize;
     
-    float* mpInputBuffer;
+    std::vector<float> m_pfInputBuffer;
     
 };
 

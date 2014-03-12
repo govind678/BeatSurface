@@ -12,9 +12,12 @@
 #define SVMTRAIN_H_INCLUDED
 
 
+#include <vector>
 #include <iostream>
+#include <iterator>
 #include "SVMBase.h"
 
+using std::vector;
 
 class SVMTrain : public SVMBase
 {
@@ -24,13 +27,17 @@ public:
     SVMTrain();
     ~SVMTrain();
     
-    Error_t setTrainingDataAndTrain(float **ppfFeatureData, float *pfLabels, int iNumFeatures, int iNumObservations);
+    Error_t setTrainingDataAndTrain(vector<vector<float>> ppfTrainingData,
+                                    vector<int> piTrainingClassLabels,
+                                    int iNumFeatures,
+                                    int iNumObservations);
+    
     Error_t setParameters(const SvmParameter_t &stSvmParam);
     
     
     double* classify(float *pfFeatures, int iNumFeatures);
     double getResult (double *pdProbability = 0);
-    double* getProbability();
+    vector<double> getProbability();
     
     int getNumSvElements( std::string strSvString );
     
@@ -43,6 +50,8 @@ private:
     void setDefaultParameters();
     
     bool m_bIsInitialized;
+    
+    vector<double> m_pdProbabilityEstimate;
     
 };
 

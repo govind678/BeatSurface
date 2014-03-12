@@ -17,11 +17,14 @@
 #include "CustomShapeButton.h"
 #include "GUIUpdater.h"
 
+#include <stdio.h>
+#include <vector>
 
-extern ScopedPointer<ApplicationCommandManager> commandManager;
-extern ScopedPointer<AudioDeviceManager> sharedAudioDeviceManager;
-extern ScopedPointer<GlobalClock>   globalClock;
-extern ScopedPointer<GUIUpdater>    guiUpdater;
+
+extern ScopedPointer<ApplicationCommandManager>     commandManager;
+extern ScopedPointer<AudioDeviceManager>            sharedAudioDeviceManager;
+extern ScopedPointer<GUIUpdater>                    guiUpdater;
+extern ScopedPointer<GlobalClock>                   globalClock;
 
 
 //=========================================== BeatSurfaceBase Class ======================================================
@@ -75,7 +78,6 @@ public:
     };
     
     
-    
 private:
     
     
@@ -83,6 +85,8 @@ private:
 };
 
 //========================================================================================================================
+
+
 
 
 
@@ -105,7 +109,7 @@ public:
     ClassButtonArray()
     {
         m_iNumButtons = 0;
-        m_iButtonFlashTime_ms = 10;    // Default 10 ms
+        m_iButtonFlashTime_ms = 20;    // Default 20 ms
         m_fFinalAlpha   =   0.2f;
         m_bFlashArray = false;
         m_pcClassButton.clear(true);
@@ -230,11 +234,12 @@ public:
     //==============================================================================
     // Flash All Buttons
     
-    void flashArray(float* alphaValues)
+    void flashArray(std::vector<float> alphaValues)
     {
         if (m_iNumButtons > 0)
         {
-            for (int i=0; i < m_iNumButtons; i++) {
+            for (int i=0; i < m_iNumButtons; i++)
+            {
                 m_pcClassButton.getUnchecked(i)->setAlpha(alphaValues[i]);
             }
             
@@ -364,9 +369,295 @@ private:
 };
 
 
+//========================================================================================================================
+
+
+
+
+
+
+
+//====================================== Clock Display Component =========================================================
+// Component that displays the metronome
+//========================================================================================================================
+
+
+class ClockDisplayComponent     :   public Button,
+                                    public Timer
+{
+    
+public:
+    
+    ClockDisplayComponent()  :   Button("transportButton")
+    {
+        
+        //    addAndMakeVisible (beatLabel = new Label ("beatLabel", TRANS("0")));
+        //    beatLabel->setFont (Font ("Myriad Pro", 14.00f, Font::bold));
+        //    beatLabel->setJustificationType (Justification::centred);
+        //    beatLabel->setEditable (false, false, false);
+        //    beatLabel->setColour (Label::textColourId, Colour (0xFF334455));
+        //    beatLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+        //    beatLabel->setColour (TextEditor::highlightColourId, Colour (0x00000000));
+        //    beatLabel->toBack();
+        
+        normalColour        = Colour(0.1f, 0.8f, 1.0f, 0.5f);
+        overColour          = Colour(0.1f, 0.8f, 0.75f, 0.5f);
+        downColour          = Colour(0.1f, 0.8f, 0.4f, 0.5f);
+        downFlashColour     = Colour(0.15f, 1.0f, 1.0f, 0.8f);
+        normalFlashColour   = Colour(0.1f, 0.8f, 0.6f, 0.7f);
+        offFlashColour      = Colour(0.1f, 0.8f, 0.2f, 0.5f);
+        
+        m_fFlashTime = 50.0f;   // 50 ms
+        
+        currentBeatType = 0;
+        paintToggle     = false;
+    }
+    
+    
+    ~ClockDisplayComponent()
+    {
+        //    beatLabel = nullptr;
+    }
+    
+    
+    void resized()
+    {
+        //    beatLabel->setBounds(0,0, getWidth(), getHeight());
+        ellipse.addEllipse(0.0f, 0.0f, getWidth(), getHeight());
+    }
+    
+    
+    
+    void paintButton(juce::Graphics &g, bool isMouseOverButton, bool isButtonDown)
+    {
+        //    g.fillAll(Colours::white);
+        
+        
+        if (globalClock->getMetronomeStatus())
+        {
+            if (paintToggle)
+            {
+                if (currentBeatType == 1)
+                {
+                    g.setColour(downFlashColour);
+                }
+                
+                else
+                {
+                    g.setColour(normalFlashColour);
+                }
+            }
+            
+            else
+            {
+                g.setColour(offFlashColour);
+            }
+            
+        }
+        
+        else
+        {
+            g.setColour (isButtonDown ? normalColour
+                         : isMouseOverButton ? overColour
+                         : downColour);
+        }
+        
+        
+        g.fillPath(ellipse);
+    }
+    
+    
+    void flashBeat(int newBeatType)
+    {
+        currentBeatType = newBeatType;
+        paintToggle     = true;
+        startTimer(m_fFlashTime);
+        repaint();
+    }
+    
+    
+    void setFlashTime_ms(float flashTime)
+    {
+        m_fFlashTime = flashTime;
+    }
+    
+    
+    void timerCallback()
+    {
+        paintToggle = false;
+        stopTimer();
+        repaint();
+    }
+    
+    
+    bool hitTest(int x, int y)
+    {
+        return ellipse.contains(x,y);
+    }
+    
+    
+    
+private:
+    
+    ScopedPointer<Label>    beatLabel;
+    
+    Colour  normalColour, overColour, downColour;
+    Colour  downFlashColour, normalFlashColour, offFlashColour;
+    
+    Path ellipse;
+    
+    float m_fFlashTime;
+    int currentBeatType;
+    bool paintToggle;
+    
+};
 
 //========================================================================================================================
 
+
+
+
+
+
+//======================================= Custom Inc/Dec Buttons =========================================================
+// Custom Increment and Decrement Button Component
+//========================================================================================================================
+
+
+
+class IncDecButton      :       public Slider,
+                                public ButtonListener
+{
+    
+public:
+    
+    IncDecButton(const String& name)
+    {
+        addAndMakeVisible(incrementButton = new TextButton(name + "inc"));
+        incrementButton->addListener(this);
+        incrementButton->setButtonText (TRANS("+"));
+        
+        addAndMakeVisible(decrementButton = new TextButton(name + "dec"));
+        decrementButton->addListener(this);
+        decrementButton->setButtonText (TRANS("-"));
+        
+        addAndMakeVisible(valueLabel = new Label(name + "label"));
+        valueLabel->setFont (Font ("Myriad Pro", 11.0f, Font::plain));
+        valueLabel->setJustificationType (Justification::centred);
+        valueLabel->setEditable (false, false, false);
+        
+        
+        m_fMinValue = 0.0f;
+        m_fMaxValue = 0.0f;
+        m_fIncrement = 0.0f;
+        m_fCurrentValue = 0.0f;
+    }
+    
+    
+    ~IncDecButton()
+    {
+        incrementButton = nullptr;
+        decrementButton = nullptr;
+        valueLabel      = nullptr;
+    }
+    
+    
+    void setRange(float minValue, float increment, float maxValue)
+    {
+        m_fMinValue     =   minValue;
+        m_fMaxValue     =   maxValue;
+        m_fIncrement    =   increment;
+        
+        m_fCurrentValue = m_fMinValue;
+    }
+    
+    
+    void setBackgroundColours(Colour normalColour, Colour overColour, Colour downColour)
+    {
+        incrementButton->setColour(TextButton::buttonOnColourId, downColour);
+        incrementButton->setColour(TextButton::buttonColourId, normalColour);
+        
+        decrementButton->setColour(TextButton::buttonOnColourId, downColour);
+        decrementButton->setColour(TextButton::buttonColourId, normalColour);
+    }
+    
+    
+    void setTextColours(Colour normalColour, Colour textBoxBackgroundColour, Colour textBoxHighlightColour)
+    {
+        valueLabel->setColour(TextEditor::backgroundColourId, textBoxBackgroundColour);
+        valueLabel->setColour(TextEditor::highlightColourId, textBoxHighlightColour);
+        valueLabel->setColour(TextEditor::textColourId, normalColour);
+    }
+    
+    
+private:
+    
+    void buttonClicked(Button* buttonThatWasClicked)
+    {
+        if (buttonThatWasClicked == incrementButton)
+        {
+            m_fCurrentValue += m_fIncrement;
+            
+            if (m_fCurrentValue > m_fMaxValue)
+            {
+                m_fCurrentValue = m_fMaxValue;
+            }
+            
+            setValue(m_fCurrentValue);
+            
+        }
+        
+        if (buttonThatWasClicked == decrementButton)
+        {
+            m_fCurrentValue -= m_fIncrement;
+            
+            if (m_fCurrentValue < m_fMinValue)
+            {
+                m_fCurrentValue = m_fMinValue;
+            }
+            
+            setValue(m_fCurrentValue);
+        }
+        
+    }
+    
+
+    
+    ScopedPointer<TextButton> incrementButton;
+    ScopedPointer<TextButton> decrementButton;
+    ScopedPointer<Label>    valueLabel;
+    
+    
+    
+    void resized()
+    {
+        incrementButton->setBounds(0, 0, getWidth()/2, getHeight()/2);
+        decrementButton->setBounds(0, getHeight()/2, getWidth()/2, getHeight()/2);
+        valueLabel->setBounds(getWidth()/2, 0, getWidth()/2, getHeight());
+    }
+    
+    
+    void startedDragging()
+    {
+        
+    }
+    
+    
+    void paint (Graphics& g)
+    {
+        g.fillAll(Colours::white);
+    }
+    
+    
+    
+    float m_fMaxValue;
+    float m_fMinValue;
+    float m_fIncrement;
+    
+    float m_fCurrentValue;
+    
+    
+};
 
 
 #endif  // BEATSURFACEHEADER_H_INCLUDED

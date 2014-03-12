@@ -11,7 +11,8 @@
 #ifndef ONSETCLASSIFICATION_H_INCLUDED
 #define ONSETCLASSIFICATION_H_INCLUDED
 
-#define MAX_ONSETS_PER_TRAINING     30
+//#define MAX_ONSETS_PER_TRAINING     80
+#define MAX_BUFFER_SIZE             2048
 
 
 #include <algorithm>
@@ -38,15 +39,61 @@ using std::vector;
 
 class OnsetClassification
 {
-    
+   
+
 public:
+    
     
     //==============================================================================
     // Constructor and Destructor
     
-    OnsetClassification(int blockSize, int numChannels, float sampleRate);
+    OnsetClassification();
     ~OnsetClassification();
     //==============================================================================
+    
+    
+    
+    
+    //==============================================================================
+    // Audio Device Settings Structure
+    
+    struct AudioDeviceSettings
+    {
+        int iBufferSize;
+        int iNumChannels;
+        float fSampleRate;
+    };
+    //==============================================================================
+    
+    
+    
+    
+    //==============================================================================
+    // Detection Parameters Structure
+    
+    struct DetectionParameters
+    {
+        //--- Sensitivity Settings ---//
+        float fDeltaThreshold;
+        int   iDecayBlockWindow;
+    };
+    //==============================================================================
+    
+    
+    
+    
+    //==============================================================================
+    // Classification Parameters Structure
+    
+    struct ClassificationParameters
+    {
+        int iNumClasses;
+        int iNumFeatures;
+        int iNumObservations;
+        bool bDidFinishTraining;
+    };
+    //==============================================================================
+    
     
     
     
@@ -54,11 +101,13 @@ public:
     // Process Methods
     
     bool detectOnsets(const float** inputBuffer);
-    double* classify();
+    int classify();
+    double* getProbabilityEstimates();
     void train(int classLabel);
+    float rootMeanSquare(const float** inputBuffer);
     //==============================================================================
-
-
+    
+    
     
     
     //==============================================================================
@@ -72,112 +121,101 @@ public:
     
     
     
+    
+    //==============================================================================
+    // Set Audio Device Settings
+    
+    void setAudioDeviceSettings(AudioDeviceSettings newSettings);
+    //==============================================================================
+    
+    
+    
+    
     //==============================================================================
     // Set Training Params
     
     void addClass();
     void deleteClass(int classIndex);
     void setCurrentClassIndex(int classIndex);
-    void userFinishedTraining();
+    int  getNumClasses();
+    void doneTraining();
     
-    void saveTraining(std::string filePath);
+    int saveTraining(std::string filePath);
     void loadTraining(std::string filePath);
     //==============================================================================
     
     
+    vector<float> getCurrentSpectrum();
+    
+    float getCurrentSpectralCentroid();
+    
+    
 private:
     
-    
-    float* mpCurrentRealFFT;
-    float* mpCurrentImgFFT;
-    float* mpPreviousRealFFT;
-    
-    bool onsetDetected;
-    
     //--- Low Pass Filter for Detection Function ---//
-    float mfNoveltyFunction;
+    float m_fNoveltyFunction;
     
     
     //--- Moving Average for Threshold ---//
-    float mfAdaptiveThreshold;
-    bool mbDecayPeriod;
-    int  miDecayBlockCounter;
+    float m_fAdaptiveThreshold;
+    bool m_bDecayPeriod;
+    int  m_iDecayBlockCounter;
     
     
-    //--- Max Amplitude for Normalization ---//
-    float mfCurrentMaxDetectionValue;
+    float k_fMaxDeltaThreshold;
+    int   k_iMaxDecayBlockWindow;
     
     
-    //--- Spectrum Bandwidth ---//
-    int miFrequencyBinLowLimit;
-    int miFrequencyBinHighLimit;
-    int miNumFeatures;
+    //--- Input Amplitude ---//
+    float m_fCurrentRootMeanSquare;
     
     
-    //--- Sensitivity Settings ---//
-    float mfDeltaThreshold;
-    int   miDecayBlockWindow;
-    
-    float kfMaxDeltaThreshold;
-    int   kiMaxDecayBlockWindow;
+    //--- Current Features ---//
+    float m_fCurrentSpectralCentroid;
     
     
-    
-    
-    ShortTermFourierTransform* stft;
-    AudioFeatureExtraction* audioFeature;
-    SVMTrain*   svmTrainer;
-    
-//    KNNClassifier* knnClassifier;
-    
+    //--- Classes ---//
+    ShortTermFourierTransform*      m_pcStft;
+    AudioFeatureExtraction*         m_pcAudioFeature;
+    SVMTrain*                       m_pcSvmTrainer;
     
 
     
     
     //--- Audio Parameters ---//
-    int miBinSize;
-    int miBlockSize;
-    int miNumChannels;
-    float mfSampleRate;
+    int m_iBinSize;
+    AudioDeviceSettings m_sDeviceSettings;
     
+    
+    //--- Detection Parameters ---//
+    DetectionParameters m_sDetectionParameters;
     
     
     //--- Training Parameters ---//
-    int m_iNumClasses;
-    int m_iNumObservations;
     int m_iCurrentClassIndex;
+    ClassificationParameters m_sTrainingParameters;
     
-    float* m_pfTestingVector;
+    
+    
+    //--- Spectrum Bandwidth ---//
+    int m_iFrequencyBinLowLimit;
+    int m_iFrequencyBinHighLimit;
+    
+    
+    
+    
+    //--- Buffers ---//
+    vector<float> m_pfCurrentRealFFT;
+    vector<float> m_pfCurrentImgFFT;
+    vector<float> m_pfPreviousRealFFT;
+    
+    
+    //--- Classification ---//
     vector<vector<float>> m_ppfTrainingData;
-    vector<int> m_piClassLabels;
-    double* probabilityEstimates;
+    vector<int> m_piTrainingClassLabels;
     
-    
-    
-    
-//    std::ofstream spTrainingFile1;
-//    std::ofstream spTrainingFile2;
-//    std::ofstream spTrainingFile3;
-    
-//    std::ofstream spOutputFile;
-    
-//    std::string sTrainingPath;
-//    std::string sOutputFilePath;
-
-    
-//    float** mpTrainingMatrix1;
-//    float** mpTrainingMatrix2;
-//    float** mpTrainingMatrix3;
-
-    
-//    int miNumOnsets1;
-//    int miNumOnsets2;
-//    int miNumOnsets3;
-    
-//    float** mpTrainingMatrix;
-//    int* mpClassLabels;
-//    float* mpTestVector;
-//    int miK;
+    vector<float> m_pfTestingVector;
+    vector<double> m_pdProbabilityEstimates;
     
 
 };

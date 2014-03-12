@@ -17,16 +17,28 @@
 #include "BeatSurfaceHeader.h"
 
 
-class BeatSurfaceEngine     :   public Timer
+class BeatSurfaceEngine     :   public Timer,
+                                public ActionListener
 {
     
 public:
     
+    //==============================================================================
+    // Constructor and Destructor
     BeatSurfaceEngine();
     ~BeatSurfaceEngine();
+    //==============================================================================
     
+    
+    
+    
+    //==============================================================================
+    // Interface Methods for GUI -> Beat Surface Core
     void liveAudioStreamButtonClicked(bool toggleState);
+    void setMode(BeatSurfaceBase::SystemMode newMode);
+    
     void trainClassButtonClicked(int classIndex);
+    void idleModeClassButtonClicked(int classIndex);
     void audioDeviceSettingsChanged();
     void parametersChanged(BeatSurfaceBase::ParameterID parameterID, float parameterValue);
     
@@ -36,26 +48,35 @@ public:
     void saveTraining(String filePath);
     void loadTraining(String filePath);
     
+    void setTrainingTimeinBars(int bars);
+    
+    BeatSurfaceBase::SystemMode getSystemMode();
+    //==============================================================================
+    
+    
     
 private:
     
-    AudioDeviceManager::AudioDeviceSetup    deviceSetup;
-    
-    ScopedPointer<AudioStream>              liveAudioStream;
+    //==============================================================================
+    // Action Listener Callback
+    void actionListenerCallback (const String &message);
+    //==============================================================================
 
     
+    ScopedPointer<AudioStream>              m_pcLiveAudioStream;
+
     
-    float   mfSamplingRate;
-    int     miNumInputChannels;
-    int     miNumOutputChannels;
-    int     miBlockSize;
-    
-    int m_iTrainingTime;
+    int m_iTrainingTimeinBars;
+    int m_fTrainingTimeinMS;
     bool m_bTrainingState;
     
+    BeatSurfaceBase::SystemMode m_eCurrentMode;
     
+    //==============================================================================
+    // Timer Callback
     void timerCallback();
-    
+    //==============================================================================
+
     
 };
 

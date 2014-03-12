@@ -83,12 +83,17 @@ SVMBase::Error_t SVMTrain::setParameters(const SvmParameter_t &stSvmParam)
 
 
 
-SVMBase::Error_t SVMTrain::setTrainingDataAndTrain(float **ppfFeatureData, float *pfTargets, int iNumFeatures, int iNumObservations)
+SVMBase::Error_t SVMTrain::setTrainingDataAndTrain(vector<vector<float>> ppfTrainingData,
+                                                   vector<int> piTrainingClassLabels,
+                                                   int iNumFeatures,
+                                                   int iNumObservations)
+
 {
     
     int i, iCurrCol = 0;
     
-    if (!ppfFeatureData || !pfTargets) {
+    if (ppfTrainingData.empty() || piTrainingClassLabels.empty())
+    {
         std::cout << "@SVMTrain: Error: Invalid Function Parameter" << std::endl;
         return kInvalidFunctionParamError;
     }
@@ -106,7 +111,9 @@ SVMBase::Error_t SVMTrain::setTrainingDataAndTrain(float **ppfFeatureData, float
     m_pSVMProblem->y  = new double [iNumObservations];
     m_pSVMProblem->x  = new svm_node* [iNumObservations];
     
-    if (!m_pSVMProblem->y || !m_pSVMProblem->x) {
+    
+    if (!m_pSVMProblem->y || !m_pSVMProblem->x)
+    {
         std::cout << "@SVMTrain: Error: Memory Error" << std::endl;
         return kMemError;
     }
@@ -115,7 +122,8 @@ SVMBase::Error_t SVMTrain::setTrainingDataAndTrain(float **ppfFeatureData, float
     for (i = 0; i < iNumObservations; i++)
     {
         m_pSVMProblem->x[i]   = new svm_node [iNumFeatures+1];
-        if (!m_pSVMProblem->x[i]) {
+        if (!m_pSVMProblem->x[i])
+        {
             std::cout << "@SVMTrain: Error: Memory Error" << std::endl;
             return kMemError;
         }
@@ -130,10 +138,11 @@ SVMBase::Error_t SVMTrain::setTrainingDataAndTrain(float **ppfFeatureData, float
     {
         int j;
         iCurrCol    = 0;
-        m_pSVMProblem->y[i]   = pfTargets[i];
+        m_pSVMProblem->y[i]   = piTrainingClassLabels.at(i);
+        
         for (j = 0; j < iNumFeatures; j++)
         {
-            double dVal = ppfFeatureData[i][j];             // Switching index order: rows -> observations, columns -> features
+            double dVal = double(ppfTrainingData.at(j).at(i));     // Switching index order: rows -> observations, columns -> features
             if (dVal == 0)
                 continue;
             else
@@ -243,9 +252,11 @@ double SVMTrain::getResult( double *pdProbability /*= 0*/ )
 
 
 
-double* SVMTrain::getProbability()
+vector<double> SVMTrain::getProbability()
 {
-    return m_pdProbability;
+    return (vector<double>(m_pdProbability, m_pdProbability + m_pSVMModel->nr_class));
+//    m_pdProbabilityEstimate
+//    return m_pdProbability;
 }
 
 

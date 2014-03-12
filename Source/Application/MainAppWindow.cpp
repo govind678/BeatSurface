@@ -13,13 +13,8 @@
 
 ScopedPointer<ApplicationCommandManager> commandManager;
 ScopedPointer<AudioDeviceManager> sharedAudioDeviceManager;
-ScopedPointer<GlobalClock>  globalClock;
 ScopedPointer<GUIUpdater>   guiUpdater;
-
-
-//--- Document Window Init Size ---//
-static const int iDocumentInitWidth                 = 1024;
-static const int iDocumentInitHeight                = 680;
+ScopedPointer<GlobalClock>  globalClock;
 
 
 MainAppWindow::MainAppWindow()  : DocumentWindow (JUCEApplication::getInstance()->getApplicationName(),
@@ -37,13 +32,16 @@ MainAppWindow::MainAppWindow()  : DocumentWindow (JUCEApplication::getInstance()
     setContentOwned(mainComponent, true);
     
     #if JUCE_MAC
-    centreWithSize (iDocumentInitWidth, iDocumentInitHeight);
+    centreWithSize (getParentWidth(), getParentHeight() - 15);
     #endif
     
     addKeyListener (commandManager->getKeyMappings());
     
+    globalClock->setMainComponent(mainComponent);
+    
     
     setVisible (true);
+    
 }
 
 
@@ -62,27 +60,6 @@ void MainAppWindow::closeButtonPressed()
     JUCEApplication::getInstance()->systemRequestedQuit();
 }
 
-
-
-//AudioDeviceManager& MainAppWindow::getSharedAudioDeviceManager()
-//{
-//    if (sharedAudioDeviceManager == nullptr)
-//    {
-//        sharedAudioDeviceManager = new AudioDeviceManager();
-//        sharedAudioDeviceManager->initialise(BeatSurfaceBase::iNumInputChannels, BeatSurfaceBase::iNumOutputChannels, 0, true, String::empty, 0);
-//    }
-//    
-//    return *sharedAudioDeviceManager;
-//}
-
-
-//ApplicationCommandManager& MainAppWindow::getApplicationCommandManager()
-//{
-//    if (commandManager == nullptr)
-//        commandManager = new ApplicationCommandManager();
-//    
-//    return *commandManager;
-//}
 
 
 

@@ -18,25 +18,36 @@ class AudioFeatureExtraction
 {
 public:
     
-    AudioFeatureExtraction(int blockSize);
+    AudioFeatureExtraction();
     ~AudioFeatureExtraction();
+    
+    void setBufferSize(int bufferSize);
     
     
     float spectralFlux(float* previousRealFFT, float* currentRealFFT);
     float spectralCentroid(float* currentRealFFT);
+    float rootMeanSquare(const float** inputBuffer, int iNumChannels);
     
     
 private:
     
-    float mfFlux_SpectralSum;
-    float mfFlux_SpectralDifference;
+    void reset();
     
-    float mfCentroid_Numerator;
-    float mfCentroid_Denominator;
-    float mfCentroid_Square;
+    //--- Spectral Flux ---//
+    float m_fFlux_SpectralSum;
+    float m_fFlux_SpectralDifference;
     
-    int miBlockSize;
-    int miBinSize;
+    //--- Spectral Centroid ---//
+    float m_fCentroid_Numerator;
+    float m_fCentroid_Denominator;
+    float m_fCentroid_Square;
+    
+    //--- Root Mean Square ---//
+    float m_fRMS_Sum;
+    float m_fRMS_MixDown;
+    
+    int m_iBlockSize;
+    int m_iBinSize;
 
     
 };

@@ -12,139 +12,125 @@
 #include <stdio.h>
 #include <iostream>
 
-OnsetClassification::OnsetClassification(int blockSize, int numChannels, float sampleRate)
+OnsetClassification::OnsetClassification()
 {
-    mfSampleRate = sampleRate;
-    miBlockSize = blockSize;
-    miNumChannels = numChannels;
-    miBinSize = miBlockSize/2 + 1;
+    
+    //--- Initializing Device Settings ---//
+    m_sDeviceSettings.iBufferSize       =   0;
+    m_sDeviceSettings.fSampleRate       =   0;
+    m_sDeviceSettings.iNumChannels      =   0;
+    m_iBinSize                          =   0;
+    
+    
+    
+    //--- Initializing Detection Parameters ---//
+    m_sDetectionParameters.iDecayBlockWindow    =   2;
+    m_sDetectionParameters.fDeltaThreshold      =   0.15f;
+    
+    
+    
+    //--- Initializing Training Parameters ---//
+    m_sTrainingParameters.iNumClasses           =   0;
+    m_sTrainingParameters.iNumFeatures          =   0;
+    m_sTrainingParameters.iNumObservations      =   0;
+    m_sTrainingParameters.bDidFinishTraining    =   false;
+    
+    
+    
+    //--- Initializing Buffers ---//
+    
+    m_pfCurrentImgFFT.assign(0, 0.0f);
+    m_pfCurrentRealFFT.assign(0, 0.0f);
+    m_pfPreviousRealFFT.assign(0, 0.0f);
+    
+    m_pfTestingVector.assign(0, 0.0f);
+    m_piTrainingClassLabels.assign(0, 0);
+    m_pdProbabilityEstimates.assign(0, 0.0f);
+    
+    m_ppfTrainingData.assign(0, vector<float> (0,0));
+    
     
 
     
-    //--- Allocating Memory ---//
+    //--- Allocating Memory / Creating Instances for Utility Objects ---//
+    m_pcStft            = new ShortTermFourierTransform();
+    m_pcAudioFeature    = new AudioFeatureExtraction();
+    m_pcSvmTrainer      = nullptr;
 
-    mpCurrentRealFFT    = new float[miBlockSize];
-    mpCurrentImgFFT     = new float[miBinSize];
-    mpPreviousRealFFT   = new float[miBinSize];
-    
-    stft = new ShortTermFourierTransform(miBlockSize);
-    audioFeature = new AudioFeatureExtraction(miBlockSize);
-    
-    
-    for (int bin = 0; bin < miBinSize; bin++) {
-        mpCurrentRealFFT[bin]   = 0;
-        mpCurrentImgFFT[bin]    = 0;
-        mpPreviousRealFFT[bin]  = 0;
-    }
-    
-    
-//    mpTrainingMatrix = nullptr;
-//    mpClassLabels    = nullptr;
-//    knnClassifier    = nullptr;
-    
+
+
     
     //--- Initializing Variables ---//
+    m_iFrequencyBinHighLimit            = 20;
+    m_iFrequencyBinLowLimit             = 3;
+    m_sTrainingParameters.iNumFeatures  = m_iFrequencyBinHighLimit - m_iFrequencyBinLowLimit + 1;
     
-    miFrequencyBinHighLimit = 15;
-    miFrequencyBinLowLimit = 5;
-    miNumFeatures = miFrequencyBinHighLimit - miFrequencyBinLowLimit + 1;
+
+    m_fNoveltyFunction                  = 0.0f;
+    m_fAdaptiveThreshold                = 0.0f;
+
+    m_bDecayPeriod                      = false;
+    m_iDecayBlockCounter                = 0;
     
-    mfNoveltyFunction = 0;
-    mfAdaptiveThreshold = 0;
-    mfCurrentMaxDetectionValue = 0.3;
-    miDecayBlockWindow = 2;
-    mfDeltaThreshold = 0.15;
-    
-    mbDecayPeriod = false;
-    miDecayBlockCounter = 0;
-    
-    
-    
-//    spTrainingFile1.open(sTrainingPath.append("Class1.txt"));
-//    spTrainingFile2.open(sTrainingPath.append("Class2.txt"));
-//    spTrainingFile3.open(sTrainingPath.append("Class3.txt"));
-//    
-//    spOutputFile.open(sOutputFilePath.append("Output.txt"));
-    
-    
-//    mpTrainingMatrix1 = new float* [MAX_ONSETS_PER_TRAINING];
-//    mpTrainingMatrix2 = new float* [MAX_ONSETS_PER_TRAINING];
-//    mpTrainingMatrix3 = new float* [MAX_ONSETS_PER_TRAINING];
-//    
-//    mpTestVector = new float [miNumFeatures];
-//    
-//    for (int i=0; i < MAX_ONSETS_PER_TRAINING; i++) {
-//        mpTrainingMatrix1[i] = new float [miNumFeatures];
-//        mpTrainingMatrix2[i] = new float [miNumFeatures];
-//        mpTrainingMatrix3[i] = new float [miNumFeatures];
-//    }
-//    
-//
-//    
-//    miNumOnsets1 = 0;
-//    miNumOnsets2 = 0;
-//    miNumOnsets3 = 0;
-    
-    
-//    miK = 1;
-    
-    
+    m_fCurrentRootMeanSquare            = 0.0f;
+    m_fCurrentSpectralCentroid          = 0.0f;
+
+
+
     //--- Train Parameters ---//
-    m_iCurrentClassIndex = 0;
-    m_iNumClasses = 0;
-    m_iNumObservations = 0;
-    m_ppfTrainingData.resize(miNumFeatures);
+    m_iCurrentClassIndex            =   0;
     
-    probabilityEstimates    = nullptr;
-    svmTrainer              = nullptr;
     
-    m_pfTestingVector = new float[miNumFeatures];
-    
+    //--- Resizing Buffers based on Number of Features ---//
+    m_ppfTrainingData.assign(m_sTrainingParameters.iNumFeatures, vector<float> (0,0.0f));
+    m_pfTestingVector.assign(m_sTrainingParameters.iNumFeatures, 0.0f);
     
 }
 
 
 
+
+//==============================================================================
+// Set Audio Device Settings - Initializer Method
+//==============================================================================
+
+void OnsetClassification::setAudioDeviceSettings(OnsetClassification::AudioDeviceSettings newSettings)
+{
+    m_sDeviceSettings = newSettings;
+    
+    m_iBinSize = (m_sDeviceSettings.iBufferSize / 2) + 1;
+    
+    m_pfCurrentRealFFT.assign(m_iBinSize, 0.0f);
+    m_pfCurrentImgFFT.assign(m_iBinSize, 0.0f);
+    m_pfPreviousRealFFT.assign(m_iBinSize, 0.0f);
+    
+    m_pcStft->setBufferSize(m_sDeviceSettings.iBufferSize);
+    m_pcAudioFeature->setBufferSize(m_sDeviceSettings.iBufferSize);
+}
+
+
+
+
 OnsetClassification::~OnsetClassification()
 {
-//    spTrainingFile1.close();
-//    spTrainingFile2.close();
-//    spTrainingFile3.close();
-//    spOutputFile.close();
+    m_pfCurrentRealFFT.clear();
+    m_pfPreviousRealFFT.clear();
+    m_pfCurrentImgFFT.clear();
     
-    
-    delete [] mpCurrentRealFFT;
-    delete [] mpCurrentImgFFT;
-    delete [] mpPreviousRealFFT;
-    
-    delete [] m_pfTestingVector;
+    m_pfTestingVector.clear();
+    m_ppfTrainingData.clear();
+    m_piTrainingClassLabels.clear();
+    m_pdProbabilityEstimates.clear();
     
 
-//    delete [] mpTrainingMatrix1;
-//    delete [] mpTrainingMatrix2;
-//    delete [] mpTrainingMatrix3;
-//
-//    delete [] mpTrainingMatrix;
-//    delete [] mpClassLabels;
-//
-//    delete [] mpTestVector;
-//
-//    delete knnClassifier;
-    
-//    if (probabilityEstimates != nullptr) {
-//        delete [] probabilityEstimates;
-//    }
-//    probabilityEstimates = nullptr;
-    
-    
-    if (svmTrainer != nullptr) {
-        delete svmTrainer;
+    if (m_pcSvmTrainer != nullptr)
+    {
+        delete m_pcSvmTrainer;
     }
-    svmTrainer = nullptr;
+    m_pcSvmTrainer = nullptr;
     
-    
-    delete stft;
-    delete audioFeature;
+    delete m_pcStft;
+    delete m_pcAudioFeature;
 
 }
 
@@ -162,45 +148,54 @@ bool OnsetClassification::detectOnsets(const float** input)
 {
     
     //--- Compute STFT on 1st channel ---//
-    stft->computeFFT(input[0], mpCurrentRealFFT, mpCurrentImgFFT);
+    m_pcStft->computeFFT(input[0], m_pfCurrentRealFFT.data(), m_pfCurrentImgFFT.data());
     
     
     
     //--- Compute Spectral Flux ---//
-    mfNoveltyFunction = audioFeature->spectralFlux(mpPreviousRealFFT, mpCurrentRealFFT);
+    m_fNoveltyFunction = m_pcAudioFeature->spectralFlux(m_pfPreviousRealFFT.data(), m_pfCurrentRealFFT.data());
     
     
     
-    //--- Create Threshold ---//
-    mfAdaptiveThreshold = mfDeltaThreshold + (mfNoveltyFunction + mfAdaptiveThreshold) / 2;
+    //--- Create Adaptive Threshold ---//
+    m_fAdaptiveThreshold = m_sDetectionParameters.fDeltaThreshold + (m_fNoveltyFunction + m_fAdaptiveThreshold) / 2;
     
     
 
     //--- Store Current FFT ---//
-    for (int bin = 0; bin < miBinSize; bin++) {
-        mpPreviousRealFFT[bin] = mpCurrentRealFFT[bin];
-    }
+    memcpy(m_pfPreviousRealFFT.data(), m_pfCurrentRealFFT.data(), m_iBinSize);
     
+    
+    
+    //--- Compute Spectral Centroid ---//
+    m_fCurrentSpectralCentroid = m_pcAudioFeature->spectralCentroid(m_pfCurrentRealFFT.data()) / m_iBinSize;
     
     
     //--- Check for Peaks ---//
-    if (mfNoveltyFunction > mfAdaptiveThreshold)
+    if (m_fNoveltyFunction > m_fAdaptiveThreshold)
     {
-        if (miDecayBlockCounter == 0) {
-            mbDecayPeriod = true;
-            miDecayBlockCounter++;
+        if (m_iDecayBlockCounter == 0)
+        {
+            m_bDecayPeriod = true;
+            m_iDecayBlockCounter++;
             return true;
         }
     }
     
     
+    
     //--- If Not Decay, Reset Counter ---//
-    if (mbDecayPeriod) {
-        if (miDecayBlockCounter == miDecayBlockWindow) {
-            mbDecayPeriod = false;
-            miDecayBlockCounter = 0;
-        } else {
-            miDecayBlockCounter++;
+    if (m_bDecayPeriod)
+    {
+        if (m_iDecayBlockCounter == m_sDetectionParameters.iDecayBlockWindow)
+        {
+            m_bDecayPeriod = false;
+            m_iDecayBlockCounter = 0;
+        }
+        
+        else
+        {
+            m_iDecayBlockCounter++;
         }
     }
     
@@ -214,24 +209,45 @@ bool OnsetClassification::detectOnsets(const float** input)
 // Classify Current Audio Block if Onset Detected
 // !!! Running on Audio Thread
 //==============================================================================
-double* OnsetClassification::classify()
+int OnsetClassification::classify()
 {
-    for (int feature = 0; feature < miNumFeatures; feature++) {
-        m_pfTestingVector[feature] = mpCurrentRealFFT[miFrequencyBinLowLimit + feature];
+    if (m_sTrainingParameters.bDidFinishTraining)
+    {
+        for (int feature = 0; feature < m_sTrainingParameters.iNumFeatures; feature++)
+        {
+            m_pfTestingVector[feature] = m_pfCurrentRealFFT[m_iFrequencyBinLowLimit + feature];
+        }
+        
+//        m_pfTestingVector.assign(m_pfCurrentRealFFT.at(m_iFrequencyBinLowLimit), m_pfCurrentRealFFT.at(m_iFrequencyBinHighLimit));
+//        double* probability = m_pcSvmTrainer->classify(m_pfTestingVector.data(), m_sTrainingParameters.iNumFeatures);
+//        m_pdProbabilityEstimates.assign(std::begin(probability), std::end(probability));
+        
+//        if (probabilityEstimates != nullptr)
+//        {
+//            probabilityEstimates = m_pcSvmTrainer->classify(m_pfTestingVector.data(), m_sTrainingParameters.iNumFeatures);
+//        }
+//        
+//        else
+//        {
+//            m_pcSvmTrainer->classify(m_pfTestingVector.data(), m_sTrainingParameters.iNumFeatures);
+//        }
+        
+        m_pcSvmTrainer->classify(m_pfTestingVector.data(), m_sTrainingParameters.iNumFeatures);
+        return int(m_pcSvmTrainer->getResult());
     }
     
-    probabilityEstimates = svmTrainer->classify(m_pfTestingVector, miNumFeatures);
-    
-    std::cout << "Out: ";
-    for (int i=0; i < m_iNumClasses; i++) {
-        std::cout << probabilityEstimates[i] << "  ";
+    else
+    {
+        return 0;
     }
-    std::cout << std::endl;
-    
-    return probabilityEstimates;
     
 }
 
+
+double* OnsetClassification::getProbabilityEstimates()
+{
+    return m_pdProbabilityEstimates.data();
+}
 
 
 //==============================================================================
@@ -240,19 +256,27 @@ double* OnsetClassification::classify()
 //==============================================================================
 void OnsetClassification::train(int classLabel)
 {
-    //    testTraining.push_back(audioFeature->spectralCentroid(mpCurrentRealFFT));
-    
-    for (int feature = 0; feature < miNumFeatures; feature++) {
-        m_ppfTrainingData[feature].push_back(mpCurrentRealFFT[miFrequencyBinLowLimit + feature]);
+    for (int feature = 0; feature < m_sTrainingParameters.iNumFeatures; feature++)
+    {
+        m_ppfTrainingData.at(feature).push_back(m_pfCurrentRealFFT[m_iFrequencyBinLowLimit + feature]);
     }
     
-    m_piClassLabels.push_back(classLabel);
+    m_piTrainingClassLabels.push_back(classLabel);
     
-    m_iNumObservations++;
+    m_sTrainingParameters.iNumObservations++;
     
 }
 
 
+//==============================================================================
+// Compute Root Mean Square of Time Domain Signal
+// !!! Running on Audio Thread
+//==============================================================================
+float OnsetClassification::rootMeanSquare(const float **inputBuffer)
+{
+    m_fCurrentRootMeanSquare = m_pcAudioFeature->rootMeanSquare(inputBuffer, m_sDeviceSettings.iNumChannels);
+    return m_fCurrentRootMeanSquare;
+}
 
 //===================================================================================================
 
@@ -273,27 +297,26 @@ void OnsetClassification::train(int classLabel)
 
 void OnsetClassification::setVelocitySensitivity(float sensitivity)
 {
-    mfDeltaThreshold = sensitivity * MAX_DELTA_THRESHOLD;
+    m_sDetectionParameters.fDeltaThreshold = sensitivity * MAX_DELTA_THRESHOLD;
 }
 
 
 float OnsetClassification::getVelocitySensitivity()
 {
-    return (mfDeltaThreshold / MAX_DELTA_THRESHOLD);
+    return (m_sDetectionParameters.fDeltaThreshold / MAX_DELTA_THRESHOLD);
 }
 
 
 void OnsetClassification::setDecayTimeSensitivity(float sensitivity)
 {
-    miDecayBlockWindow = (int) (sensitivity * MAX_DECAY_WINDOW_BLOCKS);
+    m_sDetectionParameters.iDecayBlockWindow = (int) (sensitivity * MAX_DECAY_WINDOW_BLOCKS);
 }
 
 
 float OnsetClassification::getDecayTimeSensitivity()
 {
-    return (miDecayBlockWindow / MAX_DECAY_WINDOW_BLOCKS);
+    return (m_sDetectionParameters.iDecayBlockWindow / MAX_DECAY_WINDOW_BLOCKS);
 }
-
 
 
 
@@ -304,18 +327,25 @@ float OnsetClassification::getDecayTimeSensitivity()
 
 void OnsetClassification::addClass()
 {
-    m_iNumClasses++;
+    m_sTrainingParameters.iNumClasses++;
+    
+    m_pdProbabilityEstimates.resize(m_sTrainingParameters.iNumClasses, 0.0f);
 }
 
 void OnsetClassification::deleteClass(int classIndex)
 {
-    m_iNumClasses--;
+    m_sTrainingParameters.iNumClasses--;
     
-    if (m_iNumClasses < 0) {
-        m_iNumClasses = 0;
+    if (m_sTrainingParameters.iNumClasses < 0)
+    {
+        m_sTrainingParameters.iNumClasses = 0;
     }
     
+    
+    m_pdProbabilityEstimates.resize(m_sTrainingParameters.iNumClasses, 0.0f);
+    
 }
+
 
 void OnsetClassification::setCurrentClassIndex(int classIndex)
 {
@@ -323,86 +353,79 @@ void OnsetClassification::setCurrentClassIndex(int classIndex)
 }
 
 
-void OnsetClassification::userFinishedTraining()
+void OnsetClassification::doneTraining()
 {
-    if (svmTrainer != nullptr) {
-        delete svmTrainer;
-        svmTrainer = nullptr;
-    }
-    
-    // Recreate Probability Estimates
-    if (probabilityEstimates != nullptr) {
-        delete [] probabilityEstimates;
-    }
-    
-    probabilityEstimates = new double [m_iNumClasses];
-    
-    
-    svmTrainer = new SVMTrain();
-    
-    
-//    if (svmClassifier) {
-//        delete svmClassifier;
-//        svmClassifier = nullptr;
-//    }
-    
-//    svmClassifier = new SVMClassify();
-
-    
-   
-    
-    float** ppfTrainingData     = new float* [m_iNumObservations];
-    float*  pfTrainingLabels    = new float [m_iNumObservations];
-    
-    
-    for (int i=0; i < m_iNumObservations; i++) {
-        ppfTrainingData[i] = new float [miNumFeatures];
-    }
-    
-    
-//    std::cout << "Training Data for " << m_iNumObservations << " Observations: \n\n" << std::endl;
-    
-    for (int observation = 0; observation < m_iNumObservations; observation++)
+    if (m_sTrainingParameters.iNumClasses > 1)
     {
-//        std::cout << "Class: " << m_piClassLabels[observation] << std::endl;
-        
-        pfTrainingLabels[observation] = m_piClassLabels[observation];
-        
-        for (int feature = 0; feature < miNumFeatures; feature++)
+    
+        //--- Delete Current Training ---//
+        if (m_pcSvmTrainer != nullptr)
         {
-            ppfTrainingData[observation][feature] = m_ppfTrainingData[feature][observation];
-            
-//            std::cout << m_ppfTrainingData[feature][observation] << "\t";
+            delete m_pcSvmTrainer;
+            m_pcSvmTrainer = nullptr;
+        }
+    
+    
+        //--- Create New SVM Trainer and Classifier ---//
+        m_pcSvmTrainer = new SVMTrain();
+    
+        
+        SVMBase::Error_t error  = m_pcSvmTrainer->setTrainingDataAndTrain(m_ppfTrainingData,
+                                                                      m_piTrainingClassLabels,
+                                                                      m_sTrainingParameters.iNumFeatures,
+                                                                      m_sTrainingParameters.iNumObservations);
+    
+        if (error == SVMBase::kNoError)
+        {
+            m_sTrainingParameters.bDidFinishTraining    = true;
         }
         
-//        std::cout << std::endl;
     }
-    
-    svmTrainer->setTrainingDataAndTrain(ppfTrainingData, pfTrainingLabels, miNumFeatures, m_iNumObservations);
-
-    
-    for (int i=0; i < m_iNumObservations; i++) {
-        delete [] ppfTrainingData[i];
-    }
-    
-    delete [] ppfTrainingData;
-    delete [] pfTrainingLabels;
     
 }
 
 
 
-void OnsetClassification::saveTraining(std::string filePath)
+
+int OnsetClassification::saveTraining(std::string filePath)
 {
-    svmTrainer->saveModelToDisk(filePath);
+    if (m_pcSvmTrainer != nullptr)
+    {
+        if (m_sTrainingParameters.bDidFinishTraining)
+        {
+            m_pcSvmTrainer->saveModelToDisk(filePath);
+            return 0;
+        }
+    }
+    
+    return 1;
 }
+
 
 
 void OnsetClassification::loadTraining(std::string filePath)
 {
-    svmTrainer->loadModelFromDisk(filePath);
+    m_pcSvmTrainer->loadModelFromDisk(filePath);
 }
 
 
+int OnsetClassification::getNumClasses()
+{
+    return m_sTrainingParameters.iNumClasses;
+}
+
 //===================================================================================================
+
+
+
+vector<float> OnsetClassification::getCurrentSpectrum()
+{
+    return m_pfCurrentRealFFT;
+}
+
+
+float OnsetClassification::getCurrentSpectralCentroid()
+{
+    return m_fCurrentSpectralCentroid;
+}
 

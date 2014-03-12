@@ -15,63 +15,81 @@
 
 BeatSurfaceEngine::BeatSurfaceEngine()
 {
+    m_pcLiveAudioStream         = new AudioStream();
     
-    sharedAudioDeviceManager->getAudioDeviceSetup(deviceSetup);
-    
-    mfSamplingRate          = deviceSetup.sampleRate;
-    miNumInputChannels      = deviceSetup.inputChannels.toInteger();
-    miNumOutputChannels     = deviceSetup.outputChannels.toInteger();
-    miBlockSize             = deviceSetup.bufferSize;
-    
-    liveAudioStream         = new AudioStream();
-    
-    m_iTrainingTime         = 5000;    // 10 seconds
-    m_bTrainingState        = false;
+    m_iTrainingTimeinBars       = 4;
+    m_fTrainingTimeinMS         = globalClock->getTimeInterval() * globalClock->getNumerator() * m_iTrainingTimeinBars;
+    m_bTrainingState            = false;
 }
 
 
 BeatSurfaceEngine::~BeatSurfaceEngine()
 {
-    sharedAudioDeviceManager->removeAudioCallback(liveAudioStream);
+    sharedAudioDeviceManager->removeAudioCallback(m_pcLiveAudioStream);
     
-//    onsetClassifier = nullptr;
-    liveAudioStream = nullptr;
+    m_pcLiveAudioStream = nullptr;
 }
+
+
+
+
+void BeatSurfaceEngine::setMode(BeatSurfaceBase::SystemMode newMode)
+{
+    m_eCurrentMode  =   newMode;
+    m_pcLiveAudioStream->setMode(newMode);
+    
+    if (m_eCurrentMode == BeatSurfaceBase::PlayMode)
+    {
+        
+    }
+    
+}
+
 
 
 void BeatSurfaceEngine::liveAudioStreamButtonClicked(bool toggleState)
 {
-    if (toggleState) {
-        liveAudioStream->setMode(BeatSurfaceBase::PlayMode);
+    if (toggleState)
+    {
+        m_pcLiveAudioStream->setMode(BeatSurfaceBase::PlayMode);
         m_bTrainingState    =   false;
-        sharedAudioDeviceManager->addAudioCallback(liveAudioStream);
+        sharedAudioDeviceManager->addAudioCallback(m_pcLiveAudioStream);
     }
     
-    else {
-        liveAudioStream->setMode(BeatSurfaceBase::IdleMode);
-        sharedAudioDeviceManager->removeAudioCallback(liveAudioStream);
+    else
+    {
+        m_pcLiveAudioStream->setMode(BeatSurfaceBase::IdleMode);
+        sharedAudioDeviceManager->removeAudioCallback(m_pcLiveAudioStream);
     }
 }
 
 
 void BeatSurfaceEngine::trainClassButtonClicked(int classIndex)
 {
-    liveAudioStream->setMode(BeatSurfaceBase::TrainMode);
-    liveAudioStream->setClassIndexToTrain(classIndex);
-    sharedAudioDeviceManager->addAudioCallback(liveAudioStream);
-    m_bTrainingState    =   true;
-    startTimer(m_iTrainingTime);
+    if (m_eCurrentMode == BeatSurfaceBase::TrainMode)
+    {
+        m_pcLiveAudioStream->setClassIndexToTrain(classIndex);
+        sharedAudioDeviceManager->addAudioCallback(m_pcLiveAudioStream);
+        m_bTrainingState    =   true;
+        globalClock->startClock();
+        startTimer(m_fTrainingTimeinMS);
+    }
+    
+    else if (m_eCurrentMode == BeatSurfaceBase::PlayMode)
+    {
+       
+    }
 }
 
+void BeatSurfaceEngine::idleModeClassButtonClicked(int classIndex)
+{
+    m_pcLiveAudioStream->setMode(BeatSurfaceBase::IdleMode);
+    m_pcLiveAudioStream->playTrainingDataAtClass(classIndex);
+}
 
 void BeatSurfaceEngine::audioDeviceSettingsChanged()
 {
-    sharedAudioDeviceManager->getAudioDeviceSetup(deviceSetup);
-    
-    mfSamplingRate          = deviceSetup.sampleRate;
-    miNumInputChannels      = deviceSetup.inputChannels.toInteger();
-    miNumOutputChannels     = deviceSetup.outputChannels.toInteger();
-    miBlockSize             = deviceSetup.bufferSize;
+    m_pcLiveAudioStream->audioDeviceSettingsChanged();
 }
 
 
@@ -80,13 +98,12 @@ void BeatSurfaceEngine::parametersChanged(BeatSurfaceBase::ParameterID parameter
 {
     switch (parameterID)
     {
-            
         case BeatSurfaceBase::VelocitySensitivity :
-            liveAudioStream->onsetClassifier->setVelocitySensitivity(parameterValue);
+            m_pcLiveAudioStream->m_pcOnsetClassifier->setVelocitySensitivity(parameterValue);
             break;
             
         case BeatSurfaceBase::DecayTimeSensitivity :
-            liveAudioStream->onsetClassifier->setDecayTimeSensitivity(parameterValue);
+            m_pcLiveAudioStream->m_pcOnsetClassifier->setDecayTimeSensitivity(parameterValue);
             break;
             
         default:
@@ -95,39 +112,64 @@ void BeatSurfaceEngine::parametersChanged(BeatSurfaceBase::ParameterID parameter
 }
 
 
+BeatSurfaceBase::SystemMode BeatSurfaceEngine::getSystemMode()
+{
+    return m_pcLiveAudioStream->getMode();
+}
+
+
 
 void BeatSurfaceEngine::timerCallback()
 {
-    if (m_bTrainingState) {
-        sharedAudioDeviceManager->removeAudioCallback(liveAudioStream);
+    if (m_bTrainingState)
+    {
+        sharedAudioDeviceManager->removeAudioCallback(m_pcLiveAudioStream);
         guiUpdater->doneTraining();
+        globalClock->stopClock();
         stopTimer();
         m_bTrainingState = false;
         
-        liveAudioStream->onsetClassifier->userFinishedTraining();
+        m_pcLiveAudioStream->m_pcOnsetClassifier->doneTraining();
     }
 }
 
 
 void BeatSurfaceEngine::addClass()
 {
-    liveAudioStream->onsetClassifier->addClass();
-    
+    m_pcLiveAudioStream->m_pcOnsetClassifier->addClass();
 }
 
 
 void BeatSurfaceEngine::deleteClass(int classIndex)
 {
-    liveAudioStream->onsetClassifier->deleteClass(classIndex);
+    m_pcLiveAudioStream->m_pcOnsetClassifier->deleteClass(classIndex);
 }
 
 
 void BeatSurfaceEngine::saveTraining(juce::String filePath)
 {
-    liveAudioStream->onsetClassifier->saveTraining(filePath.toStdString());
+    m_pcLiveAudioStream->m_pcOnsetClassifier->saveTraining(filePath.toStdString());
 }
+
 
 void BeatSurfaceEngine::loadTraining(juce::String filePath)
 {
-    liveAudioStream->onsetClassifier->loadTraining(filePath.toStdString());
+    m_pcLiveAudioStream->m_pcOnsetClassifier->loadTraining(filePath.toStdString());
+}
+
+
+
+void BeatSurfaceEngine::setTrainingTimeinBars(int bars)
+{
+    m_iTrainingTimeinBars       =   bars;
+    m_fTrainingTimeinMS         =   globalClock->getTimeInterval() * globalClock->getNumerator() * m_iTrainingTimeinBars;
+}
+
+
+void BeatSurfaceEngine::actionListenerCallback(const juce::String &message)
+{
+    if (message == "UPDATE_TRANSPORT")
+    {
+        m_fTrainingTimeinMS         =   globalClock->getTimeInterval() * globalClock->getNumerator() * m_iTrainingTimeinBars;
+    }
 }
