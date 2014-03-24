@@ -1,0 +1,14 @@
+digraph "Source" {
+  compound=true
+  node [ fontsize="10", fontname="Helvetica"];
+  edge [ labelfontsize="10", labelfontname="Helvetica"];
+  subgraph clusterdir_74389ed8173ad57b461b9d623a1f3867 {
+    graph [ bgcolor="#eeeeff", pencolor="black", label="" URL="dir_74389ed8173ad57b461b9d623a1f3867.html"];
+    dir_74389ed8173ad57b461b9d623a1f3867 [shape=plaintext label="Source"];
+    dir_673a4513849d35392184061423983882 [shape=box label="Application" color="black" fillcolor="white" style="filled" URL="dir_673a4513849d35392184061423983882.html"];
+    dir_c3feaf491842e219751c3e4aa12962b3 [shape=box label="AudioMIDI" color="black" fillcolor="white" style="filled" URL="dir_c3feaf491842e219751c3e4aa12962b3.html"];
+    dir_1ad6433457b0067ef8f54a4fa85f5c9a [shape=box label="Core" color="black" fillcolor="white" style="filled" URL="dir_1ad6433457b0067ef8f54a4fa85f5c9a.html"];
+    dir_f62acd82481d2cf3a26c00822e927928 [shape=box label="GUI" color="black" fillcolor="white" style="filled" URL="dir_f62acd82481d2cf3a26c00822e927928.html"];
+    dir_fd05f5edf3b493c31092ea4c9fd7a9ee [shape=box label="Wrappers" color="red" fillcolor="white" style="filled" URL="dir_fd05f5edf3b493c31092ea4c9fd7a9ee.html"];
+  }
+}

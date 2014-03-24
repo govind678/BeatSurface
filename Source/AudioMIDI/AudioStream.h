@@ -15,6 +15,7 @@
 #include "OnsetClassification.h"
 #include "MidiOut.h"
 //#include "AudioPlayer.h"
+#include "AudioFileIO.h"
 
 
 class AudioStream : public AudioIODeviceCallback,
@@ -35,13 +36,12 @@ public:
 	void audioDeviceAboutToStart (AudioIODevice* device);
     void audioDeviceStopped();
     
-    void setMode(BeatSurfaceBase::SystemMode newMode);
-    BeatSurfaceBase::SystemMode getMode();
-    
     void setClassIndexToTrain(int newClassIndex);
     void audioDeviceSettingsChanged();
     
     void playTrainingDataAtClass(int classIndex);
+    
+    void loadAudioFileToTrain(String audioFilePath);
     
     ScopedPointer<OnsetClassification> m_pcOnsetClassifier;
     
@@ -53,10 +53,14 @@ private:
     AudioDeviceManager::AudioDeviceSetup        deviceSetup;
     OnsetClassification::AudioDeviceSettings    deviceSettings;
     
+    ScopedPointer<AudioFileIO>                  m_pcAudioFileIO;
     
-    TimeSliceThread m_AudioStreamThread;
     
-    ScopedPointer<MidiOut> m_pcMidiOut;
+    TimeSliceThread                             m_AudioStreamThread;
+    
+    AudioSourcePlayer                           audioSourcePlayer;
+    
+    ScopedPointer<MidiOut>                      m_pcMidiOut;
     
 //    OwnedArray<AudioPlayer> m_acAudioPlayer;
     
@@ -64,8 +68,6 @@ private:
     static const int m_iAudioThreadPriority  = 8;
     
     void timerCallback();
-    
-    BeatSurfaceBase::SystemMode m_eCurrentMode;
     
     int m_iCurrentClassIndexToTrain;
     int m_iCurrentClassificationResult;

@@ -169,7 +169,6 @@ private:
     
     int                             m_iNumClasses;
     int                             m_iCurentSelectedClass;
-    BeatSurfaceBase::SystemMode     m_eCurrentMode;
     
     std::vector<float>              m_pfOnsetProbabilities;
     

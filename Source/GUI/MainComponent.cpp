@@ -21,10 +21,6 @@ ScopedPointer<BeatSurfaceEngine> beatSurfaceEngine;
 
 MainComponent::MainComponent()
 {
-    
-    m_eCurrentMode              = BeatSurfaceBase::IdleMode;
-    
-    
     playComponent               = new PlayContentComponent();
     settingsComponent           = new SettingsContentComponent();
     
@@ -237,15 +233,14 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
         {
             beatSurfaceEngine->liveAudioStreamButtonClicked(true);
             playComponent->shapeButtonArray->setZeroAlpha();
-            m_eCurrentMode  = BeatSurfaceBase::PlayMode;
+            BeatSurfaceBase::eCurrentMode  = BeatSurfaceBase::PlayMode;
         }
         
         else
         {
             beatSurfaceEngine->liveAudioStreamButtonClicked(false);
             playComponent->shapeButtonArray->resetAlpha();
-            beatSurfaceEngine->setMode(m_eCurrentMode);
-            m_eCurrentMode  = BeatSurfaceBase::IdleMode;
+            BeatSurfaceBase::eCurrentMode  = BeatSurfaceBase::IdleMode;
         }
     }
     
@@ -261,14 +256,12 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
         
         if (playComponent->toolBarControls->recordToggleButton->getToggleState())
         {
-            m_eCurrentMode  = BeatSurfaceBase::TrainMode;
-            beatSurfaceEngine->setMode(m_eCurrentMode);
+            BeatSurfaceBase::eCurrentMode  = BeatSurfaceBase::CustomTrainMode;
         }
         
         else
         {
-            m_eCurrentMode  = BeatSurfaceBase::IdleMode;
-            beatSurfaceEngine->setMode(m_eCurrentMode);
+            BeatSurfaceBase::eCurrentMode  = BeatSurfaceBase::IdleMode;
         }
     }
     
@@ -277,7 +270,7 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == playComponent->toolBarControls->loadTrainingButton)
     {
         FileChooser fc ("Choose Training File To Load...",
-                        File::getCurrentWorkingDirectory(), "*.csv", false);
+                        File::getCurrentWorkingDirectory(), "", false);
         
         if(fc.browseForFileToOpen())
         {
@@ -351,18 +344,18 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
         {
             if (buttonThatWasClicked == playComponent->shapeButtonArray->m_pcClassButton.getUnchecked(i))
             {
-                if (m_eCurrentMode == BeatSurfaceBase::PlayMode)
+                if (BeatSurfaceBase::eCurrentMode == BeatSurfaceBase::PlayMode)
                 {
                     
                 }
                 
-                else if (m_eCurrentMode == BeatSurfaceBase::TrainMode)
+                else if (BeatSurfaceBase::eCurrentMode == BeatSurfaceBase::CustomTrainMode)
                 {
                     beatSurfaceEngine->trainClassButtonClicked(i+1);
                     playComponent->shapeButtonArray->m_pcClassButton.getUnchecked(i)->setAlpha(0.2f);
                 }
                 
-                else if (m_eCurrentMode == BeatSurfaceBase::IdleMode)
+                else if (BeatSurfaceBase::eCurrentMode == BeatSurfaceBase::IdleMode)
                 {
                     beatSurfaceEngine->idleModeClassButtonClicked(i+1);
                 }
@@ -534,7 +527,7 @@ void MainComponent::addClass()
         }
     }
 
-    if (m_eCurrentMode == BeatSurfaceBase::PlayMode)
+    if (BeatSurfaceBase::eCurrentMode == BeatSurfaceBase::PlayMode)
     {
         playComponent->shapeButtonArray->setZeroAlpha();
     }
@@ -567,7 +560,7 @@ void MainComponent::deleteClass(int classIndex)
         }
     }
     
-    if (m_eCurrentMode == BeatSurfaceBase::PlayMode)
+    if (BeatSurfaceBase::eCurrentMode == BeatSurfaceBase::PlayMode)
     {
         playComponent->shapeButtonArray->setZeroAlpha();
     }

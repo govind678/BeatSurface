@@ -11,9 +11,6 @@
 #ifndef ONSETCLASSIFICATION_H_INCLUDED
 #define ONSETCLASSIFICATION_H_INCLUDED
 
-//#define MAX_ONSETS_PER_TRAINING     80
-#define MAX_BUFFER_SIZE             2048
-
 
 #include <algorithm>
 #include <fstream>
@@ -30,7 +27,7 @@
 
 #define MAX_DECAY_WINDOW_BLOCKS     25          // For Block Size of 512 ~ 250 ms
 #define MAX_DELTA_THRESHOLD         4.0F
-
+#define MAX_BUFFER_SIZE             2048
 
 
 //========================================================================================================================

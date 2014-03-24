@@ -33,32 +33,17 @@ BeatSurfaceEngine::~BeatSurfaceEngine()
 
 
 
-void BeatSurfaceEngine::setMode(BeatSurfaceBase::SystemMode newMode)
-{
-    m_eCurrentMode  =   newMode;
-    m_pcLiveAudioStream->setMode(newMode);
-    
-    if (m_eCurrentMode == BeatSurfaceBase::PlayMode)
-    {
-        
-    }
-    
-}
-
-
 
 void BeatSurfaceEngine::liveAudioStreamButtonClicked(bool toggleState)
 {
     if (toggleState)
     {
-        m_pcLiveAudioStream->setMode(BeatSurfaceBase::PlayMode);
         m_bTrainingState    =   false;
         sharedAudioDeviceManager->addAudioCallback(m_pcLiveAudioStream);
     }
     
     else
     {
-        m_pcLiveAudioStream->setMode(BeatSurfaceBase::IdleMode);
         sharedAudioDeviceManager->removeAudioCallback(m_pcLiveAudioStream);
     }
 }
@@ -66,7 +51,7 @@ void BeatSurfaceEngine::liveAudioStreamButtonClicked(bool toggleState)
 
 void BeatSurfaceEngine::trainClassButtonClicked(int classIndex)
 {
-    if (m_eCurrentMode == BeatSurfaceBase::TrainMode)
+    if (BeatSurfaceBase::eCurrentMode == BeatSurfaceBase::CustomTrainMode)
     {
         m_pcLiveAudioStream->setClassIndexToTrain(classIndex);
         sharedAudioDeviceManager->addAudioCallback(m_pcLiveAudioStream);
@@ -75,7 +60,7 @@ void BeatSurfaceEngine::trainClassButtonClicked(int classIndex)
         startTimer(m_fTrainingTimeinMS);
     }
     
-    else if (m_eCurrentMode == BeatSurfaceBase::PlayMode)
+    else if (BeatSurfaceBase::eCurrentMode == BeatSurfaceBase::PlayMode)
     {
        
     }
@@ -83,7 +68,6 @@ void BeatSurfaceEngine::trainClassButtonClicked(int classIndex)
 
 void BeatSurfaceEngine::idleModeClassButtonClicked(int classIndex)
 {
-    m_pcLiveAudioStream->setMode(BeatSurfaceBase::IdleMode);
     m_pcLiveAudioStream->playTrainingDataAtClass(classIndex);
 }
 
@@ -112,10 +96,6 @@ void BeatSurfaceEngine::parametersChanged(BeatSurfaceBase::ParameterID parameter
 }
 
 
-BeatSurfaceBase::SystemMode BeatSurfaceEngine::getSystemMode()
-{
-    return m_pcLiveAudioStream->getMode();
-}
 
 
 
@@ -146,16 +126,35 @@ void BeatSurfaceEngine::deleteClass(int classIndex)
 }
 
 
-void BeatSurfaceEngine::saveTraining(juce::String filePath)
+void BeatSurfaceEngine::saveTraining(String filePath)
 {
     m_pcLiveAudioStream->m_pcOnsetClassifier->saveTraining(filePath.toStdString());
 }
 
 
-void BeatSurfaceEngine::loadTraining(juce::String filePath)
+void BeatSurfaceEngine::loadTraining(File trainingFile)
 {
-    m_pcLiveAudioStream->m_pcOnsetClassifier->loadTraining(filePath.toStdString());
+    String fileExtension = trainingFile.getFileExtension();
+    
+    if (fileExtension == ".wav"     ||
+        fileExtension == ".mp3"     ||
+        fileExtension == ".flac"    ||
+        fileExtension == ".aac"     ||
+        fileExtension == ".aiff"    ||
+        fileExtension == ".aif")
+    {
+        BeatSurfaceBase::eCurrentMode = BeatSurfaceBase::AudioTrainMode;
+        m_pcLiveAudioStream->loadAudioFileToTrain(trainingFile.getFullPathName());
+    }
+    
+    else if (fileExtension == "csv")
+    {
+        BeatSurfaceBase::eCurrentMode = BeatSurfaceBase::CustomTrainMode;
+        m_pcLiveAudioStream->m_pcOnsetClassifier->loadTraining(trainingFile.getFullPathName().toStdString());
+    }
+    
 }
+
 
 
 

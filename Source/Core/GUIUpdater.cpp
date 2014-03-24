@@ -18,15 +18,19 @@ GUIUpdater::GUIUpdater()
 {
     //--- Initialize ---//
     m_iCurrentTrainingOnsetClass        =   0;
+    m_iCurrentPlayingOnsetClass         =   0;
     m_iNumClasses                       =   0;
     
     m_fCurrentWaveformSampleToDraw      =   0.0f;
     m_fCurrentSpectralCentroidToDraw    =   0.0f;
+    
+    
     DisplayTrainingOnset                =   false;
     DoneTraining                        =   false;
     DisplayOnsetProbabilities           =   false;
     DrawWaveform                        =   false;
     UpdateMetronome                     =   false;
+    DisplayPlayingOnset                 =   false;
     
     
 //    m_pfOnsetProbabilities.clear();
@@ -111,6 +115,22 @@ vector<float> GUIUpdater::getOnsetProbabilities()
 
 
 
+
+
+//==============================================================================
+// Flash Playing Onset
+
+void GUIUpdater::displayPlayingOnset(int index)
+{
+    m_iCurrentPlayingOnsetClass = index;
+    
+    DisplayPlayingOnset =   true;
+}
+
+int GUIUpdater::getCurrentPlayingOnset()
+{
+    return m_iCurrentPlayingOnsetClass;
+}
 
 
 

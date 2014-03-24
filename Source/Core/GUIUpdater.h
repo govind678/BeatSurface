@@ -48,6 +48,9 @@ public:
     // Display Onset Class Probabilities during Play Mode
     void displayOnsetProbabilities(vector<double> probabilities);
     vector<float> getOnsetProbabilities();
+    
+    void displayPlayingOnset(int index);
+    int getCurrentPlayingOnset();
     //==============================================================================
     
     
@@ -83,6 +86,7 @@ public:
     bool DisplayTrainingOnset;
     bool DoneTraining;
     bool DisplayOnsetProbabilities;
+    bool DisplayPlayingOnset;
     bool DrawWaveform;
     bool UpdateMetronome;
     bool DrawSpectrum;
@@ -92,6 +96,7 @@ public:
 private:
     
     int             m_iCurrentTrainingOnsetClass;
+    int             m_iCurrentPlayingOnsetClass;
     float           m_fCurrentWaveformSampleToDraw;
     float           m_fCurrentSpectralCentroidToDraw;
     int             m_iNumClasses;

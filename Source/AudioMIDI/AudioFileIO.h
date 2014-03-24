@@ -11,34 +11,49 @@
 #ifndef AUDIOFILEIO_H_INCLUDED
 #define AUDIOFILEIO_H_INCLUDED
 
-#include "JuceHeader.h"
+#include "BeatSurfaceHeader.h"
 //#include "OnsetClassification.h"
 
 
-class AudioFileIO
+class AudioFileIO   :   public AudioSource
 {
     
 public:
     
-    AudioFileIO (File audioFile, int blockSize);
+    AudioFileIO ();
     ~AudioFileIO();
     
     void runDetectionAndClassification();
+    
+    void loadAudioFile(String audioFilePath);
+    
+    void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
+    void getNextAudioBlock (const AudioSourceChannelInfo& audioSourceChannelInfo) override;
+    void releaseResources() override;
+    
+    void processAudioBlock(float** audioBuffer, int numSamples);
+    
+    
+    void startPlayback();
+    void stopPlayback();
+    
     
     //OnsetClassification* onsetClassifier;
     
     
 private:
     
+    
+    AudioFormatManager      formatManager;
+    ScopedPointer<AudioFormatReaderSource> currentAudioFileSource;
+    AudioTransportSource    transportSource;
+    
     int miBlockSize;
     float mfSampleRate;
-    
-    const float** inputBuffer;
-    
-    int miNumBlocks;
-    bool* mpOnsets;
-    
-    ScopedPointer<AudioFormatReader> mpReader;
+
+    TimeSliceThread thread;
+    String  m_sCurrentFilePath;
+
 };
 
 

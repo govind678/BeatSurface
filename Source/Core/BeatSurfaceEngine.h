@@ -35,7 +35,6 @@ public:
     //==============================================================================
     // Interface Methods for GUI -> Beat Surface Core
     void liveAudioStreamButtonClicked(bool toggleState);
-    void setMode(BeatSurfaceBase::SystemMode newMode);
     
     void trainClassButtonClicked(int classIndex);
     void idleModeClassButtonClicked(int classIndex);
@@ -46,11 +45,9 @@ public:
     void deleteClass(int classIndex);
     
     void saveTraining(String filePath);
-    void loadTraining(String filePath);
+    void loadTraining(File trainingFile);
     
     void setTrainingTimeinBars(int bars);
-    
-    BeatSurfaceBase::SystemMode getSystemMode();
     //==============================================================================
     
     
@@ -70,7 +67,6 @@ private:
     int m_fTrainingTimeinMS;
     bool m_bTrainingState;
     
-    BeatSurfaceBase::SystemMode m_eCurrentMode;
     
     //==============================================================================
     // Timer Callback

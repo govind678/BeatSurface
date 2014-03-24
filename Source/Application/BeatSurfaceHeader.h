@@ -36,6 +36,7 @@ class BeatSurfaceBase
     
 public:
     
+    
     //--- Audio Device Selector Component ---//
     static const int iMinNoInputChannelsRequired        = 0;
     static const int iMinNoOutputChannelsRequired       = 0;
@@ -64,7 +65,8 @@ public:
     //--- System Modes ---//
     enum SystemMode
     {
-        TrainMode,
+        CustomTrainMode,
+        AudioTrainMode,
         PlayMode,
         IdleMode
     };
@@ -77,6 +79,8 @@ public:
         DecayTimeSensitivity
     };
     
+    
+    static SystemMode  eCurrentMode;
     
 private:
     

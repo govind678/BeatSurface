@@ -67,6 +67,10 @@ public:
         
         // Main Window
         mainWindow = new MainAppWindow();
+        
+        
+        // Setting Application Mode
+        BeatSurfaceBase::eCurrentMode = BeatSurfaceBase::IdleMode;
     }
 
     void shutdown()

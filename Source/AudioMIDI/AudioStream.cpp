@@ -21,6 +21,7 @@ AudioStream::AudioStream() : m_AudioStreamThread("Audio IO")
     sharedAudioDeviceManager->getAudioDeviceSetup(deviceSetup);
     
     m_pcOnsetClassifier = new OnsetClassification();
+    m_pcAudioFileIO     = new AudioFileIO();
     
     deviceSettings.fSampleRate  =   float(deviceSetup.sampleRate);
     deviceSettings.iBufferSize  =   deviceSetup.bufferSize;
@@ -28,15 +29,15 @@ AudioStream::AudioStream() : m_AudioStreamThread("Audio IO")
     
     m_pcOnsetClassifier->setAudioDeviceSettings(deviceSettings);
     
-    
-    m_eCurrentMode = BeatSurfaceBase::IdleMode;
-    
     m_iCurrentClassIndexToTrain = 0;
     
     m_pcMidiOut = new MidiOut;
     
     m_pfOnsetProbabilities.clear();
     m_ppfOnsetAudio.clear();
+    
+    
+    audioSourcePlayer.setSource(m_pcAudioFileIO);
 
 }
 
@@ -44,8 +45,12 @@ AudioStream::AudioStream() : m_AudioStreamThread("Audio IO")
 
 AudioStream::~AudioStream()
 {
+    audioSourcePlayer.setSource(0);
+    
     m_pcOnsetClassifier     = nullptr;
     m_pcMidiOut             = nullptr;
+    m_pcAudioFileIO         = nullptr;
+    
     
     m_pfOnsetProbabilities.clear();
     
@@ -57,19 +62,6 @@ AudioStream::~AudioStream()
     m_AudioStreamThread.stopThread(m_iStopThreadTimeOut_ms);
 }
 
-
-
-void AudioStream::audioDeviceAboutToStart(AudioIODevice* device)
-{
-    
-}
-
-
-
-void AudioStream::audioDeviceStopped()
-{
-    
-}
 
 
 
@@ -86,7 +78,7 @@ void AudioStream::audioDeviceIOCallback( const float** inputChannelData,
                                         int blockSize)
 {
     
-    if (m_eCurrentMode == BeatSurfaceBase::TrainMode)
+    if (BeatSurfaceBase::eCurrentMode == BeatSurfaceBase::CustomTrainMode)
     {
         if(m_pcOnsetClassifier->detectOnsets(inputChannelData))
         {
@@ -108,9 +100,19 @@ void AudioStream::audioDeviceIOCallback( const float** inputChannelData,
     }
     
     
-    else if (m_eCurrentMode == BeatSurfaceBase::PlayMode)
+    else if (BeatSurfaceBase::eCurrentMode == BeatSurfaceBase::AudioTrainMode)
     {
-        guiUpdater->DrawWaveform = true;
+        audioSourcePlayer.audioDeviceIOCallback (inputChannelData,
+                                                 totalNumInputChannels,
+                                                 outputChannelData,
+                                                 totalNumOutputChannels,
+                                                 blockSize);
+    }
+    
+    
+    
+    else if (BeatSurfaceBase::eCurrentMode == BeatSurfaceBase::PlayMode)
+    {
         m_fCurrentRMS = m_pcOnsetClassifier->rootMeanSquare(inputChannelData);
         guiUpdater->drawWaveformWithSample(m_fCurrentRMS);
 
@@ -120,7 +122,7 @@ void AudioStream::audioDeviceIOCallback( const float** inputChannelData,
             if(m_pcOnsetClassifier->getNumClasses() > 0)
             {
                 m_iCurrentClassificationResult  =  m_pcOnsetClassifier->classify();
-                guiUpdater->displayOnsetProbabilities(m_pcOnsetClassifier->getCurrentProbabilityEstimates());
+                guiUpdater->displayPlayingOnset(m_iCurrentClassificationResult);
                 m_pcMidiOut->makeNoteAndSend(1, m_iCurrentClassificationResult + 35, int((m_fCurrentRMS * 120.0f) / 0.6f), 250);
             }
             
@@ -130,7 +132,7 @@ void AudioStream::audioDeviceIOCallback( const float** inputChannelData,
     }
     
     
-    else if (m_eCurrentMode == BeatSurfaceBase::IdleMode)
+    else if (BeatSurfaceBase::eCurrentMode == BeatSurfaceBase::IdleMode)
     {
 //        guiUpdater->drawWaveformWithSample(m_pcOnsetClassifier->rootMeanSquare(inputChannelData));
         
@@ -153,30 +155,33 @@ void AudioStream::audioDeviceIOCallback( const float** inputChannelData,
 }
 
 
-
-void AudioStream::setMode(BeatSurfaceBase::SystemMode newMode)
+void AudioStream::audioDeviceAboutToStart(AudioIODevice* device)
 {
-    m_eCurrentMode = newMode;
+    audioSourcePlayer.audioDeviceAboutToStart (device);
 }
 
 
-BeatSurfaceBase::SystemMode AudioStream::getMode()
+
+void AudioStream::audioDeviceStopped()
 {
-    return m_eCurrentMode;
+    audioSourcePlayer.audioDeviceStopped();
 }
 
+
+
+
+
+
+//==============================================================================
+// Set Current Class
+//
+//==============================================================================
 
 void AudioStream::setClassIndexToTrain(int newClassIndex)
 {
     m_iCurrentClassIndexToTrain = newClassIndex;
 }
 
-
-void AudioStream::timerCallback()
-{
-    sharedAudioDeviceManager->removeAudioCallback(this);
-    stopTimer();
-}
 
 
 void AudioStream::playTrainingDataAtClass(int classIndex)
@@ -190,6 +195,12 @@ void AudioStream::playTrainingDataAtClass(int classIndex)
 }
 
 
+void AudioStream::timerCallback()
+{
+    sharedAudioDeviceManager->removeAudioCallback(this);
+    stopTimer();
+}
+
 
 void AudioStream::audioDeviceSettingsChanged()
 {
@@ -200,3 +211,13 @@ void AudioStream::audioDeviceSettingsChanged()
     
     m_pcOnsetClassifier->setAudioDeviceSettings(deviceSettings);
 }
+
+
+void AudioStream::loadAudioFileToTrain(String audioFilePath)
+{
+    m_pcAudioFileIO->loadAudioFile(audioFilePath);
+    m_pcAudioFileIO->startPlayback();
+    sharedAudioDeviceManager->addAudioCallback(this);
+}
+
+
