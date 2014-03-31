@@ -102,13 +102,15 @@ void GlobalClock::timerCallback()
     
     if (m_iBeat == 1)
     {
-        sendActionMessage("BEAT1");
+        sendActionMessage("DBEAT1");
     }
     
     else
     {
-        sendActionMessage("BEAT0");
+        sendActionMessage("DBEAT0");
     }
+    
+    sendActionMessage("BEAT" + String(m_iBeat));
     
 }
 

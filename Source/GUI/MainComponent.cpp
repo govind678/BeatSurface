@@ -57,7 +57,11 @@ MainComponent::MainComponent()
     settingsComponent->numeratorNumBox->addListener(this);
     settingsComponent->denominatorNumBox->addListener(this);
     
+    settingsComponent->setMainComponent(this);
+    
+    
     transcriptionComponent->retrainButton->addListener(this);
+    transcriptionComponent->clearButton->addListener(this);
     
     
     
@@ -102,7 +106,7 @@ MainComponent::MainComponent()
     
     m_iCurentSelectedClass = 1;
     m_iNumClasses = 0;
-    
+
     
     addAndMakeVisible(confidenceDisplayBar = new Slider("confidenceDisplaySlider"));
     confidenceDisplayBar->setSliderStyle(Slider::LinearBar);
@@ -126,6 +130,7 @@ MainComponent::MainComponent()
     
     
     playComponent->shapeButtonArray->setButtonFlashTime_ms(15);
+    playComponent->metroDisplay->setTotalBeats(16);
     
     startTimer(BeatSurfaceBase::iGUITimerInterval);
     
@@ -250,6 +255,8 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
         if (playComponent->toolBarControls->recordToggleButton->getToggleState())
         {
             playComponent->toolBarControls->recordToggleButton->setToggleState(false, dontSendNotification);
+            m_pcBeatSurfaceEngine->recordButtonClicked(false);
+            transcriptionComponent->clearRows();
         }
         
         
@@ -276,6 +283,7 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
         {
             m_pcBeatSurfaceEngine->playButtonClicked(false);
             playComponent->toolBarControls->audioStreamToggleButton->setToggleState(false, dontSendNotification);
+            m_pcBeatSurfaceEngine->playButtonClicked(false);
         }
         
         if (playComponent->toolBarControls->recordToggleButton->getToggleState())
@@ -286,6 +294,7 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
         else
         {
             m_pcBeatSurfaceEngine->recordButtonClicked(false);
+            transcriptionComponent->clearRows();
         }
         
         transcriptionComponent->setSystemMode(m_pcBeatSurfaceEngine->getSystemMode());
@@ -374,6 +383,19 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
     
     if (buttonThatWasClicked == transcriptionComponent->retrainButton)
     {
+        m_pcBeatSurfaceEngine->updateDataset(transcriptionComponent->getCurrentIncludes(),
+                                             transcriptionComponent->getCurrentClasses());
+        
+        
+        transcriptionComponent->clearRows();
+    }
+    
+    
+    
+    if (buttonThatWasClicked == transcriptionComponent->clearButton)
+    {
+        
+        
         transcriptionComponent->clearRows();
     }
     
@@ -387,6 +409,7 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
             if (buttonThatWasClicked == playComponent->shapeButtonArray->m_pcClassButton.getUnchecked(i))
             {
                 m_pcBeatSurfaceEngine->classButtonClicked(i+1);
+                
                 if (m_pcBeatSurfaceEngine->getSystemMode() == BeatSurfaceBase::TrainMode)
                 {
                     playComponent->shapeButtonArray->m_pcClassButton.getUnchecked(i)->setAlpha(0.2f);
@@ -396,10 +419,37 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
         }
     }
     
-    
 }
 
 
+void MainComponent::loadAudioFileToPlay(int index)
+{
+    FileChooser fc ("Load Audio File for Class: " + String(index+1),
+                    File::getSpecialLocation(File::userMusicDirectory), "", false);
+    
+    if(fc.browseForFileToOpen())
+    {
+        File result = fc.getResult();
+        
+        if (result.existsAsFile())
+        {
+            m_pcBeatSurfaceEngine->setAudioOutputFile(index, result);
+            settingsComponent->setAudioFileName(index, result.getFileName());
+        }
+        
+    }
+}
+
+void MainComponent::setMidiOutput(int classIndex, int channelNo, int noteNum, int duration_ms)
+{
+    m_pcBeatSurfaceEngine->setMidiOutput(classIndex, channelNo, noteNum, duration_ms);
+}
+
+void MainComponent::setAudioFileParam(int index, bool looping, bool toggle)
+{
+    m_pcBeatSurfaceEngine->setAudioOutputLooping(index, looping);
+    m_pcBeatSurfaceEngine->setAudioOutputToggle(index, toggle);
+}
 
 
 //==============================================================================
@@ -424,7 +474,7 @@ void MainComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == playComponent->trainingTimeinBarsSlider)
     {
         m_pcBeatSurfaceEngine->setTrainingTimeinBars(int(playComponent->trainingTimeinBarsSlider->getValue()));
-        
+        playComponent->metroDisplay->setTotalBeats(int(playComponent->trainingTimeinBarsSlider->getValue()) * 4);
     }
 }
 
@@ -479,6 +529,7 @@ void MainComponent::timerCallback()
         if (m_iNumClasses > 0)
         {
             playComponent->shapeButtonArray->resetAlpha();
+            playComponent->metroDisplay->setZeroAlpha();
         }
         
         confidenceDisplayBar->setValue(m_pcBeatSurfaceEngine->getClassificationConfidence(), dontSendNotification);
@@ -534,10 +585,12 @@ void MainComponent::timerCallback()
 
 void MainComponent::actionListenerCallback(const String &message)
 {
-    if (message.startsWith("BEAT"))
+    if (message.startsWith("DBEAT"))
     {
-        clockDisplay->flashBeat(message.getLastCharacters(1).getIntValue());
+//        clockDisplay->flashBeat(message.getLastCharacters(1).getIntValue());
+        playComponent->metroDisplay->countBeat();
     }
+    
     
     if (message == "UPDATE_TRANSPORT")
     {
@@ -564,6 +617,7 @@ void MainComponent::addClass(bool updateBackend)
     
     playComponent->shapeButtonArray->setNumClasses(m_iNumClasses);
     transcriptionComponent->setNumClasses(m_iNumClasses);
+    settingsComponent->addClass();
     
     
     if (m_iNumClasses > 0)

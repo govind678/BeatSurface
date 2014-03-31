@@ -140,6 +140,29 @@ void BeatSurfaceEngine::setParameter(BeatSurfaceBase::ParameterID parameterID, d
 
 
 
+void BeatSurfaceEngine::setMidiOutput(int classIndex, int channelNo, int noteNum, int duration_ms)
+{
+    m_pcLiveAudioStream->setMIDIOutput(classIndex - 1, channelNo, noteNum, duration_ms);
+}
+
+
+void BeatSurfaceEngine::setAudioOutputFile(int index, File audioFile)
+{
+    m_pcLiveAudioStream->setAudioOutputFile(index, audioFile);
+}
+
+void BeatSurfaceEngine::setAudioOutputLooping(int index, bool looping)
+{
+    m_pcLiveAudioStream->setAudioOutputLooping(index, looping);
+}
+
+
+void BeatSurfaceEngine::setAudioOutputToggle(int index, bool toggle)
+{
+    m_pcLiveAudioStream->setAudioOutputToggle(index, toggle);
+}
+
+
 
 
 void BeatSurfaceEngine::timerCallback()
@@ -185,9 +208,9 @@ void BeatSurfaceEngine::loadTraining(File trainingFile)
         m_eCurrentMode = BeatSurfaceBase::FileTrainMode;
         m_pcLiveAudioStream->setSystemMode(m_eCurrentMode);
         
-        m_pcLiveAudioStream->loadAudioFileToTrain(trainingFile);
-        sharedAudioDeviceManager->addAudioCallback(m_pcLiveAudioStream);
-        m_pcLiveAudioStream->startPlayback();
+//        m_pcLiveAudioStream->loadAudioFileToTrain(trainingFile);
+//        sharedAudioDeviceManager->addAudioCallback(m_pcLiveAudioStream);
+//        m_pcLiveAudioStream->startPlayback();
     }
     
     else if (fileExtension == ".txt")
@@ -215,6 +238,23 @@ void BeatSurfaceEngine::actionListenerCallback(const juce::String &message)
 }
 
 
+
+void BeatSurfaceEngine::updateDataset(Array<bool> includes, Array<int> classes)
+{
+    bool type;
+    
+    if (m_eCurrentMode == BeatSurfaceBase::TrainMode)
+    {
+        type = false;
+    }
+    
+    else
+    {
+        type = true;
+    }
+    
+    m_pcLiveAudioStream->updateDataset(includes, classes, type);
+}
 
 
 double BeatSurfaceEngine::getParameter(BeatSurfaceBase::ParameterID parameterID)
@@ -251,4 +291,10 @@ String BeatSurfaceEngine::getCurrentFeatureVector()
 int BeatSurfaceEngine::getCurrentClassificationResult()
 {
     return m_pcLiveAudioStream->getCurrentClassificationResult();
+}
+
+
+void BeatSurfaceEngine::testButton()
+{
+    m_pcLiveAudioStream->testButton();
 }

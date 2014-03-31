@@ -60,11 +60,18 @@ void MidiOut::sendMidiOut(int channel, int noteNumber, int velocity)
 
 void MidiOut::makeNoteAndSend(int channel, int noteNumber, int velocity, int duration)
 {
-    channelNo = channel;
-    noteNo = noteNumber;
+    if ((channel > 0) && (channel <= 16))
+    {
+        if ((noteNumber > 0) && (noteNumber < 128))
+        {
+            channelNo = channel;
+            noteNo = noteNumber;
+            
+            sendMidiOut(channelNo, noteNo, velocity);
+            startTimer(duration);
+        }
+    }
     
-    sendMidiOut(channelNo, noteNo, velocity);
-    startTimer(duration);
 }
 
 

@@ -139,9 +139,8 @@ public:
     
     void paint (Graphics& g)
     {
-        if (m_iNumButtons > 0) {
-            
-            
+        if (m_iNumButtons > 0)
+        {
             for (int side = 1; side <= m_iNumButtons; side++)
             {
                 Path pie;
@@ -154,8 +153,6 @@ public:
                 g.setColour(Colours::black);
                 g.strokePath(pie, PathStrokeType(1.0f));
             }
-            
-            
         }
     }
     //==============================================================================
@@ -207,10 +204,12 @@ public:
         
         
         
-        if (m_iNumButtons > 0) {
+        if (m_iNumButtons > 0)
+        {
             
             
-            for (int side = 1; side <= m_iNumButtons; side++) {
+            for (int side = 1; side <= m_iNumButtons; side++)
+            {
                 
                 m_pcClassButton.add(new CustomShapeButton(String(side),
                                                           Colour(float((m_iNumButtons - side) + 1)/float(m_iNumButtons), 0.75f, 0.9f, 1.0f),
@@ -294,8 +293,13 @@ public:
         if (m_iNumButtons > 0)
         {
             m_fFinalAlpha   =   finalAlpha;
-            m_iCurrentButtonIndex = index;
-            m_pcClassButton.getUnchecked(index)->setAlpha(1.0f);
+            
+            if (index >= 0)
+            {
+                m_iCurrentButtonIndex = index;
+                m_pcClassButton.getUnchecked(index)->setAlpha(1.0f);
+            }
+            
         }
         
         m_bFlashArray = false;
@@ -666,6 +670,184 @@ private:
     
     
 };
+
+
+
+//====================================== Metronome Display ===============================================================
+// Component that displays the metronome
+//========================================================================================================================
+
+
+
+class MetronomeComponent    :   public Component
+{
+    
+public:
+    
+    MetronomeComponent()
+    {
+        m_iTotalBeats = 0;
+        m_iBeat = 0;
+        
+        downBeatColour  = Colour(0.1f, 0.8f, 0.8f, 0.9f);
+        upBeatColour    = Colour(0.1f, 0.8f, 0.6f, 0.9f);
+        
+        m_pcMetroQuantum.clear();
+        
+        setInterceptsMouseClicks(false, false);
+    }
+    
+    ~MetronomeComponent()
+    {
+        m_pcMetroQuantum.clear();
+    }
+    
+    
+    void paint(Graphics& g) override
+    {
+        if (m_iTotalBeats > 0)
+        {
+            for (int side = 1; side <= m_iTotalBeats; side++)
+            {
+                Path pie;
+                
+                float fromRadians   = float((side - 1.0f) * 2.0f * M_PI) / float(m_iTotalBeats);
+                float toRadians     = float(side * 2.0f * M_PI) / float(m_iTotalBeats);
+                
+                pie.addPieSegment(0.0f, 0.0f, getWidth(), getHeight(), fromRadians, toRadians, 0.94f);
+                pie.closeSubPath();
+                g.setColour(Colours::black);
+                g.strokePath(pie, PathStrokeType(1.0f));
+            }
+        }
+        
+    }
+    
+    void resized() override
+    {
+        if (m_iTotalBeats > 0)
+        {
+            for (int side = 1; side <= m_iTotalBeats; side++)
+            {
+                Path pie;
+                
+                float fromRadians   = float((side - 1.0f) * 2.0f * M_PI) / float(m_iTotalBeats);
+                float toRadians     = float(side * 2.0f * M_PI) / float(m_iTotalBeats);
+                
+                pie.addPieSegment(0.0f, 0.0f, getWidth(), getHeight(), fromRadians, toRadians, 0.94f);
+                pie.closeSubPath();
+                
+                m_pcMetroQuantum.getUnchecked(side-1)->setShape(pie, true, true);
+                m_pcMetroQuantum.getUnchecked(side-1)->setBounds(0, 0, getWidth(), getHeight());
+            }
+        }
+    }
+    
+    
+    
+    void setTotalBeats(int totalBeats)
+    {
+        m_iTotalBeats = totalBeats;
+        
+        if(m_pcMetroQuantum.size() > 0)
+        {
+            m_pcMetroQuantum.clear(true);
+        }
+        
+        
+        if (m_iTotalBeats > 0)
+        {
+            for (int beat = 1; beat <= m_iTotalBeats; beat++)
+            {
+                
+                m_pcMetroQuantum.add(new CustomShapeButton(String(beat), downBeatColour,
+                                                           downBeatColour.withBrightness(0.5),
+                                                           downBeatColour.withBrightness(0.3)));
+                
+                Path pie;
+                
+                float fromRadians   = float((beat - 1.0f) * 2.0f * M_PI) / float(m_iTotalBeats);
+                float toRadians     = float(beat * 2.0f * M_PI) / float(m_iTotalBeats);
+                
+                pie.addPieSegment(0.0f, 0.0f, getWidth(), getHeight(), fromRadians, toRadians, 0.94f);
+                pie.closeSubPath();
+                
+                m_pcMetroQuantum.getUnchecked(beat-1)->setShape(pie, true, true);
+                addAndMakeVisible(m_pcMetroQuantum.getUnchecked(beat-1));
+                m_pcMetroQuantum.getUnchecked(beat-1)->setBounds(0, 0, getWidth(), getHeight());
+            }
+            
+            setZeroAlpha();
+        }
+        
+        repaint();
+    }
+    
+    
+    //==============================================================================
+    // Reset Opacity of all buttons to 1.0
+    
+    void resetAlpha()
+    {
+        if (m_iTotalBeats > 0)
+        {
+            for (int i=0; i < m_iTotalBeats; i++) {
+                m_pcMetroQuantum.getUnchecked(i)->setAlpha(1.0f);
+            }
+        }
+    }
+    
+    
+    //==============================================================================
+    // Set Opacity of all buttons to 0.0
+    
+    void setZeroAlpha()
+    {
+        if (m_iTotalBeats > 0)
+        {
+            for (int i=0; i < m_iTotalBeats; i++)
+            {
+                m_pcMetroQuantum.getUnchecked(i)->setAlpha(0.0f);
+            }
+        }
+    }
+    
+    
+    //==============================================================================
+    // Count Beat
+    
+    void countBeat()
+    {
+        if (m_iTotalBeats > 0)
+        {
+            m_iBeat = (m_iBeat % m_iTotalBeats) + 1;
+            
+            for (int i=0; i < m_iBeat; i++)
+            {
+                m_pcMetroQuantum.getUnchecked(i)->setAlpha(1.0f);
+            }
+            
+            for (int i = m_iBeat; i < m_iTotalBeats; i++)
+            {
+                m_pcMetroQuantum.getUnchecked(i)->setAlpha(0.0f);
+            }
+        }
+    }
+    
+    
+
+private:
+    
+    int m_iTotalBeats;
+    int m_iBeat;
+    
+    Colour downBeatColour;
+    Colour upBeatColour;
+    
+    OwnedArray<CustomShapeButton>     m_pcMetroQuantum;
+};
+
+
 
 
 #endif  // BEATSURFACEHEADER_H_INCLUDED

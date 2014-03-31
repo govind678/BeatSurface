@@ -17,6 +17,10 @@ AudioStream::AudioStream() : m_AudioStreamThread("Audio IO")
     
     m_pcOnsetClassifier = new OnsetClassification();
     m_pcMidiOut         = new MidiOut();
+    m_pcAudioMixer      = new AudioMixerPlayer;
+    
+    m_psMidiNoteData.clear();
+    m_pbOutputStatus.clear();
     
     
     m_iCurrentClassIndexToTrain     = 0;
@@ -28,13 +32,13 @@ AudioStream::AudioStream() : m_AudioStreamThread("Audio IO")
     m_eCurrentMode                  = BeatSurfaceBase::IdleMode;
     
     
-    transportSource.setSource(nullptr);
-    formatManager.registerBasicFormats();
-    audioSourcePlayer.setSource(this);
+//    transportSource.setSource(nullptr);
+//    formatManager.registerBasicFormats();
+//    audioSourcePlayer.setSource(this);
     
     
     m_pfOnsetProbabilities.clear();
-    m_ppfOnsetAudio.clear();
+//    m_ppfOnsetAudio.clear();
     m_piClassLabels.clear();
     
     m_AudioStreamThread.startThread(m_iAudioThreadPriority);
@@ -45,16 +49,19 @@ AudioStream::AudioStream() : m_AudioStreamThread("Audio IO")
 
 AudioStream::~AudioStream()
 {
-    transportSource.setSource(nullptr);
-    currentAudioFileSource  =   nullptr;
-    audioSourcePlayer.setSource(0);
+//    transportSource.setSource(nullptr);
+//    currentAudioFileSource  =   nullptr;
+//    audioSourcePlayer.setSource(0);
     
     m_pcOnsetClassifier     = nullptr;
     m_pcMidiOut             = nullptr;
+    m_pcAudioMixer          = nullptr;
+    
+    m_psMidiNoteData.clear();
     
     
     m_pfOnsetProbabilities.clear();
-    m_ppfOnsetAudio.clear(true);
+//    m_ppfOnsetAudio.clear(true);
     m_piClassLabels.clear();
     
     sharedAudioDeviceManager->removeAudioCallback(this);
@@ -77,7 +84,7 @@ AudioStream::~AudioStream()
 void AudioStream::audioDeviceAboutToStart(AudioIODevice* device)
 {
     m_pcOnsetClassifier->initialize(device->getCurrentBufferSizeSamples(), device->getCurrentSampleRate());
-    audioSourcePlayer.audioDeviceAboutToStart (device);
+//    audioSourcePlayer.audioDeviceAboutToStart (device);
 }
 
 
@@ -157,11 +164,11 @@ void AudioStream::audioDeviceIOCallback( const float** inputChannelData,
     
     if (m_eCurrentMode == BeatSurfaceBase::FileTrainMode)
     {
-        audioSourcePlayer.audioDeviceIOCallback (inputChannelData,
-                                                 totalNumInputChannels,
-                                                 outputChannelData,
-                                                 totalNumOutputChannels,
-                                                 blockSize);
+//        audioSourcePlayer.audioDeviceIOCallback (inputChannelData,
+//                                                 totalNumInputChannels,
+//                                                 outputChannelData,
+//                                                 totalNumOutputChannels,
+//                                                 blockSize);
     }
     
     
@@ -179,7 +186,20 @@ void AudioStream::audioDeviceIOCallback( const float** inputChannelData,
             else if (m_eCurrentMode == BeatSurfaceBase::PlayMode)
             {
                 m_iCurrentClassificationResult = m_pcOnsetClassifier->classify(inputChannelData);
-                m_pcMidiOut->makeNoteAndSend(1, m_iCurrentClassificationResult + 35, 100, 250);
+                
+                if ((m_iCurrentClassificationResult > 0))
+                {
+                    if(m_iCurrentClassificationResult <= m_psMidiNoteData.size())
+                    {
+                        m_pcMidiOut->makeNoteAndSend(m_psMidiNoteData.getUnchecked(m_iCurrentClassificationResult - 1)->iChannelNo,
+                                                     m_psMidiNoteData.getUnchecked(m_iCurrentClassificationResult - 1)->iNoteNum,
+                                                     100,
+                                                     m_psMidiNoteData.getUnchecked(m_iCurrentClassificationResult - 1)->iDuration_ms);
+                    }
+                    
+                    m_pcAudioMixer->startPlayback(m_iCurrentClassificationResult - 1, 100);
+                }
+                
                 guiUpdater->displayPlayingOnset();
             }
             
@@ -193,118 +213,23 @@ void AudioStream::audioDeviceIOCallback( const float** inputChannelData,
         }
     }
     
+    
+    for (int sample = 0; sample < blockSize; sample++)
+    {
+        for (int channel = 0; channel < totalNumOutputChannels; channel++)
+        {
+            outputChannelData[channel][sample] = 0.0f;
+        }
+    }
+    
 }
 
 
 void AudioStream::audioDeviceStopped()
 {
-    audioSourcePlayer.audioDeviceStopped();
-}
-
-
-
-//==============================================================================
-// Audio File Player Callback Methods
-// !!! Running on Audio Thread
-//==============================================================================
-
-void AudioStream::prepareToPlay(int samplesPerBlockExpected, double sampleRate)
-{
-    transportSource.prepareToPlay(samplesPerBlockExpected, sampleRate);
-    m_pcOnsetClassifier->initialize(samplesPerBlockExpected, sampleRate);
-}
-
-
-void AudioStream::releaseResources()
-{
-    stopPlayback();
-    transportSource.releaseResources();
-}
-
-
-void AudioStream::getNextAudioBlock(const AudioSourceChannelInfo &audioSourceChannelInfo)
-{
-    transportSource.getNextAudioBlock(audioSourceChannelInfo);
-    processAudioBlock(audioSourceChannelInfo.buffer->getArrayOfReadPointers(), audioSourceChannelInfo.numSamples);
-}
-
-
-
-//==============================================================================
-// Process Block for File Training
-// !!!
-//==============================================================================
-
-void AudioStream::processAudioBlock(const float **audioBuffer, int numSamples)
-{
-    if (m_bOnsetDetected == true)
-    {
-        if (m_eCurrentMode == BeatSurfaceBase::FileTrainMode)
-        {
-            m_pcOnsetClassifier->trainAtClass(audioBuffer, m_iCurrentClassIndexToTrain);
-        }
-        
-        else if (m_eCurrentMode == BeatSurfaceBase::PlayMode)
-        {
-            m_iCurrentClassificationResult = m_pcOnsetClassifier->classify(audioBuffer);
-            m_pcMidiOut->makeNoteAndSend(1, m_iCurrentClassificationResult + 35, 100, 250);
-            guiUpdater->displayPlayingOnset();
-        }
-        
-        m_bOnsetDetected = false;
-    }
-    
-    if (m_pcOnsetClassifier->detectOnset(audioBuffer))
-    {
-        m_bOnsetDetected = true;
-    }
     
 }
 
-
-
-
-void AudioStream::loadAudioFileToTrain(File audioTrainFile)
-{
-    transportSource.stop();
-    transportSource.setSource(nullptr);
-    
-    currentAudioFileSource  =   nullptr;
-    
-    AudioFormatReader* reader = formatManager.createReaderFor(audioTrainFile);
-    
-    
-    if (reader != nullptr)
-    {
-        currentAudioFileSource = new AudioFormatReaderSource (reader, true);
-        currentAudioFileSource->setLooping(false);
-        transportSource.setSource(currentAudioFileSource, 32768, &m_AudioStreamThread, reader->sampleRate);
-    }
-}
-
-
-
-
-//==============================================================================
-// Transport Control Methods
-//==============================================================================
-
-void AudioStream::startPlayback()
-{
-    transportSource.setPosition(0);
-    transportSource.start();
-}
-
-void AudioStream::stopPlayback()
-{
-    transportSource.stop();
-}
-
-
-bool AudioStream::isPlaying()
-{
-    return transportSource.isPlaying();
-}
 
 
 
@@ -342,11 +267,25 @@ void AudioStream::performTraining()
 void AudioStream::addClass()
 {
     m_pcOnsetClassifier->addClass();
+    m_pcAudioMixer->addClass();
+    
+    m_psMidiNoteData.add(new MidiNoteData());
+    
+    m_psMidiNoteData.getLast()->iChannelNo = 1;
+    m_psMidiNoteData.getLast()->iDuration_ms = 250;
+    m_psMidiNoteData.getLast()->iNoteNum = 36;
+    
+    m_pbOutputStatus.add(false);
+    
+//    m_psMidiNoteData.getUnchecked(index)->iChannelNo = 0;
+//    m_psMidiNoteData.getUnchecked(index)->iNoteNum   = 0;
 }
 
 void AudioStream::deleteClass(int index)
 {
     m_pcOnsetClassifier->deleteClass(index);
+    m_psMidiNoteData.remove(index);
+    m_pbOutputStatus.remove(index);
 }
 
 void AudioStream::saveTraining(File trainingFile)
@@ -379,15 +318,15 @@ void AudioStream::setCurrentClassToTrain(int newClassIndex)
 }
 
 
-void AudioStream::playTrainingDataAtClass(int classIndex)
-{
-////    m_iCurrentIndexToPlay   =   m_piClassLabels.indexOf(classIndex);
-//    m_iCurrentIndexToPlay       =   classIndex - 1;
-//    
-//    sharedAudioDeviceManager->addAudioCallback(this);
-//    startTimer((deviceSetup.bufferSize / deviceSetup.sampleRate) * 1000.0f);
-////    startTimer(50);
-}
+//void AudioStream::playTrainingDataAtClass(int classIndex)
+//{
+//////    m_iCurrentIndexToPlay   =   m_piClassLabels.indexOf(classIndex);
+////    m_iCurrentIndexToPlay       =   classIndex - 1;
+////    
+////    sharedAudioDeviceManager->addAudioCallback(this);
+////    startTimer((deviceSetup.bufferSize / deviceSetup.sampleRate) * 1000.0f);
+//////    startTimer(50);
+//}
 
 
 void AudioStream::audioDeviceSettingsChanged()
@@ -395,6 +334,15 @@ void AudioStream::audioDeviceSettingsChanged()
     sharedAudioDeviceManager->getAudioDeviceSetup(deviceSetup);
     m_pcOnsetClassifier->initialize(deviceSetup.bufferSize, deviceSetup.sampleRate);
 }
+
+
+void AudioStream::updateDataset(Array<bool> includes, Array<int> classes, bool type)
+{
+    m_pcOnsetClassifier->updateDataset(includes, classes, type);
+    guiUpdater->doneTraining();
+}
+
+
 
 
 
@@ -450,6 +398,50 @@ int AudioStream::getCurrentClassificationResult()
     return m_iCurrentClassificationResult;
 }
 
+
+
+
+//==============================================================================
+// Audio MIDI Output Methods
+//==============================================================================
+
+void AudioStream::setMIDIOutput(int index, int channelNo, int noteNumber, int duration_ms)
+{
+    if (index >= 0)
+    {
+        m_psMidiNoteData.getUnchecked(index)->iChannelNo = channelNo;
+        m_psMidiNoteData.getUnchecked(index)->iNoteNum   = noteNumber;
+        m_psMidiNoteData.getUnchecked(index)->iDuration_ms = duration_ms;
+    }
+}
+
+
+void AudioStream::setAudioOutputFile(int index, File audioFile)
+{
+    if (index >= 0)
+    {
+        m_pcAudioMixer->loadAudioFile(index, audioFile);
+    }
+}
+
+
+void AudioStream::setAudioOutputLooping(int index, bool looping)
+{
+    if (index >= 0)
+    {
+        m_pcAudioMixer->setLooping(index, looping);
+    }
+}
+
+void AudioStream::setAudioOutputToggle(int index, bool toggle)
+{
+    if (index >= 0)
+    {
+        m_pcAudioMixer->setToggle(index, toggle);
+    }
+}
+
+
 //==============================================================================
 // Timer Callback Methods
 //==============================================================================
@@ -457,4 +449,9 @@ void AudioStream::timerCallback()
 {
 //    sharedAudioDeviceManager->removeAudioCallback(this);
     stopTimer();
+}
+
+void AudioStream::testButton()
+{
+    m_pcAudioMixer->startPlayback(0, 100);
 }

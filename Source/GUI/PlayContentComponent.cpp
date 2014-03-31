@@ -222,6 +222,8 @@ PlayContentComponent::PlayContentComponent ()
     
     
     addAndMakeVisible(shapeButtonArray = new ClassButtonArray);
+    
+    addAndMakeVisible(metroDisplay = new MetronomeComponent);
 
     
     setSize (getParentWidth(), getParentHeight());
@@ -231,9 +233,12 @@ PlayContentComponent::PlayContentComponent ()
 PlayContentComponent::~PlayContentComponent()
 {
     toolBarControls                 = nullptr;
+    
     waveformLiveScroller            = nullptr;
-    shapeButtonArray                = nullptr;
     spectrumLiveScroller            = nullptr;
+    
+    shapeButtonArray                = nullptr;
+    metroDisplay                    = nullptr;
     
     trainingTimeinBarsLabel         = nullptr;
     trainingTimeinBarsSlider        = nullptr;
@@ -259,5 +264,6 @@ void PlayContentComponent::resized()
     trainingTimeinBarsLabel->setBounds(getWidth() - 128, getHeight() / 2 + 32, 128, 20);
     
     shapeButtonArray->setBounds(getWidth()/2 - getHeight()/4, getHeight()/2 - getHeight()/4 + 30, getHeight()/2, getHeight()/2);
+    metroDisplay->setBounds(getWidth()/2 - (getHeight()/4 + 10), getHeight()/2 - getHeight()/4 + 20, getHeight()/2 + 20, getHeight()/2 + 20);
 }
 

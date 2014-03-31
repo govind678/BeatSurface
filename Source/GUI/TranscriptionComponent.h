@@ -55,9 +55,15 @@ public:
     void clearRows();
     void setSystemMode(BeatSurfaceBase::SystemMode newMode);
     
+    void updateTable();
+    
+    Array<bool> getCurrentIncludes();
+    Array<int>  getCurrentClasses();
+    
 private:
     
     ScopedPointer<TextButton>   retrainButton;
+    ScopedPointer<TextButton>   clearButton;
     
     TableListBox table;
     int          numRows;

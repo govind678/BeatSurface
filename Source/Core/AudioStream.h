@@ -14,20 +14,35 @@
 #include "BeatSurfaceHeader.h"
 #include "OnsetClassification.h"
 #include "MidiOut.h"
-//#include "AudioPlayer.h"
+#include "AudioMixerPlayer.h"
 
 
 class AudioStream : public AudioIODeviceCallback,
-                    public AudioSource,
                     private Timer
+
 {
     
 public:
     
     //==============================================================================
     // Constructor & Destructor
+    
     AudioStream();
     ~AudioStream();
+    
+    
+    
+    //==============================================================================
+    // MIDI Output Structure
+    
+    struct MidiNoteData
+    {
+        int         iChannelNo;
+        int         iNoteNum;
+        int         iDuration_ms;
+    };
+    
+    
     
     
     
@@ -47,28 +62,21 @@ public:
     
     //==============================================================================
     // Audio Source Player Callback Methods
-    
-    void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
-    void getNextAudioBlock (const AudioSourceChannelInfo& audioSourceChannelInfo) override;
-    void releaseResources() override;
+//    
+//    void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
+//    void getNextAudioBlock (const AudioSourceChannelInfo& audioSourceChannelInfo) override;
+//    void releaseResources() override;
     
     
     
     //==============================================================================
     // Audio Stream Training Methods
-    
-    void loadAudioFileToTrain(File audioTrainingFile);
+//    
+//    void loadAudioFileToTrain(File audioTrainingFile);
     void setCurrentClassToTrain(int newClass);
-    void playTrainingDataAtClass(int classIndex);
+//    void playTrainingDataAtClass(int classIndex);
     
     
-    
-    //==============================================================================
-    // Transport Control Methods
-    
-    void startPlayback();
-    void stopPlayback();
-    bool isPlaying();
     
     
     
@@ -83,7 +91,7 @@ public:
     //==============================================================================
     // Onset Classification Methods
     
-    void processAudioBlock(const float** audioBuffer, int numSamples);
+//    void processAudioBlock(const float** audioBuffer, int numSamples);
     
     void setParameter(BeatSurfaceBase::ParameterID parameterID, double value);
     
@@ -93,6 +101,19 @@ public:
     
     void saveTraining(File trainingFile);
     void loadTraining(File trainingFile);
+    
+    void updateDataset(Array<bool> includes, Array<int> classes, bool type);
+    
+    
+    
+    //==============================================================================
+    // Audio MIDI Output Methods
+    
+    void setMIDIOutput(int index, int channelNo, int noteNumber, int duration_ms);
+    void setAudioOutputFile(int index, File audioFile);
+    void setAudioOutputLooping(int index, bool looping);
+    void setAudioOutputToggle(int index, bool toggle);
+    
     
     
     
@@ -106,6 +127,9 @@ public:
     double getClassificationConfidence();
     String getCurrentFeatureVector();
     int    getCurrentObservation();
+    
+    
+    void testButton();
     
 private:
     
@@ -121,6 +145,7 @@ private:
     
     ScopedPointer<OnsetClassification>          m_pcOnsetClassifier;
     ScopedPointer<MidiOut>                      m_pcMidiOut;
+    ScopedPointer<AudioMixerPlayer>             m_pcAudioMixer;
     
     
     
@@ -141,11 +166,11 @@ private:
     
     //==============================================================================
     // Audio File Reader and Playback
-    
-    AudioSourcePlayer                           audioSourcePlayer;
-    AudioFormatManager                          formatManager;
-    ScopedPointer<AudioFormatReaderSource>      currentAudioFileSource;
-    AudioTransportSource                        transportSource;
+//    
+//    AudioSourcePlayer                           audioSourcePlayer;
+//    AudioFormatManager                          formatManager;
+//    ScopedPointer<AudioFormatReaderSource>      currentAudioFileSource;
+//    AudioTransportSource                        transportSource;
     
     
     
@@ -154,7 +179,17 @@ private:
     
     Array<float>                                m_pfOnsetProbabilities;
     Array<int>                                  m_piClassLabels;
-    OwnedArray<AudioSampleBuffer>               m_ppfOnsetAudio;
+    
+//    OwnedArray<AudioSampleBuffer>               m_ppfOnsetAudio;
+    
+    
+    
+    
+    //==============================================================================
+    // Midi Output Array
+    
+    OwnedArray<MidiNoteData>                    m_psMidiNoteData;
+    Array<bool>                                 m_pbOutputStatus;   // 0: Audio, 1: MIDI
     
     
     

@@ -130,13 +130,8 @@ public:
     // Process Methods
     
     bool detectOnset(const float** audioBuffer);
-    bool detectOnset(float** audioBuffer);
-    
     void trainAtClass(const float** audioBuffer, int classLabel);
-    void trainAtClass(float** audioBuffer, int classLabel);
-    
     int classify(const float** audioBuffer);
-    int classify(float** audioBuffer);
     
     
     
@@ -165,6 +160,8 @@ public:
     double getClassificationConfidence();
     int    getCurrentObservation();
     
+    void updateDataset(Array<bool> includes, Array<int> classes, bool type);
+    void clearDataset();
     
     
     //==============================================================================

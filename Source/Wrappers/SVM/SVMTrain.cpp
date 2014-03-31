@@ -13,14 +13,33 @@
 
 SVMTrain::SVMTrain()
 {
+    
+    m_pSVMParameters  = 0;
+    m_pSVMProblem = 0;
+    m_pSVMModel   = 0;
+    
+    m_pSVMParameters    = new svm_parameter;
+    memset (m_pSVMParameters, 0, sizeof(svm_parameter));
+    
+    m_pSVMProblem       = new svm_problem;
+    memset (m_pSVMProblem, 0, sizeof(svm_problem));
+    
+    m_pSVMModel         = new svm_model;
+    memset (m_pSVMModel, 0, sizeof(svm_model));
+    
+    
+    
+    m_pdProbability     = 0;
+    m_dResult           = 0;
+    
+    
+    
     // add initialization
     setDefaultParameters();
     
     
     
     //Error_t eError = SetTrainData (ppfFeatureData, pfTargets, iNumFeatures, iNumObservations);
-    
-    m_bIsInitialized  = true;
     
     m_pSvmFeatures = NULL;
     m_pdProbabilityEstimate.assign(0, 0.0f);
@@ -30,7 +49,6 @@ SVMTrain::SVMTrain()
 
 SVMTrain::~SVMTrain()
 {
-    m_bIsInitialized    = false;
     
     if (m_pdProbability != NULL) {
         delete [] m_pdProbability;
@@ -41,6 +59,27 @@ SVMTrain::~SVMTrain()
         delete [] m_pSvmFeatures;
     }
     m_pSvmFeatures = NULL;
+    
+    
+    svm_free_and_destroy_model (&m_pSVMModel);
+    
+    if (m_pSVMProblem)
+    {
+        for (int i = 0; i < m_pSVMProblem->l; i++)
+            delete [] m_pSVMProblem->x[i];
+        delete [] m_pSVMProblem->x;
+        delete [] m_pSVMProblem->y;
+    }
+    
+    
+    
+    
+    if (m_pSVMProblem != NULL) {
+        delete m_pSVMProblem;
+    }
+    
+    m_pSVMProblem = NULL;
+    
 }
 
 
@@ -58,7 +97,7 @@ void SVMTrain::setDefaultParameters ()
     m_pSVMParameters->gamma         = 0.3;	// 1/num_features
     m_pSVMParameters->coef0         = 0;
     m_pSVMParameters->nu            = 0.5;
-    m_pSVMParameters->cache_size    = 100;
+    m_pSVMParameters->cache_size    = 500;
     m_pSVMParameters->C             = 1;
     m_pSVMParameters->eps           = 1e-3;
     m_pSVMParameters->p             = 0.1;
@@ -72,7 +111,7 @@ void SVMTrain::setDefaultParameters ()
 
 
 
-SVMBase::Error_t SVMTrain::setParameters(const SvmParameter_t &stSvmParam)
+SVMTrain::Error_t SVMTrain::setParameters(const SvmParameter_t &stSvmParam)
 {
     /////////////////////////////////////////////////////////
     // SvmParameter_t
@@ -93,7 +132,8 @@ SVMBase::Error_t SVMTrain::setParameters(const SvmParameter_t &stSvmParam)
 
 
 
-SVMBase::Error_t SVMTrain::setTrainingDataAndTrain(vector<vector<double>> ppdTrainingData,
+
+SVMTrain::Error_t SVMTrain::setTrainingDataAndTrain(vector<vector<double>> ppdTrainingData,
                                                    vector<int> piTrainingClassLabels,
                                                    int iNumFeatures,
                                                    int iNumObservations)
@@ -176,25 +216,32 @@ SVMBase::Error_t SVMTrain::setTrainingDataAndTrain(vector<vector<double>> ppdTra
     
     //--- Train SVM Model ---//
     
-    if (!m_bIsInitialized)
-        return kNotInitializedError;
-    
-    if (!m_pSVMProblem)
+    if (m_pSVMProblem == NULL)
+    {
+        std::cout << "@SVMTrain: Error: With SVM Problem" << std::endl;
         return kUnknownError;
+    }
     
     if (m_pSVMProblem->l <= 1)
+    {
+        std::cout << "@SVMTrain: Error: SVs <= 1" << std::endl;
         return kNotInitializedError;
+    }
     
     // verify parameter
     if (svm_check_parameter (m_pSVMProblem, m_pSVMParameters))
+    {
+        std::cout << "@SVMTrain: Error: With Parameters" << std::endl;
         return kUnknownError;
+    }
     
     // train
     m_pSVMModel   = svm_train(m_pSVMProblem, m_pSVMParameters);
     
     
     
-    if (m_pdProbability != nullptr) {
+    if (m_pdProbability != nullptr)
+    {
         delete [] m_pdProbability;
     }
     
@@ -209,7 +256,7 @@ SVMBase::Error_t SVMTrain::setTrainingDataAndTrain(vector<vector<double>> ppdTra
 
 
 
-SVMBase::Error_t SVMTrain::saveModelToDisk(std::string modelFilePath)
+SVMTrain::Error_t SVMTrain::saveModelToDisk(std::string modelFilePath)
 {
     if(svm_save_model((char*)modelFilePath.c_str(), m_pSVMModel)) {
         std::cout << "@SVMTrain: Error: Cannot Save Model" << std::endl;
@@ -223,9 +270,6 @@ SVMBase::Error_t SVMTrain::saveModelToDisk(std::string modelFilePath)
 
 double SVMTrain::classify(double* pfFeatures, double* pdProbability /*= 0*/)
 {
-    
-    if (!m_bIsInitialized)
-        return 0;
     
     int iNodeIdx        = 0;
     
@@ -266,7 +310,9 @@ int SVMTrain::getNumSvElements(std::string strSvString )
 }
 
 
-SVMBase::Error_t SVMTrain::loadModelFromDisk(std::string modelFilePath)
+
+
+SVMTrain::Error_t SVMTrain::loadModelFromDisk(std::string modelFilePath)
 {
     
     if((m_pSVMModel = svm_load_model((char*)modelFilePath.c_str())) == 0) {
@@ -285,18 +331,13 @@ SVMBase::Error_t SVMTrain::loadModelFromDisk(std::string modelFilePath)
 }
 
 
-SVMBase::Error_t SVMTrain::crossValidationOnTrainingDataset(int numFolds, double& accuracy)
+SVMTrain::Error_t SVMTrain::crossValidationOnTrainingDataset(int numFolds, double& accuracy)
 {
     if (numFolds <= 0)
         return kInvalidFunctionParamError;
     
     m_iNumFolds = numFolds;
     
-    
-    if (!m_bIsInitialized) {
-        std::cout << "@SVMEvaluate: Error: Instance not initialized" << std::endl;
-        return kNotInitializedError;
-    }
     
     if (!m_pSVMProblem) {
         std::cout << "@SVMEvaluate: Error: SVM Problem" << std::endl;
@@ -374,7 +415,7 @@ SVMBase::Error_t SVMTrain::crossValidationOnTrainingDataset(int numFolds, double
 
 
 
-SVMBase::Error_t SVMTrain::setNumOfFolds( int iNumFolds /*= 10*/ )
+SVMTrain::Error_t SVMTrain::setNumOfFolds( int iNumFolds /*= 10*/ )
 {
     if (iNumFolds <= 0)
         return kInvalidFunctionParamError;
@@ -387,7 +428,7 @@ SVMBase::Error_t SVMTrain::setNumOfFolds( int iNumFolds /*= 10*/ )
 
 
 
-SVMBase::Error_t SVMTrain::evaluationOnTestDataset(double **ppfTestDataset, double *pfTargetLabels, int iNumObservations, int iNumFeatures)
+SVMTrain::Error_t SVMTrain::evaluationOnTestDataset(double **ppfTestDataset, double *pfTargetLabels, int iNumObservations, int iNumFeatures)
 {
     float accuracy = 0;
     float** ppfConfusionMatrix;
@@ -442,4 +483,80 @@ SVMBase::Error_t SVMTrain::evaluationOnTestDataset(double **ppfTestDataset, doub
     
     
     return kNoError;
+}
+
+
+
+
+
+//--- Internal Methods to Convert SVMBase Enums to LibSVM Type ---//
+
+
+
+SVMTrain::SvmType_t SVMTrain::SvmTypeInternal2External( int iInternalSvmType )
+{
+    switch (iInternalSvmType)
+    {
+        default:
+        case C_SVC:
+            return kSvmType_C_SVC;
+        case NU_SVC:
+            return kSvmType_NU_SVC;
+        case ONE_CLASS:
+            return kSvmType_ONE_CLASS;
+        case EPSILON_SVR:
+            return kSvmType_EPSILON_SVR;
+        case NU_SVR:
+            return kSvmType_NU_SVR;
+    }
+}
+
+
+
+
+int SVMTrain::SvmTypeExternal2Internal( SvmType_t eExternalType )
+{
+    switch (eExternalType)
+    {
+        default:
+        case kSvmType_C_SVC:
+            return C_SVC;
+        case kSvmType_NU_SVC:
+            return NU_SVC;
+        case kSvmType_ONE_CLASS:
+            return ONE_CLASS;
+        case kSvmType_EPSILON_SVR:
+            return EPSILON_SVR;
+        case kSvmType_NU_SVR:
+            return NU_SVR;
+    }
+    
+}
+
+
+
+SVMTrain::SvmKernelType_t SVMTrain::SvmKernelTypeInternal2External( int iInternalSvmKernelType )
+{
+    switch (iInternalSvmKernelType)
+    {
+        default:
+        case LINEAR:
+            return kSvmKernelType_LINEAR;
+        case RBF:
+            return kSvmKernelType_RBF;
+    }
+}
+
+
+
+int SVMTrain::SvmKernelTypeExternal2Internal( SvmKernelType_t eExternalKernelType )
+{
+    switch (eExternalKernelType)
+    {
+        default:
+        case kSvmKernelType_LINEAR:
+            return LINEAR;
+        case kSvmKernelType_RBF:
+            return RBF;
+    }
 }

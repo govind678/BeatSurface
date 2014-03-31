@@ -90,8 +90,14 @@
               file="Source/GUI/TranscriptionComponent.h"/>
       </GROUP>
       <GROUP id="{B056DD55-77D0-5AE7-268D-B7219D0CBDB4}" name="Output">
-        <FILE id="eBqGuK" name="AudioPlayer.cpp" compile="1" resource="0" file="Source/Output/AudioPlayer.cpp"/>
-        <FILE id="C88ldL" name="AudioPlayer.h" compile="0" resource="0" file="Source/Output/AudioPlayer.h"/>
+        <FILE id="e5vV3H" name="AudioMixerPlayer.cpp" compile="1" resource="0"
+              file="Source/Output/AudioMixerPlayer.cpp"/>
+        <FILE id="aMuWAk" name="AudioMixerPlayer.h" compile="0" resource="0"
+              file="Source/Output/AudioMixerPlayer.h"/>
+        <FILE id="eBqGuK" name="AudioFilePlayer.cpp" compile="1" resource="0"
+              file="Source/Output/AudioFilePlayer.cpp"/>
+        <FILE id="C88ldL" name="AudioFilePlayer.h" compile="0" resource="0"
+              file="Source/Output/AudioFilePlayer.h"/>
         <FILE id="BL71V3" name="GlobalClock.cpp" compile="1" resource="0" file="Source/Output/GlobalClock.cpp"/>
         <FILE id="RC4t2s" name="GlobalClock.h" compile="0" resource="0" file="Source/Output/GlobalClock.h"/>
         <FILE id="lTFi8e" name="MidiOut.cpp" compile="1" resource="0" file="Source/Output/MidiOut.cpp"/>
@@ -99,8 +105,6 @@
       </GROUP>
       <GROUP id="{781E0B90-9159-1D25-110C-D617A00F2DF7}" name="Wrappers">
         <GROUP id="{8830BC45-008C-567F-126A-862E82B737ED}" name="SVM">
-          <FILE id="RXDuk2" name="SVMBase.cpp" compile="1" resource="0" file="Source/Wrappers/SVM/SVMBase.cpp"/>
-          <FILE id="FgZxgk" name="SVMBase.h" compile="0" resource="0" file="Source/Wrappers/SVM/SVMBase.h"/>
           <FILE id="QPvs48" name="SVMTrain.cpp" compile="1" resource="0" file="Source/Wrappers/SVM/SVMTrain.cpp"/>
           <FILE id="wOeVCT" name="SVMTrain.h" compile="0" resource="0" file="Source/Wrappers/SVM/SVMTrain.h"/>
         </GROUP>
@@ -116,40 +120,40 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="NfnoQN" bigIcon="RzQmWg">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="default" osxArchitecture="default"
+        <CONFIGURATION name="Debug" osxSDK="10.9 SDK" osxCompatibility="10.7 SDK" osxArchitecture="Native"
                        isDebug="1" optimisation="1" targetName="Beat Surface"/>
         <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="default" osxArchitecture="default"
                        isDebug="0" optimisation="2" targetName="Beat Surface"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_core" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../../../Libraries/JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="../../../../Libraries/JUCE/modules"/>
         <MODULEPATH id="juce_audio_devices" path="../../../../Libraries/JUCE/modules"/>
         <MODULEPATH id="juce_audio_formats" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../../Libraries/JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../../Libraries/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
   </EXPORTFORMATS>
   <MODULES>
-    <MODULES id="juce_audio_basics" showAllCode="1" useLocalCopy="1"/>
-    <MODULES id="juce_audio_devices" showAllCode="1" useLocalCopy="1"/>
-    <MODULES id="juce_audio_formats" showAllCode="1" useLocalCopy="1"/>
-    <MODULES id="juce_audio_processors" showAllCode="1" useLocalCopy="1"/>
-    <MODULES id="juce_audio_utils" showAllCode="1" useLocalCopy="1"/>
-    <MODULES id="juce_core" showAllCode="1" useLocalCopy="1"/>
-    <MODULES id="juce_cryptography" showAllCode="1" useLocalCopy="1"/>
-    <MODULES id="juce_data_structures" showAllCode="1" useLocalCopy="1"/>
-    <MODULES id="juce_events" showAllCode="1" useLocalCopy="1"/>
-    <MODULES id="juce_graphics" showAllCode="1" useLocalCopy="1"/>
-    <MODULES id="juce_gui_basics" showAllCode="1" useLocalCopy="1"/>
-    <MODULES id="juce_gui_extra" showAllCode="1" useLocalCopy="1"/>
+    <MODULES id="juce_audio_basics" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_audio_devices" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_audio_formats" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_audio_processors" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_audio_utils" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_core" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_cryptography" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_data_structures" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_events" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_graphics" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_gui_basics" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
   </MODULES>
   <JUCEOPTIONS JUCE_USE_MP3AUDIOFORMAT="enabled"/>
 </JUCERPROJECT>

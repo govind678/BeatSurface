@@ -170,25 +170,9 @@ OnsetClassification::~OnsetClassification()
 bool OnsetClassification::detectOnset(const float** audioBuffer)
 {
     m_pfDetectionAudioBlock.insert(m_pfDetectionAudioBlock.begin(), audioBuffer[0], audioBuffer[0] + m_sDeviceSettings.iBufferSize);
-    return internal_detectOnset();
-
-}
-
-bool OnsetClassification::detectOnset(float** audioBuffer)
-{
-    m_pfDetectionAudioBlock.insert(m_pfDetectionAudioBlock.begin(), audioBuffer[0], audioBuffer[0] + m_sDeviceSettings.iBufferSize);
-    return internal_detectOnset();
-}
-
-
-
-//==============================================================================
-// Internal Onset Detection
-// !!! Running on Audio Thread
-//==============================================================================
-
-bool OnsetClassification::internal_detectOnset()
-{
+    
+    
+    
     //--- Compute STFT on 1st channel ---//
     m_pcDetectionSTFT->computeFFT(m_pfDetectionAudioBlock.data(),
                                   m_pfDetectionCurrentRealFFT.data(),
@@ -212,7 +196,7 @@ bool OnsetClassification::internal_detectOnset()
     
     //--- Store Current FFT ---//
     m_pfDetectionPreviousRealFFT = m_pfDetectionCurrentRealFFT;
-
+    
     
     
     //--- Store Current Audio Buffer ---//
@@ -255,7 +239,9 @@ bool OnsetClassification::internal_detectOnset()
     
     
     return false;
+
 }
+
 
 
 
@@ -266,24 +252,8 @@ bool OnsetClassification::internal_detectOnset()
 int OnsetClassification::classify(const float** audioBuffer)
 {
     m_pfDetectionAudioBlock.insert(m_pfDetectionAudioBlock.begin(), audioBuffer[0], audioBuffer[0] + m_sDeviceSettings.iBufferSize);
-    return internal_classify();
-}
-
-
-int OnsetClassification::classify(float** audioBuffer)
-{
-    m_pfDetectionAudioBlock.insert(m_pfDetectionAudioBlock.begin(), audioBuffer[0], audioBuffer[0] + m_sDeviceSettings.iBufferSize);
-    return internal_classify();
-}
-
-
-//==============================================================================
-// Internal Onset Detection
-// !!! Running on Audio Thread
-//==============================================================================
-
-int OnsetClassification::internal_classify()
-{
+    
+    
     //--- If only one class or no classes is/are trained, return ---//
     if (m_sTrainingParameters.iNumClasses < 2)
     {
@@ -333,12 +303,12 @@ int OnsetClassification::internal_classify()
             
             
             //--- Printout Probability Estimates ---//
-            std::cout << result << ":\t";
-            for (int c = 0; c < m_sTrainingParameters.iNumClasses; c++)
-            {
-                std::cout << m_pdProbabilityEstimates[c] << "\t";
-            }
-            std::cout << std::endl;
+//            std::cout << result << ":\t";
+//            for (int c = 0; c < m_sTrainingParameters.iNumClasses; c++)
+//            {
+//                std::cout << m_pdProbabilityEstimates[c] << "\t";
+//            }
+//            std::cout << std::endl;
             
             
             //--- Return Resulting Class ---//
@@ -349,32 +319,28 @@ int OnsetClassification::internal_classify()
 }
 
 
+
+
+
 std::vector<double> OnsetClassification::getCurrentProbabilityEstimates()
 {
     return m_pdProbabilityEstimates;
 }
 
 
+
+
 //==============================================================================
 // Add Training sample if block consists of Onset
 // !!! Running on Audio Thread
 //==============================================================================
-void OnsetClassification::trainAtClass(float** audioBuffer, int classLabel)
-{
-    m_pfDetectionAudioBlock.insert(m_pfDetectionAudioBlock.begin(), audioBuffer[0], audioBuffer[0] + m_sDeviceSettings.iBufferSize);
-    internal_trainAtClass(classLabel);
-}
-
 
 void OnsetClassification::trainAtClass(const float** audioBuffer, int classLabel)
 {
     m_pfDetectionAudioBlock.insert(m_pfDetectionAudioBlock.begin(), audioBuffer[0], audioBuffer[0] + m_sDeviceSettings.iBufferSize);
-    internal_trainAtClass(classLabel);
-}
-
-
-void OnsetClassification::internal_trainAtClass(int classLabel)
-{
+    
+    
+    
     for (int sample = 0; sample < m_sDeviceSettings.iBufferSize; sample++)
     {
         m_pfClassificationAudioBlock[m_sDeviceSettings.iBufferSize + sample] = m_pfDetectionAudioBlock[sample];
@@ -393,12 +359,12 @@ void OnsetClassification::internal_trainAtClass(int classLabel)
     
     
     //--- Printout Features ---//
-    std::cout << classLabel << ": ";
-    for (int i=0; i < m_sTrainingParameters.iNumFeatures; i++)
-    {
-        std::cout << m_pdFeatureVector[i] << "\t ";
-    }
-    std::cout << std::endl;
+    //    std::cout << classLabel << ": ";
+    //    for (int i=0; i < m_sTrainingParameters.iNumFeatures; i++)
+    //    {
+    //        std::cout << m_pdFeatureVector[i] << "\t ";
+    //    }
+    //    std::cout << std::endl;
     
     
     
@@ -406,7 +372,6 @@ void OnsetClassification::internal_trainAtClass(int classLabel)
     m_piTrainingClassLabels.push_back(classLabel);
     
     m_sTrainingParameters.iNumObservations++;
-    
 }
 
 
@@ -449,12 +414,12 @@ void OnsetClassification::performTraining()
             //--- Create New SVM Trainer and Classifier ---//
             m_pcSVMTrainer = new SVMTrain();
             
-            SVMBase::Error_t error  = m_pcSVMTrainer->setTrainingDataAndTrain(m_ppdNormalizedData,
+            SVMTrain::Error_t error  = m_pcSVMTrainer->setTrainingDataAndTrain(m_ppdNormalizedData,
                                                                               m_piTrainingClassLabels,
                                                                               m_sTrainingParameters.iNumFeatures,
                                                                               m_sTrainingParameters.iNumObservations);
             
-            if (error == SVMBase::kNoError)
+            if (error == SVMTrain::kNoError)
             {
                 evaluate();
                 m_sTrainingParameters.bDidFinishTraining    = true;
@@ -780,6 +745,108 @@ int OnsetClassification::getCurrentObservation()
 {
     return m_sTrainingParameters.iCurrentObservation;
 }
+
+
+
+void OnsetClassification::clearDataset()
+{
+    m_ppdEvaluationData.clear();
+    m_piEvaluationLabels.clear();
+}
+
+// Type: 0 -> Update Training
+// Type: 1 -> Update Testing
+void OnsetClassification::updateDataset(Array<bool> includes, Array<int> classes, bool type)
+{
+    if (type)
+    {
+        //--- Update any changes made to class index ---//
+        for (int i=0; i < classes.size(); i++)
+        {
+            m_piEvaluationLabels[i] = classes.getUnchecked(i);
+        }
+        
+        vector<int>::iterator itClass               = m_piEvaluationLabels.begin();
+        vector<vector<double>>::iterator itTest     = m_ppdEvaluationData.begin();
+        
+        
+        int i = 0;
+        
+        while (itClass != m_piEvaluationLabels.end())
+        {
+            i = distance(m_piEvaluationLabels.begin(), itClass);
+            
+            if (! includes.getUnchecked(i))
+            {
+                itClass = m_piEvaluationLabels.erase(itClass);
+                itTest = m_ppdEvaluationData.erase(itTest);
+                includes.remove(i);
+                classes.remove(i);
+            }
+            
+            else
+            {
+                ++itClass;
+                ++itTest;
+            }
+        }
+        
+        
+        //--- Append Testing Data to Training ---//
+//        a.insert(a.end(), b.begin(), b.end());
+        m_piTrainingClassLabels.insert(m_piTrainingClassLabels.end(), m_piEvaluationLabels.begin(), m_piEvaluationLabels.end());
+        m_ppdTrainingData.insert(m_ppdTrainingData.end(), m_ppdEvaluationData.begin(), m_ppdEvaluationData.end());
+        
+        m_piEvaluationLabels.clear();
+        m_ppdEvaluationData.clear();
+        
+    }
+    
+    
+    else
+    {
+        //--- Update any changes made to class index ---//
+        for (int i=0; i < classes.size(); i++)
+        {
+            m_piTrainingClassLabels[i] = classes.getUnchecked(i);
+        }
+        
+        vector<int>::iterator itClass               = m_piTrainingClassLabels.begin();
+        vector<vector<double>>::iterator itTrain    = m_ppdTrainingData.begin();
+        
+        
+        int ind = 0;
+        
+        while (itClass != m_piTrainingClassLabels.end())
+        {
+            ind = distance(m_piTrainingClassLabels.begin(), itClass);
+            
+            if (! includes.getUnchecked(ind))
+            {
+                itClass = m_piTrainingClassLabels.erase(itClass);
+                itTrain = m_ppdTrainingData.erase(itTrain);
+                includes.remove(ind);
+                classes.remove(ind);
+            }
+            
+            else
+            {
+                ++itClass;
+                ++itTrain;
+            }
+        }
+    }
+    
+    m_sTrainingParameters.iCurrentObservation = 0;
+    m_sTrainingParameters.iNumObservations = m_piTrainingClassLabels.size();
+    
+    //--- Normalize Data and Train SVM ---//
+    performTraining();
+    
+    
+}
+
+
 
 
 //==============================================================================

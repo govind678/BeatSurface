@@ -85,7 +85,11 @@ public:
     
     //==============================================================================
     // Button Listener
+    
     void buttonClicked (Button* buttonThatWasClicked);
+    void loadAudioFileToPlay (int index);
+    void setAudioFileParam (int index, bool looping, bool toggle);
+    void setMidiOutput(int classIndex, int channelNo, int noteNum, int duration_ms);
     //==============================================================================
     
     

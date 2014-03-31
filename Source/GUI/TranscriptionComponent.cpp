@@ -163,6 +163,12 @@ TranscriptionComponent::TranscriptionComponent()
     retrainButton->setColour (TextButton::buttonColourId, Colour (0xFF5B5B5B));
     retrainButton->setColour (TextButton::buttonOnColourId, Colour (0xFF9A9A9A));
     
+    addAndMakeVisible (clearButton = new TextButton ("clearButton"));
+    clearButton->setButtonText (TRANS("Clear Button"));
+    clearButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
+    clearButton->setColour (TextButton::buttonColourId, Colour (0xFF5B5B5B));
+    clearButton->setColour (TextButton::buttonOnColourId, Colour (0xFF9A9A9A));
+    
     clearRows();
     m_iNumClasses = 0;
     
@@ -172,6 +178,7 @@ TranscriptionComponent::TranscriptionComponent()
 TranscriptionComponent::~TranscriptionComponent()
 {
     retrainButton = nullptr;
+    clearButton   = nullptr;
     
     clearRows();
 }
@@ -184,6 +191,7 @@ void TranscriptionComponent::resized()
     table.setBounds(50, 10, 910, getHeight() - 40);
     
     retrainButton->setBounds(1000, 100, 150, 40);
+    clearButton->setBounds(1000, 180, 150, 40);
 }
 
 
@@ -413,4 +421,20 @@ void TranscriptionComponent::setSystemMode(BeatSurfaceBase::SystemMode newMode)
         table.setColour(ListBox::backgroundColourId, Colour(playingColour));
         table.updateContent();
     }
+}
+
+Array<bool> TranscriptionComponent::getCurrentIncludes()
+{
+    return m_pbIncludes;
+}
+
+
+Array<int> TranscriptionComponent::getCurrentClasses()
+{
+    return m_piActualClasses;
+}
+
+void TranscriptionComponent::updateTable()
+{
+    table.updateContent();
 }

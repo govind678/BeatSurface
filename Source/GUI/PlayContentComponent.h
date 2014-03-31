@@ -78,6 +78,7 @@ public:
 private:
     
     ScopedPointer<ClassButtonArray>             shapeButtonArray;
+    ScopedPointer<MetronomeComponent>           metroDisplay;
     
     ScopedPointer<LiveScrollDisplay>            waveformLiveScroller;
     ScopedPointer<LiveScrollDisplay>            spectrumLiveScroller;

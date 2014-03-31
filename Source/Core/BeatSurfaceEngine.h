@@ -60,9 +60,15 @@ public:
     
     void setTrainingTimeinBars(int bars);
     
+    void updateDataset(Array<bool> includes, Array<int> classes);
+    
+    void setMidiOutput(int classIndex, int channelNo, int noteNum, int duration_ms);
+    void setAudioOutputFile(int index, File audioFile);
+    void setAudioOutputLooping(int index, bool looping);
+    void setAudioOutputToggle(int index, bool toggle);
     
     
-    
+    void testButton();
     
     //==============================================================================
     // Interface Get Methods for Beat Surface Core -> GUI
