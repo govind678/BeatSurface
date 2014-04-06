@@ -81,7 +81,12 @@ OnsetClassification::OnsetClassification()
     m_sAudioFeatures.dSpectralSlope             =   0.0f;
     
     m_sAudioFeatures.dSpectralFlux              =   0.0f;
-    m_sAudioFeatures.dRootMeanSquare            =   0.0f;
+    m_sAudioFeatures.dRootMeanSquare_dB         =   0.0f;
+    
+    for (int i=0; i<16; i++)
+    {
+        m_psAudioFilePaths.add("");
+    }
     
 }
 
@@ -149,6 +154,8 @@ OnsetClassification::~OnsetClassification()
     
     m_psFeatureVector.clear();
     
+    m_psAudioFilePaths.clear();
+    
     m_pcDetectionSTFT       = nullptr;
     m_pcClassificationSTFT  = nullptr;
     m_pcAudioFeature        = nullptr;
@@ -206,6 +213,8 @@ bool OnsetClassification::detectOnset(const float** audioBuffer)
     }
     
     
+    //--- Compute RMS ---//
+    m_sAudioFeatures.dRootMeanSquare_dB = m_pcAudioFeature->rootMeanSquareIndB(audioBuffer, m_sDeviceSettings.iBufferSize);
     
     
     //--- Check for Peaks ---//
@@ -340,7 +349,7 @@ void OnsetClassification::trainAtClass(const float** audioBuffer, int classLabel
     m_pfDetectionAudioBlock.insert(m_pfDetectionAudioBlock.begin(), audioBuffer[0], audioBuffer[0] + m_sDeviceSettings.iBufferSize);
     
     
-    
+    // Use Iterators instead
     for (int sample = 0; sample < m_sDeviceSettings.iBufferSize; sample++)
     {
         m_pfClassificationAudioBlock[m_sDeviceSettings.iBufferSize + sample] = m_pfDetectionAudioBlock[sample];
@@ -589,6 +598,11 @@ void OnsetClassification::deleteClass(int classIndex)
         m_sTrainingParameters.iNumObservations = m_piTrainingClassLabels.size();
         
         
+        for (int i=0; i<m_piTrainingClassLabels.size(); i++) {
+            std::cout << m_piTrainingClassLabels[i] << std::endl;
+        }
+        
+        
         //--------------------------------------------------
         // Iterate through class labels to restructure
         // all classes as continously ascending from 1.
@@ -637,8 +651,15 @@ int OnsetClassification::saveTraining(File trainingFile)
         + "Classes: " + String(m_sTrainingParameters.iNumClasses) + "\n"
         + "Features: " + String(m_sTrainingParameters.iNumFeatures) + "\n"
         + "VelocityThresholdSetting: " + String(m_sDetectionParameters.dDeltaThreshold) + "\n"
-        + "DecayTimeSetting: " + String(m_sDetectionParameters.iDecayBlockWindow) + "\n"
-        + "\nClass: \t Audio Features: \n";
+        + "DecayTimeSetting: " + String(m_sDetectionParameters.iDecayBlockWindow) + "\n";
+        
+        for (int i=0; i < m_sTrainingParameters.iNumClasses; i++)
+        {
+            dataToWrite += m_psAudioFilePaths.getReference(i) + "\n";
+        }
+        
+        
+        dataToWrite += "Class: \t Audio Features: \n";
         
         for (int observation = 0; observation < m_sTrainingParameters.iNumObservations; observation++)
         {
@@ -686,6 +707,11 @@ void OnsetClassification::loadTraining(File trainingFile)
             m_sDetectionParameters.iDecayBlockWindow    = trainingDataString[6].fromFirstOccurrenceOf("DecayTimeSetting: ",
                                                                                                       false, false).getIntValue();
             
+            for (int i=0; i < m_sTrainingParameters.iNumClasses; i++)
+            {
+                m_psAudioFilePaths.set(i, trainingDataString[i+7]);
+            }
+            
             
             m_ppdTrainingData.clear();
             m_ppdTrainingData.assign(m_sTrainingParameters.iNumObservations, vector<double> (m_sTrainingParameters.iNumFeatures,0.0f));
@@ -697,7 +723,7 @@ void OnsetClassification::loadTraining(File trainingFile)
             for (int observation = 0; observation < m_sTrainingParameters.iNumObservations; observation++)
             {
                 StringArray data;
-                data.addTokens(trainingDataString[observation + 9].trim(), ";", "\"");
+                data.addTokens(trainingDataString[observation + 8 + m_sTrainingParameters.iNumClasses].trim(), ";", "\"");
                 
                 m_piTrainingClassLabels[observation] = data[0].getIntValue();
                 
@@ -747,12 +773,21 @@ int OnsetClassification::getCurrentObservation()
 }
 
 
+double OnsetClassification::getCurrentRMSIndB()
+{
+    return m_sAudioFeatures.dRootMeanSquare_dB;
+}
+
+
+
 
 void OnsetClassification::clearDataset()
 {
     m_ppdEvaluationData.clear();
     m_piEvaluationLabels.clear();
 }
+
+
 
 // Type: 0 -> Update Training
 // Type: 1 -> Update Testing
@@ -859,8 +894,18 @@ vector<float> OnsetClassification::getCurrentSpectrum()
 }
 
 
-float OnsetClassification::getCurrentSpectralCentroid()
+double OnsetClassification::getCurrentSpectralCentroid()
 {
     return m_sAudioFeatures.dSpectralCentroid;
 }
 
+
+void OnsetClassification::setAudioFilePathsToSave(juce::StringArray filePaths)
+{
+    m_psAudioFilePaths = filePaths;
+}
+
+StringArray OnsetClassification::getAudioFilePathsToLoad()
+{
+    return m_psAudioFilePaths;
+}

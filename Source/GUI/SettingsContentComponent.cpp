@@ -111,9 +111,10 @@ class ToggleButtonColumnCustomComponent    :        public Component,
 {
 public:
     
-    ToggleButtonColumnCustomComponent (MidiAudioOutputComponent& owner_, bool isLooping) : owner (owner_)
+    ToggleButtonColumnCustomComponent (MidiAudioOutputComponent& owner_, int type) : owner (owner_)
     {
-        m_bIsLooping = isLooping;
+//        m_bIsLooping = isLooping;
+        m_iType = type;
         
         addAndMakeVisible (toggleButton);
         
@@ -137,12 +138,22 @@ public:
         row = newRow;
         columnId = newColumn;
         
-        if (m_bIsLooping)
+        if (m_iType == 0)
+        {
+            toggleButton.setToggleState(owner.getIncludeMidi(row), dontSendNotification);
+        }
+        
+        else if (m_iType == 1)
+        {
+            toggleButton.setToggleState(owner.getIncludeAudio(row), dontSendNotification);
+        }
+        
+        else if (m_iType == 2)
         {
             toggleButton.setToggleState(owner.getLooping(row), dontSendNotification);
         }
         
-        else
+        else if (m_iType == 3)
         {
             toggleButton.setToggleState(owner.getToggle(row), dontSendNotification);
         }
@@ -150,12 +161,22 @@ public:
     
     void buttonClicked (Button* buttonThatWasClicked) override
     {
-        if (m_bIsLooping)
+        if (m_iType == 0)
+        {
+            owner.setIncludeMidi (row, toggleButton.getToggleState());
+        }
+        
+        else if (m_iType == 1)
+        {
+            owner.setIncludeAudio (row, toggleButton.getToggleState());
+        }
+        
+        else if (m_iType == 2)
         {
             owner.setLooping (row, toggleButton.getToggleState());
         }
         
-        else
+        else if (m_iType == 3)
         {
             owner.setToggle (row, toggleButton.getToggleState());
         }
@@ -167,7 +188,7 @@ private:
     MidiAudioOutputComponent& owner;
     ToggleButton    toggleButton;
     int row, columnId;
-    bool m_bIsLooping;
+    int m_iType;    // 0: MIDI, 1: Audio, 2: Looping, 3: Toggle
 };
 
 
@@ -349,19 +370,22 @@ MidiAudioOutputComponent::MidiAudioOutputComponent()
     addAndMakeVisible(table);
     table.setModel(this);
     
-    table.setColour (ListBox::outlineColourId, Colours::grey);
+    table.setColour (ListBox::outlineColourId, Colours::darkgrey);
     table.setOutlineThickness (1);
+    table.setColour(ListBox::backgroundColourId, Colour(0xDD888888));
     
     
     // Add Columns To Table
     table.getHeader().addColumn("Class", 1, 50, 50, 50, TableHeaderComponent::notResizableOrSortable, -1);
-    table.getHeader().addColumn("Midi Channel", 2, 100, 100, 100, TableHeaderComponent::notResizableOrSortable, -1);
-    table.getHeader().addColumn("Midi Note", 3, 100, 100, 100, TableHeaderComponent::notResizableOrSortable, -1);
-    table.getHeader().addColumn("Midi Duration", 4, 100, 100, 100, TableHeaderComponent::notResizableOrSortable, -1);
-    table.getHeader().addColumn("Load Audio File", 5, 100, 100, 100, TableHeaderComponent::notResizableOrSortable, -1);
-    table.getHeader().addColumn("Audio File", 6, 250, 250, 250, TableHeaderComponent::notResizableOrSortable, -1);
-    table.getHeader().addColumn("Looping", 7, 100, 100, 100, TableHeaderComponent::notResizableOrSortable, -1);
-    table.getHeader().addColumn("Toggle", 8, 100, 100, 100, TableHeaderComponent::notResizableOrSortable, -1);
+    table.getHeader().addColumn("Play MIDI", 2, 75, 75, 75, TableHeaderComponent::notResizableOrSortable, -1);
+    table.getHeader().addColumn("Midi Channel", 3, 100, 100, 100, TableHeaderComponent::notResizableOrSortable, -1);
+    table.getHeader().addColumn("Midi Note", 4, 100, 100, 100, TableHeaderComponent::notResizableOrSortable, -1);
+    table.getHeader().addColumn("Midi Duration", 5, 100, 100, 100, TableHeaderComponent::notResizableOrSortable, -1);
+    table.getHeader().addColumn("Play Audio", 6, 75, 75, 75, TableHeaderComponent::notResizableOrSortable, -1);
+    table.getHeader().addColumn("Load Audio File", 7, 100, 100, 100, TableHeaderComponent::notResizableOrSortable, -1);
+    table.getHeader().addColumn("Audio File", 8, 250, 250, 250, TableHeaderComponent::notResizableOrSortable, -1);
+    table.getHeader().addColumn("Looping", 9, 75, 75, 75, TableHeaderComponent::notResizableOrSortable, -1);
+    table.getHeader().addColumn("Toggle", 10, 75, 75, 75, TableHeaderComponent::notResizableOrSortable, -1);
     
     
 //    table.setColour(ListBox::backgroundColourId, Colour(playingColour));
@@ -439,8 +463,22 @@ void MidiAudioOutputComponent::paintCell (Graphics& g, int rowNumber, int column
 Component* MidiAudioOutputComponent::refreshComponentForCell (int rowNumber, int columnId, bool /*isRowSelected*/,
                                                             Component* existingComponentToUpdate)
 {
+    if (columnId == 2)
+    {
+        ToggleButtonColumnCustomComponent* includeMIDIToggle = (ToggleButtonColumnCustomComponent*) existingComponentToUpdate;
+        
+        if (includeMIDIToggle == 0)
+            includeMIDIToggle = new ToggleButtonColumnCustomComponent (*this, 0);
+        
+        includeMIDIToggle->setRowAndColumn (rowNumber, columnId);
+        
+        return includeMIDIToggle;
+    }
+    
+    
+    
     // MIDI Channel and Note Combo Boxes
-    if ((columnId == 2) || (columnId == 3))
+    else if ((columnId == 3) || (columnId == 4))
     {
         MidiComboBoxCustomComponent* midiBox = (MidiComboBoxCustomComponent*) existingComponentToUpdate;
         
@@ -448,12 +486,12 @@ Component* MidiAudioOutputComponent::refreshComponentForCell (int rowNumber, int
         // if not, we'll have to create one.
         if (midiBox == 0)
         {
-            if (columnId == 2)
+            if (columnId == 3)
             {
                 midiBox = new MidiComboBoxCustomComponent (*this, true);
             }
             
-            else if (columnId == 3)
+            else if (columnId == 4)
             {
                 midiBox = new MidiComboBoxCustomComponent (*this, false);
             }
@@ -466,7 +504,7 @@ Component* MidiAudioOutputComponent::refreshComponentForCell (int rowNumber, int
     }
     
     
-    else if (columnId == 4)
+    else if (columnId == 5)
     {
         TextEditorColumnCustomComponent* durationLabel = (TextEditorColumnCustomComponent*) existingComponentToUpdate;
         
@@ -479,7 +517,21 @@ Component* MidiAudioOutputComponent::refreshComponentForCell (int rowNumber, int
     }
     
     
-    else if (columnId == 5)
+    else if (columnId == 6)
+    {
+        ToggleButtonColumnCustomComponent* includeAudioToggle = (ToggleButtonColumnCustomComponent*) existingComponentToUpdate;
+        
+        if (includeAudioToggle == 0)
+            includeAudioToggle = new ToggleButtonColumnCustomComponent (*this, 1);
+        
+        includeAudioToggle->setRowAndColumn (rowNumber, columnId);
+        
+        return includeAudioToggle;
+    }
+    
+    
+    
+    else if (columnId == 7)
     {
         TextButtonColumnCustomComponent* loadFileButton = (TextButtonColumnCustomComponent*) existingComponentToUpdate;
         
@@ -496,7 +548,7 @@ Component* MidiAudioOutputComponent::refreshComponentForCell (int rowNumber, int
     }
     
     
-    else if (columnId == 6)
+    else if (columnId == 8)
     {
         LabelColumnCustomComponent* audioFileName = (LabelColumnCustomComponent*) existingComponentToUpdate;
         
@@ -514,12 +566,12 @@ Component* MidiAudioOutputComponent::refreshComponentForCell (int rowNumber, int
     
     
     
-    else if (columnId == 7)
+    else if (columnId == 9)
     {
         ToggleButtonColumnCustomComponent* loopingToggle = (ToggleButtonColumnCustomComponent*) existingComponentToUpdate;
         
         if (loopingToggle == 0)
-            loopingToggle = new ToggleButtonColumnCustomComponent (*this, true);
+            loopingToggle = new ToggleButtonColumnCustomComponent (*this, 2);
         
         loopingToggle->setRowAndColumn (rowNumber, columnId);
         
@@ -528,12 +580,12 @@ Component* MidiAudioOutputComponent::refreshComponentForCell (int rowNumber, int
     
     
     
-    else if (columnId == 8)
+    else if (columnId == 10)
     {
         ToggleButtonColumnCustomComponent* toggleToggle = (ToggleButtonColumnCustomComponent*) existingComponentToUpdate;
         
         if (toggleToggle == 0)
-            toggleToggle = new ToggleButtonColumnCustomComponent (*this, false);
+            toggleToggle = new ToggleButtonColumnCustomComponent (*this, 3);
         
         toggleToggle->setRowAndColumn (rowNumber, columnId);
         
@@ -561,6 +613,29 @@ int MidiAudioOutputComponent::getNumRows()
 void MidiAudioOutputComponent::setNumRows(int newNumRows)
 {
     numRows = newNumRows;
+}
+
+
+void MidiAudioOutputComponent::setIncludeMidi(const int rowNumber, const bool newInclude)
+{
+    if (m_pbIncludeMIDI.size() != 0)
+    {
+        m_pbIncludeMIDI.set(rowNumber, newInclude);
+        updateMidiData(rowNumber);
+    }
+}
+
+bool MidiAudioOutputComponent::getIncludeMidi(const int rowNumber)
+{
+    if (m_pbIncludeMIDI.size() != 0)
+    {
+        return (m_pbIncludeMIDI.getUnchecked(rowNumber));
+    }
+    
+    else
+    {
+        return 0;
+    }
 }
 
 
@@ -642,6 +717,18 @@ void MidiAudioOutputComponent::setMidiDuration (const int rowNumber, const int n
 
 
 
+void MidiAudioOutputComponent::setLooping(const int rowNumber, const bool newToggle)
+{
+    if (m_pbLooping.size() != 0)
+    {
+        m_pbLooping.set(rowNumber, newToggle);
+        m_pcMainComponent->setAudioFileParam(rowNumber, m_pbIncludeAudio.getUnchecked(rowNumber),
+                                             m_pbLooping.getUnchecked(rowNumber),
+                                             m_pbToggle.getUnchecked(rowNumber));
+    }
+}
+
+
 bool MidiAudioOutputComponent::getLooping(const int rowNumber) const
 {
     if (m_pbLooping.size() != 0)
@@ -652,16 +739,6 @@ bool MidiAudioOutputComponent::getLooping(const int rowNumber) const
     else
     {
         return false;
-    }
-}
-
-
-void MidiAudioOutputComponent::setLooping(const int rowNumber, const bool newToggle)
-{
-    if (m_pbLooping.size() != 0)
-    {
-        m_pbLooping.set(rowNumber, newToggle);
-        m_pcMainComponent->setAudioFileParam(rowNumber, m_pbLooping.getUnchecked(rowNumber), m_pbToggle.getUnchecked(rowNumber));
     }
 }
 
@@ -677,12 +754,29 @@ void MidiAudioOutputComponent::setAudioFilename(int rowNumber, String filename)
 }
 
 
+
+String MidiAudioOutputComponent::getAudioFilename(const int rowNumber)
+{
+    if (m_psAudioFilenames.size() != 0)
+    {
+        return (m_psAudioFilenames.getReference(rowNumber));
+    }
+    
+    else
+    {
+        return "";
+    }
+}
+
+
 void MidiAudioOutputComponent::setToggle(const int rowNumber, const bool newToggle)
 {
     if (m_pbToggle.size() != 0)
     {
         m_pbToggle.set(rowNumber, newToggle);
-        m_pcMainComponent->setAudioFileParam(rowNumber, m_pbLooping.getUnchecked(rowNumber), m_pbToggle.getUnchecked(rowNumber));
+        m_pcMainComponent->setAudioFileParam(rowNumber, m_pbIncludeAudio.getUnchecked(rowNumber),
+                                             m_pbLooping.getUnchecked(rowNumber),
+                                             m_pbToggle.getUnchecked(rowNumber));
     }
 }
 
@@ -703,31 +797,44 @@ bool MidiAudioOutputComponent::getToggle(const int rowNumber) const
 
 
 
-String MidiAudioOutputComponent::getAudioFilename(const int rowNumber)
+void MidiAudioOutputComponent::setIncludeAudio(const int rowNumber, const bool newInclude)
 {
-    if (m_psAudioFilenames.size() != 0)
+    if (m_pbIncludeAudio.size() != 0)
     {
-        return (m_psAudioFilenames.getReference(rowNumber));
+        m_pbIncludeAudio.set(rowNumber, newInclude);
+        m_pcMainComponent->setAudioFileParam(rowNumber, m_pbIncludeAudio.getUnchecked(rowNumber),
+                                             m_pbLooping.getUnchecked(rowNumber),
+                                             m_pbToggle.getUnchecked(rowNumber));
+    }
+}
+
+bool MidiAudioOutputComponent::getIncludeAudio(const int rowNumber)
+{
+    if (m_pbIncludeAudio.size() != 0)
+    {
+        return (m_pbIncludeAudio.getUnchecked(rowNumber));
     }
     
     else
     {
-        return "";
+        return 0;
     }
 }
 
 
 
-void MidiAudioOutputComponent::addRow(int classIndex, int midiChannel, int midiNote, int midiDuration,
-                                      String filename, bool looping, bool toggle)
+void MidiAudioOutputComponent::addRow(int classIndex, bool includeMIDI, int midiChannel, int midiNote, int midiDuration,
+                                      bool includeAudio, String filename, bool looping, bool toggle)
 {
     numRows++;
     m_piClasses.add(classIndex);
+    m_pbIncludeMIDI.add(includeMIDI);
     m_piMidiChannels.add(midiChannel);
     m_piMidiNotes.add(midiNote);
     m_piMidiDuration.add(midiDuration);
     m_psAudioFilenames.add(filename);
     m_pbLooping.add(looping);
+    m_pbIncludeAudio.add(includeAudio);
     m_pbToggle.add(toggle);
     
     updateTable();
@@ -751,6 +858,8 @@ void MidiAudioOutputComponent::deleteRow(int rowIndex)
     m_psAudioFilenames.remove(rowIndex);
     m_pbLooping.remove(rowIndex);
     m_pbToggle.remove(rowIndex);
+    m_pbIncludeAudio.remove(rowIndex);
+    m_pbIncludeMIDI.remove(rowIndex);
     
     updateTable();
 }
@@ -767,6 +876,8 @@ void MidiAudioOutputComponent::clearRows()
     m_psAudioFilenames.clear();
     m_pbLooping.clear();
     m_pbToggle.clear();
+    m_pbIncludeAudio.clear();
+    m_pbIncludeMIDI.clear();
 }
 
 
@@ -790,7 +901,11 @@ MainComponent* MidiAudioOutputComponent::getMainComponent()
 
 void MidiAudioOutputComponent::updateMidiData(int rowNumber)
 {
-    m_pcMainComponent->setMidiOutput(rowNumber, m_piMidiChannels.getUnchecked(rowNumber), m_piMidiNotes.getUnchecked(rowNumber), m_piMidiDuration.getUnchecked(rowNumber));
+    m_pcMainComponent->setMidiOutput(rowNumber,
+                                     m_pbIncludeMIDI.getUnchecked(rowNumber),
+                                     m_piMidiChannels.getUnchecked(rowNumber),
+                                     m_piMidiNotes.getUnchecked(rowNumber),
+                                     m_piMidiDuration.getUnchecked(rowNumber));
 }
 
 //==============================================================================
@@ -920,6 +1035,37 @@ SettingsContentComponent::SettingsContentComponent ()
     meterLabel->setColour (TextEditor::highlightColourId, Colour (0x00000000));
     
     
+    
+    
+    addAndMakeVisible(trainingTimeinBarsSlider = new Slider("trainingTimeSlider"));
+    trainingTimeinBarsSlider->setSliderStyle(Slider::IncDecButtons);
+    trainingTimeinBarsSlider->setIncDecButtonsMode(Slider::incDecButtonsDraggable_AutoDirection);
+    trainingTimeinBarsSlider->setRange(1, 16, 1);
+    trainingTimeinBarsSlider->setTextBoxStyle(Slider::TextBoxAbove, false, 64, 20);
+    trainingTimeinBarsSlider->setColour(TextButton::buttonColourId, Colour (0xFF363E46));
+    trainingTimeinBarsSlider->setColour(TextButton::buttonOnColourId, Colour (0xFF565E66));
+    trainingTimeinBarsSlider->setColour(Label::backgroundColourId, Colour (0xFF565E66));
+    trainingTimeinBarsSlider->setColour(Slider::backgroundColourId, Colour (0xFF565E66));
+    trainingTimeinBarsSlider->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
+    trainingTimeinBarsSlider->setColour (Label::textColourId, Colour (0xff4c5256));
+    trainingTimeinBarsSlider->setColour (TextEditor::textColourId, Colour (0xff3d4248));
+    trainingTimeinBarsSlider->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    trainingTimeinBarsSlider->setColour (TextEditor::highlightColourId, Colour (0x00000000));
+    trainingTimeinBarsSlider->setValue(4);
+    
+    
+    
+    addAndMakeVisible(trainingTimeinBarsLabel = new Label("trainingTimeLabel", TRANS("Training Time (Bars)")));
+    trainingTimeinBarsLabel->setFont (Font ("Myriad Pro", 9.00f, Font::plain));
+    trainingTimeinBarsLabel->setJustificationType (Justification::centred);
+    trainingTimeinBarsLabel->setEditable (false, false, false);
+    trainingTimeinBarsLabel->setColour (Label::textColourId, Colour (0xFF5C6266));
+    trainingTimeinBarsLabel->setColour (TextEditor::textColourId, Colour (0xFF3D4248));
+    trainingTimeinBarsLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    trainingTimeinBarsLabel->setColour (TextEditor::highlightColourId, Colour (0x00000000));
+    
+    
+    
     addAndMakeVisible(midiAudioComponent = new MidiAudioOutputComponent());
     
     
@@ -945,6 +1091,9 @@ SettingsContentComponent::~SettingsContentComponent()
     tempoLabel                  = nullptr;
     meterLabel                  = nullptr;
     
+    trainingTimeinBarsLabel         = nullptr;
+    trainingTimeinBarsSlider        = nullptr;
+    
     midiAudioComponent          = nullptr;
     
     deleteAllChildren();
@@ -960,6 +1109,8 @@ void SettingsContentComponent::paint (Graphics& g)
 
 void SettingsContentComponent::resized()
 {
+#if JUCE_MAC || JUCE_WINDOWS || JUCE_LINUX
+    
     audioSetupButton->setBounds((getWidth() / 2) - ((120) / 2), (getHeight() / 2) - ((40) / 2) - 20, 120, 40);
     velocitySensitivitySlider->setBounds ((getWidth() / 2) + -90 - ((90) / 2), (getHeight() / 2) + 90 - ((90) / 2), 90, 90);
     decayTimeSensitivitySlider->setBounds ((getWidth() / 2) + 90 - ((90) / 2), (getHeight() / 2) + 90 - ((90) / 2), 90, 90);
@@ -973,7 +1124,32 @@ void SettingsContentComponent::resized()
     tempoLabel           -> setBounds(getWidth() - 140, 90, 60, 20);
     meterLabel           -> setBounds(getWidth() - 140, 110, 60, 20);
     
-    midiAudioComponent   -> setBounds(10, 10, 910, getHeight()/2 - 100);
+    trainingTimeinBarsSlider->setBounds(getWidth() - 64 - 32, getHeight() / 2 - 16, 64, 40);
+    trainingTimeinBarsLabel->setBounds(getWidth() - 128, getHeight() / 2 + 32, 128, 20);
+    
+    midiAudioComponent   -> setBounds(getWidth()/2 - 505, 10, 1010, getHeight()/2 - 100);
+    
+#elif JUCE_IOS || JUCE_ANDROID
+    
+    audioSetupButton->setBounds((getWidth() / 2) - ((60) / 2), (getHeight() / 2), 60, 20);
+    velocitySensitivitySlider->setBounds ((getWidth() / 2) + -90 - ((90) / 2), (getHeight() / 2) + 90 - ((90) / 2), 60, 60);
+    decayTimeSensitivitySlider->setBounds ((getWidth() / 2) + 90 - ((90) / 2), (getHeight() / 2) + 90 - ((90) / 2), 60, 60);
+    velocitySensitivityLabel->setBounds ((getWidth() / 2) + -90 - ((150) / 2), (getHeight() / 2) + 145 - ((20) / 2), 90, 20);
+    decayTimeSensitivityLabel->setBounds ((getWidth() / 2) + 90 - ((150) / 2), (getHeight() / 2) + 145 - ((20) / 2), 90, 20);
+    
+    tempoNumBox          -> setBounds(20, 90, 60, 20);
+    numeratorNumBox      -> setBounds(20, 110, 25, 20);
+    denominatorNumBox    -> setBounds(55, 110, 25, 20);
+    
+    tempoLabel           -> setBounds(0, 90, 60, 20);
+    meterLabel           -> setBounds(0, 110, 60, 20);
+    
+    trainingTimeinBarsSlider->setBounds(getWidth() - 64 - 32, getHeight() / 2, 64, 40);
+    trainingTimeinBarsLabel->setBounds(getWidth() - 128, getHeight() / 2 + 42, 128, 20);
+    
+    midiAudioComponent   -> setBounds(0, 0, getWidth(), getHeight()/2 - 20);
+    
+#endif
 }
 
 
@@ -985,7 +1161,7 @@ void SettingsContentComponent::addClass()
     
     if (m_iNumClasses > 0)
     {
-        midiAudioComponent->addRow(m_iNumClasses, 0, 0, 250, "", false, false);
+        midiAudioComponent->addRow(m_iNumClasses, false, 1, 36, 250, false, "", false, false);
     }
     
 }

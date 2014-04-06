@@ -44,7 +44,7 @@ bool AudioFilePlayer::loadFileIntoTransport(const File& audioFile)
     
     currentAudioFileSource = nullptr;
     
-    
+    std::cout << audioFile.getFullPathName() << std::endl;
     AudioFormatReader* reader = formatManager.createReaderFor(audioFile);
     
     if (reader != nullptr)

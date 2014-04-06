@@ -47,7 +47,6 @@ MainComponent::MainComponent()
     playComponent->toolBarControls->deleteClassButton->addListener(this);
     playComponent->toolBarControls->saveTrainingButton->addListener(this);
     playComponent->toolBarControls->loadTrainingButton->addListener(this);
-    playComponent->trainingTimeinBarsSlider->addListener(this);
 
 
     settingsComponent->audioSetupButton->addListener(this);
@@ -56,6 +55,7 @@ MainComponent::MainComponent()
     settingsComponent->tempoNumBox->addListener(this);
     settingsComponent->numeratorNumBox->addListener(this);
     settingsComponent->denominatorNumBox->addListener(this);
+    settingsComponent->trainingTimeinBarsSlider->addListener(this);
     
     settingsComponent->setMainComponent(this);
     
@@ -98,10 +98,6 @@ MainComponent::MainComponent()
     
     audioSetup = new AudioSetupDisplay;
     audioSetup->applyAudioSettingsButton->addListener(this);
-    
-    addAndMakeVisible(clockDisplay = new ClockDisplayComponent);
-    clockDisplay->setClickingTogglesState(true);
-    clockDisplay->addListener(this);
     
     
     m_iCurentSelectedClass = 1;
@@ -149,8 +145,6 @@ MainComponent::~MainComponent()
     
     audioSetup                  = nullptr;
     
-    clockDisplay                = nullptr;
-    
     playComponent               = nullptr;
     settingsComponent           = nullptr;
     transcriptionComponent      = nullptr;
@@ -176,12 +170,11 @@ void MainComponent::resized()
 {
     tabbedComponent->setBounds (0, 0, proportionOfWidth (1.0000f), proportionOfHeight (1.0000f));
     
+#if JUCE_MAC || JUCE_WINDOW || JUCE||LINUX
     beatSurfaceLogo->setBounds(getWidth() - 182, getHeight() - 80, 64, 64);
-    
     beatSurfaceLabel->setBounds (getWidth() - 130, getHeight() - 45 - 24, 128, 24);
     gtcmtLabel->setBounds (getWidth() - 38 - 64, getHeight() - 25 - 20, 64, 20);
-    
-    clockDisplay->setBounds(getWidth() - 80, 60, 64, 64);
+#endif
     
     confidenceDisplayBar->setBounds(getWidth()/2 - 150, getHeight() - 25, 300, 20);
 }
@@ -234,16 +227,24 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
     {
         PopupMenu pop;
         
-        if (m_iNumClasses > 0) {
-            for (int i=0; i < m_iNumClasses; i++) {
-                pop.addItem(i+1, "Class " + String(i+1));
+        if (m_iNumClasses > 0)
+        {
+            for (int i=0; i < m_iNumClasses; i++)
+            {
+                pop.addColouredItem(i+1, "Class " + String(i+1),
+                                    Colour(float((m_iNumClasses - i))/float(m_iNumClasses), 1.0f, 1.0f, 1.0f));
+                
+//                pop.showMenuAsync (PopupMenu::Options().withTargetComponent (playComponent->toolBarControls->deleteClassButton), nullptr);
+                
+            }
+            
+            const int result = pop.show();
+            
+            if (result > 0)
+            {
+                deleteClass(result, true);
             }
         }
-        
-        pop.showMenuAsync (PopupMenu::Options().withTargetComponent (playComponent->toolBarControls->deleteClassButton), nullptr);
-       
-        
-//        deleteClass(0);
     }
     
     
@@ -365,21 +366,6 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
     }
     
     
-    //--- Metronome Button Clicked ---//
-    if (buttonThatWasClicked == clockDisplay)
-    {
-        if(clockDisplay->getToggleState())
-        {
-            globalClock->startClock();
-        }
-        
-        else
-        {
-            globalClock->stopClock();
-        }
-        
-    }
-    
     
     if (buttonThatWasClicked == transcriptionComponent->retrainButton)
     {
@@ -424,6 +410,7 @@ void MainComponent::buttonClicked (Button* buttonThatWasClicked)
 
 void MainComponent::loadAudioFileToPlay(int index)
 {
+#if JUCE_MAC || JUCE_LINUX || JUCE_WINDOWS
     FileChooser fc ("Load Audio File for Class: " + String(index+1),
                     File::getSpecialLocation(File::userMusicDirectory), "", false);
     
@@ -438,17 +425,41 @@ void MainComponent::loadAudioFileToPlay(int index)
         }
         
     }
+#elif JUCE_IOS
+    
+    String audioFilePath = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName();
+    if (index == 0)
+    {
+        File audioFile = File(audioFilePath + "/Kick.wav");
+        m_pcBeatSurfaceEngine->setAudioOutputFile(index, audioFile);
+        settingsComponent->setAudioFileName(index, audioFile.getFileName());
+    }
+    
+    else if (index == 1)
+    {
+        File audioFile = File(audioFilePath + "/Snare.wav");
+        m_pcBeatSurfaceEngine->setAudioOutputFile(index, audioFile);
+        settingsComponent->setAudioFileName(index, audioFile.getFileName());
+    }
+    
+    else if (index == 2)
+    {
+        File audioFile = File(audioFilePath + "/Hat.wav");
+        m_pcBeatSurfaceEngine->setAudioOutputFile(index, audioFile);
+        settingsComponent->setAudioFileName(index, audioFile.getFileName());
+    }
+    
+#endif
 }
 
-void MainComponent::setMidiOutput(int classIndex, int channelNo, int noteNum, int duration_ms)
+void MainComponent::setMidiOutput(int classIndex, bool include, int channelNo, int noteNum, int duration_ms)
 {
-    m_pcBeatSurfaceEngine->setMidiOutput(classIndex, channelNo, noteNum, duration_ms);
+    m_pcBeatSurfaceEngine->setMidiOutput(classIndex, include, channelNo, noteNum, duration_ms);
 }
 
-void MainComponent::setAudioFileParam(int index, bool looping, bool toggle)
+void MainComponent::setAudioFileParam(int index, bool include, bool looping, bool toggle)
 {
-    m_pcBeatSurfaceEngine->setAudioOutputLooping(index, looping);
-    m_pcBeatSurfaceEngine->setAudioOutputToggle(index, toggle);
+    m_pcBeatSurfaceEngine->setAudioFileParam(index, include, looping, toggle);
 }
 
 
@@ -471,10 +482,10 @@ void MainComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     }
     
     
-    if (sliderThatWasMoved == playComponent->trainingTimeinBarsSlider)
+    if (sliderThatWasMoved == settingsComponent->trainingTimeinBarsSlider)
     {
-        m_pcBeatSurfaceEngine->setTrainingTimeinBars(int(playComponent->trainingTimeinBarsSlider->getValue()));
-        playComponent->metroDisplay->setTotalBeats(int(playComponent->trainingTimeinBarsSlider->getValue()) * 4);
+        m_pcBeatSurfaceEngine->setTrainingTimeinBars(int(settingsComponent->trainingTimeinBarsSlider->getValue()));
+        playComponent->metroDisplay->setTotalBeats(int(settingsComponent->trainingTimeinBarsSlider->getValue()) * 4);
     }
 }
 
@@ -657,6 +668,7 @@ void MainComponent::deleteClass(int classIndex, bool updateBackend)
     
     
     playComponent->shapeButtonArray->setNumClasses(m_iNumClasses);
+    settingsComponent->midiAudioComponent->deleteRow(classIndex - 1);
     transcriptionComponent->setNumClasses(m_iNumClasses);
 
     
@@ -747,10 +759,10 @@ void MainComponent::getAllCommands (Array <CommandID>& commands)
         CommandIDs::AddClass,
         CommandIDs::DeleteClass,
         CommandIDs::CurrentClass,
-        CommandIDs::RecordTraining,
-        CommandIDs::DoneTraining,
-        CommandIDs::ToggleAudio,
-        CommandIDs::ToggleClock,
+        CommandIDs::IdleMode,
+        CommandIDs::PlayMode,
+        CommandIDs::TrainingMode,
+//        CommandIDs::ToggleClock,
         CommandIDs::Preferences,
         CommandIDs::GoToKioskMode,
     };
@@ -769,7 +781,7 @@ void MainComponent::getCommandInfo (const CommandID commandID, ApplicationComman
     switch (commandID)
     {
         case CommandIDs::AddClass:
-            result.setInfo ("Add New Class", "Adds a new class of sounds", CommandCategories::TrainCommands, 0);
+            result.setInfo ("Add New Class", "Adds a new class of sounds to be trained", CommandCategories::TrainCommands, 0);
             result.addDefaultKeypress ('=', ModifierKeys::commandModifier);
             break;
             
@@ -783,39 +795,36 @@ void MainComponent::getCommandInfo (const CommandID commandID, ApplicationComman
             result.addDefaultKeypress ('t', ModifierKeys::commandModifier);
             break;
             
-        case CommandIDs::RecordTraining:
+        case CommandIDs::TrainingMode:
             result.setInfo ("Record Training", "Start currently selected class recording", CommandCategories::TrainCommands, 0);
-            result.addDefaultKeypress ('3', ModifierKeys::commandModifier);
+            result.addDefaultKeypress ('2', ModifierKeys::commandModifier);
             break;
             
-        case CommandIDs::DoneTraining:
-            result.setInfo ("Finished Training", "Finished currently selected training", CommandCategories::TrainCommands, 0);
-            result.addDefaultKeypress ('4', ModifierKeys::commandModifier);
-            break;
-            
-        case CommandIDs::ToggleAudio:
-            result.setInfo ("Start/Stop System", "Turns on/off detection and classification system", CommandCategories::PlayCommands, 0);
+        case CommandIDs::PlayMode:
+            result.setInfo ("Start playing", "Play using training data", CommandCategories::TrainCommands, 0);
             result.addDefaultKeypress ('1', ModifierKeys::commandModifier);
             break;
             
-        case CommandIDs::ToggleClock:
-            result.setInfo ("Start Metronome", "Metronome default to 120BPM", CommandCategories::CommonCommands, 0);
-            result.addDefaultKeypress (' ', ModifierKeys::noModifiers);
+            
+        case CommandIDs::IdleMode:
+            result.setInfo ("Idle Mode", "Idle Mode", CommandCategories::TrainCommands, 0);
+            result.addDefaultKeypress ('3', ModifierKeys::commandModifier);
             break;
             
+            
         case CommandIDs::Preferences:
-            result.setInfo ("Open Preferences Panel", "Audio, MIDI and other Preferences", CommandCategories::SettingsCommands, 0);
+            result.setInfo ("Preferences", "Launch Preferences", CommandCategories::CommonCommands, 0);
             result.addDefaultKeypress (',', ModifierKeys::commandModifier);
             break;
             
             
-        #if ! JUCE_LINUX
+#if ! JUCE_LINUX
         case CommandIDs::GoToKioskMode:
             result.setInfo ("Show full-screen kiosk mode", String::empty, CommandCategories::CommonCommands, 0);
             result.addDefaultKeypress ('f', ModifierKeys::commandModifier);
             result.setTicked (Desktop::getInstance().getKioskModeComponent() != 0);
             break;
-        #endif
+#endif
             
         default:
             break;
@@ -829,75 +838,63 @@ bool MainComponent::perform (const InvocationInfo& info)
 	switch (info.commandID)
     {
         case CommandIDs::AddClass:
+            // do something
             addClass(true);
             break;
             
         case CommandIDs::DeleteClass:
             // do something
-            deleteClass(0, true);
-            std::cout << "@MainComponent: Delete class" << std::endl;
+            std::cout << "@Main, Delete class" << std::endl;
             break;
             
         case CommandIDs::CurrentClass:
             // do something
-            std::cout << "@MainComponent: Current class" << std::endl;
+            std::cout << "@Main, Current class" << std::endl;
             break;
             
             
             
-        case CommandIDs::RecordTraining:
+        case CommandIDs::IdleMode:
             // do something
-            std::cout << "@MainComponent: Record Training" << std::endl;
+            playComponent->toolBarControls->recordToggleButton->setToggleState(false, sendNotification);
+            playComponent->toolBarControls->audioStreamToggleButton->setToggleState(false, sendNotification);
             break;
             
-        case CommandIDs::DoneTraining:
+        case CommandIDs::TrainingMode:
             // do something
-            std::cout << "@MainComponent: Done Training" << std::endl;
+            playComponent->toolBarControls->recordToggleButton->setToggleState(~(playComponent->toolBarControls->recordToggleButton->getToggleState()), sendNotification);
             break;
             
             
-            
-        case CommandIDs::ToggleAudio:
+        case CommandIDs::PlayMode:
             // do something
-            
+            playComponent->toolBarControls->audioStreamToggleButton->setToggleState(~(playComponent->toolBarControls->audioStreamToggleButton->getToggleState()), sendNotification);
             break;
-            
-            
-        case CommandIDs::ToggleClock:
-            if (!globalClock->getMetronomeStatus()) {
-                globalClock->startClock();
-            } else {
-                globalClock->stopClock();
-                clockDisplay->repaint();
-            }
-            break;
-            
-            
             
         case CommandIDs::Preferences:
-            // do something
             launchPreferences();
             break;
             
             
-        #if ! JUCE_LINUX
+            
+#if ! JUCE_LINUX
         case CommandIDs::GoToKioskMode:
         {
             Desktop& desktop = Desktop::getInstance();
             
-            if (desktop.getKioskModeComponent() == nullptr)
-                desktop.setKioskModeComponent (getTopLevelComponent());
+           if (desktop.getKioskModeComponent() == nullptr)
+               desktop.setKioskModeComponent (getTopLevelComponent());
             else
                 desktop.setKioskModeComponent (nullptr);
             
             break;
         }
-        #endif
+#endif
             
         default:
             return false;
     }
-
+    
     return true;
 	
 }

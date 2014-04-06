@@ -120,6 +120,7 @@ public:
         m_fFinalAlpha   =   0.2f;
         m_bFlashArray = false;
         m_pcClassButton.clear(true);
+
     }
     
     
@@ -228,7 +229,7 @@ public:
                 addAndMakeVisible(m_pcClassButton.getUnchecked(side-1));
                 m_pcClassButton.getUnchecked(side-1)->setBounds(0, 0, getWidth(), getHeight());
             }
-            
+
             
         }
     }
@@ -361,7 +362,10 @@ private:
         
         else
         {
-            m_pcClassButton.getUnchecked(m_iCurrentButtonIndex)->setAlpha(m_fFinalAlpha);
+            if (m_iNumButtons > 0)
+            {
+                m_pcClassButton.getUnchecked(m_iCurrentButtonIndex)->setAlpha(m_fFinalAlpha);
+            }
         }
         
         stopTimer();
@@ -374,7 +378,7 @@ private:
     
     bool m_bFlashArray;
     int m_iButtonFlashTime_ms;
-    
+
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ClassButtonArray)
@@ -714,7 +718,7 @@ public:
                 float fromRadians   = float((side - 1.0f) * 2.0f * M_PI) / float(m_iTotalBeats);
                 float toRadians     = float(side * 2.0f * M_PI) / float(m_iTotalBeats);
                 
-                pie.addPieSegment(0.0f, 0.0f, getWidth(), getHeight(), fromRadians, toRadians, 0.94f);
+                pie.addPieSegment(0.0f, 0.0f, getWidth(), getHeight(), fromRadians, toRadians, 0.95f);
                 pie.closeSubPath();
                 g.setColour(Colours::black);
                 g.strokePath(pie, PathStrokeType(1.0f));
@@ -734,7 +738,7 @@ public:
                 float fromRadians   = float((side - 1.0f) * 2.0f * M_PI) / float(m_iTotalBeats);
                 float toRadians     = float(side * 2.0f * M_PI) / float(m_iTotalBeats);
                 
-                pie.addPieSegment(0.0f, 0.0f, getWidth(), getHeight(), fromRadians, toRadians, 0.94f);
+                pie.addPieSegment(0.0f, 0.0f, getWidth(), getHeight(), fromRadians, toRadians, 0.95f);
                 pie.closeSubPath();
                 
                 m_pcMetroQuantum.getUnchecked(side-1)->setShape(pie, true, true);
@@ -769,7 +773,7 @@ public:
                 float fromRadians   = float((beat - 1.0f) * 2.0f * M_PI) / float(m_iTotalBeats);
                 float toRadians     = float(beat * 2.0f * M_PI) / float(m_iTotalBeats);
                 
-                pie.addPieSegment(0.0f, 0.0f, getWidth(), getHeight(), fromRadians, toRadians, 0.94f);
+                pie.addPieSegment(0.0f, 0.0f, getWidth(), getHeight(), fromRadians, toRadians, 0.95f);
                 pie.closeSubPath();
                 
                 m_pcMetroQuantum.getUnchecked(beat-1)->setShape(pie, true, true);

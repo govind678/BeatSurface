@@ -37,6 +37,7 @@ public:
     
     struct MidiNoteData
     {
+        bool        bInclude;
         int         iChannelNo;
         int         iNoteNum;
         int         iDuration_ms;
@@ -109,10 +110,11 @@ public:
     //==============================================================================
     // Audio MIDI Output Methods
     
-    void setMIDIOutput(int index, int channelNo, int noteNumber, int duration_ms);
+    void setMIDIOutput(int index, bool include, int channelNo, int noteNumber, int duration_ms);
     void setAudioOutputFile(int index, File audioFile);
     void setAudioOutputLooping(int index, bool looping);
     void setAudioOutputToggle(int index, bool toggle);
+    void setAudioOutputInclude(int index, bool include);
     
     
     
@@ -129,7 +131,7 @@ public:
     int    getCurrentObservation();
     
     
-    void testButton();
+    void sendKeyPressEvent();
     
 private:
     
@@ -157,6 +159,7 @@ private:
     float                                       m_fCurrentRMS;
     int                                         m_iCurrentIndexToPlay;
     bool                                        m_bOnsetDetected;
+    bool                                        m_bMemoryInitialized;
     
     AudioDeviceManager::AudioDeviceSetup        deviceSetup;
     TimeSliceThread                             m_AudioStreamThread;
@@ -186,12 +189,12 @@ private:
     
     
     //==============================================================================
-    // Midi Output Array
+    // Midi Audio Output Array
     
     OwnedArray<MidiNoteData>                    m_psMidiNoteData;
-    Array<bool>                                 m_pbOutputStatus;   // 0: Audio, 1: MIDI
-    
-    
+    Array<bool>                                 m_pbAudioInclude;
+
+    StringArray                                  m_psAudioFilePaths;
     
     //==============================================================================
     // Thread Parameters

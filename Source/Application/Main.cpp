@@ -38,12 +38,18 @@ public:
     {
         // This method is where you should put your application's initialisation code..
         
+        #if JUCE_MAC
         Desktop::getInstance().setOrientationsEnabled (Desktop::allOrientations);
+        
+        #elif JUCE_IOS
+//        Desktop::getInstance().setOrientationsEnabled(Desktop::rotatedClockwise | Desktop::rotatedAntiClockwise);
+        Desktop::getInstance().setOrientationsEnabled (Desktop::allOrientations);
+        #endif
         
         
         // Command Manager for entire application
         commandManager = new ApplicationCommandManager();
-        commandManager->registerAllCommandsForTarget (this);
+//        commandManager->registerAllCommandsForTarget (this);
         
         
         // Device Manager used by entire application
@@ -107,18 +113,15 @@ public:
     {
         const CommandID ids[] =
         {
-            CommandIDs::AddClass,
-            CommandIDs::DeleteClass,
-            CommandIDs::CurrentClass,
-            
-            CommandIDs::RecordTraining,
-            CommandIDs::DoneTraining,
-            
-//            CommandIDs::StartAudio,
-//            CommandIDs::StopAudio,
-//            CommandIDs::ToggleClock,
-            
-            CommandIDs::GoToKioskMode,
+//            CommandIDs::AddClass,
+//            CommandIDs::DeleteClass,
+//            CommandIDs::CurrentClass,
+//            
+//            CommandIDs::IdleMode,
+//            CommandIDs::TrainingMode,
+//            CommandIDs::PlayMode,
+//            
+//            CommandIDs::GoToKioskMode,
             
             StandardApplicationCommandIDs::quit
         };
@@ -132,30 +135,43 @@ public:
     {
         switch (commandID)
         {
-            case CommandIDs::AddClass:
-                result.setInfo ("Add New Class", "Adds a new class of sounds", CommandCategories::TrainCommands, 0);
-                result.addDefaultKeypress ('=', ModifierKeys::commandModifier);
-                break;
+//            case CommandIDs::AddClass:
+//                result.setInfo ("Add New Class", "Adds a new class of sounds to be trained", CommandCategories::TrainCommands, 0);
+//                result.addDefaultKeypress ('=', ModifierKeys::commandModifier);
+//                break;
+//                
+//            case CommandIDs::DeleteClass:
+//                result.setInfo ("Delete Selected Class", "Deletes a selected class", CommandCategories::TrainCommands, 0);
+//                result.addDefaultKeypress ('-', ModifierKeys::commandModifier);
+//                break;
+//                
+//            case CommandIDs::CurrentClass:
+//                result.setInfo ("Select Class", "Selects the current class", CommandCategories::CommonCommands, 0);
+//                result.addDefaultKeypress ('t', ModifierKeys::commandModifier);
+//                break;
+//                
+//            case CommandIDs::TrainingMode:
+//                result.setInfo ("Record Training", "Start currently selected class recording", CommandCategories::TrainCommands, 0);
+//                result.addDefaultKeypress ('2', ModifierKeys::commandModifier);
+//                break;
+//                
+//            case CommandIDs::PlayMode:
+//                result.setInfo ("Start playing", "Play using training data", CommandCategories::TrainCommands, 0);
+//                result.addDefaultKeypress ('1', ModifierKeys::commandModifier);
+//                break;
+//                
+//                
+//            case CommandIDs::IdleMode:
+//                result.setInfo ("Idle Mode", "Play using training data", CommandCategories::TrainCommands, 0);
+//                result.addDefaultKeypress ('3', ModifierKeys::commandModifier);
+//                break;
+//                
+//            case CommandIDs::Preferences:
+//                result.setInfo ("Preferences", "Launch Preferences", CommandCategories::TrainCommands, 0);
+//                result.addDefaultKeypress (',', ModifierKeys::commandModifier);
+//                break;
                 
-            case CommandIDs::DeleteClass:
-                result.setInfo ("Delete Selected Class", "Deletes a selected class", CommandCategories::TrainCommands, 0);
-                result.addDefaultKeypress ('-', ModifierKeys::commandModifier);
-                break;
                 
-            case CommandIDs::CurrentClass:
-                result.setInfo ("Select Class", "Selects the current class", CommandCategories::CommonCommands, 0);
-                result.addDefaultKeypress ('t', ModifierKeys::commandModifier);
-                break;
-                
-            case CommandIDs::RecordTraining:
-                result.setInfo ("Record Training", "Start currently selected class recording", CommandCategories::TrainCommands, 0);
-                result.addDefaultKeypress ('3', ModifierKeys::commandModifier);
-                break;
-                
-            case CommandIDs::DoneTraining:
-                result.setInfo ("Finished Training", "Finished currently selected training", CommandCategories::TrainCommands, 0);
-                result.addDefaultKeypress ('4', ModifierKeys::commandModifier);
-                break;
                 
 //            case CommandIDs::StartAudio:
 //                result.setInfo ("Start System", "Turns on detection and classification system", CommandCategories::PlayCommands, 0);
@@ -173,13 +189,13 @@ public:
 //                break;
                 
                 
-            #if ! JUCE_LINUX
-            case CommandIDs::GoToKioskMode:
-                result.setInfo ("Show full-screen kiosk mode", String::empty, CommandCategories::CommonCommands, 0);
-                result.addDefaultKeypress ('f', ModifierKeys::commandModifier);
-                result.setTicked (Desktop::getInstance().getKioskModeComponent() != 0);
-                break;
-            #endif
+//            #if ! JUCE_LINUX
+//            case CommandIDs::GoToKioskMode:
+//                result.setInfo ("Show full-screen kiosk mode", String::empty, CommandCategories::CommonCommands, 0);
+//                result.addDefaultKeypress ('f', ModifierKeys::commandModifier);
+//                result.setTicked (Desktop::getInstance().getKioskModeComponent() != 0);
+//                break;
+//            #endif
                 
             default:
                 break;
@@ -192,32 +208,44 @@ public:
     {
         switch (info.commandID)
         {
-            case CommandIDs::AddClass:
-                // do something
-                std::cout << "@Main, Add class" << std::endl;
-                break;
-                
-            case CommandIDs::DeleteClass:
-                // do something
-                std::cout << "@Main, Delete class" << std::endl;
-                break;
-                
-            case CommandIDs::CurrentClass:
-                // do something
-                std::cout << "@Main, Current class" << std::endl;
-                break;
-                
-                
-                
-            case CommandIDs::RecordTraining:
-                // do something
-                std::cout << "@Main, Record Training" << std::endl;
-                break;
-                
-            case CommandIDs::DoneTraining:
-                // do something
-                std::cout << "@Main, Done Training" << std::endl;
-                break;
+//            case CommandIDs::AddClass:
+//                // do something
+//                std::cout << "@Main, Add class" << std::endl;
+//                return false;
+//                break;
+//                
+//            case CommandIDs::DeleteClass:
+//                // do something
+//                std::cout << "@Main, Delete class" << std::endl;
+//                return false;
+//                break;
+//                
+//            case CommandIDs::CurrentClass:
+//                // do something
+//                std::cout << "@Main, Current class" << std::endl;
+//                return false;
+//                break;
+//                
+//                
+//                
+//            case CommandIDs::IdleMode:
+//                // do something
+//                std::cout << "@Main, Record Training" << std::endl;
+//                return false;
+//                break;
+//                
+//            case CommandIDs::TrainingMode:
+//                // do something
+////                std::cout << "@Main, Done Training" << std::endl;
+//                return false;
+//                break;
+//                
+//                
+//            case CommandIDs::PlayMode:
+//                // do something
+//                std::cout << "@Main, Done Training" << std::endl;
+//                return false;
+//                break;
                 
                 
                 
@@ -236,31 +264,31 @@ public:
 //                break;
                 
                 
-            case CommandIDs::Preferences:
-                return false;
-                break;
+//            case CommandIDs::Preferences:
+//                return false;
+//                break;
                 
                 
-                
-            #if ! JUCE_LINUX
-            case CommandIDs::GoToKioskMode:
-            {
-//                Desktop& desktop = Desktop::getInstance();
-                
-//                if (desktop.getKioskModeComponent() == nullptr)
-//                    desktop.setKioskModeComponent (getTopLevelComponent());
-//                else
-//                    desktop.setKioskModeComponent (nullptr);
-                
-                break;
-            }
-            #endif
+//                
+//            #if ! JUCE_LINUX
+//            case CommandIDs::GoToKioskMode:
+//            {
+////                Desktop& desktop = Desktop::getInstance();
+//                
+////                if (desktop.getKioskModeComponent() == nullptr)
+////                    desktop.setKioskModeComponent (getTopLevelComponent());
+////                else
+////                    desktop.setKioskModeComponent (nullptr);
+//                return false;
+//                break;
+//            }
+//            #endif
                 
             default:
                 return false;
         }
         
-        return true;
+        return false;
     }
     
     

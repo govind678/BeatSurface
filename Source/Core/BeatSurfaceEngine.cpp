@@ -140,9 +140,9 @@ void BeatSurfaceEngine::setParameter(BeatSurfaceBase::ParameterID parameterID, d
 
 
 
-void BeatSurfaceEngine::setMidiOutput(int classIndex, int channelNo, int noteNum, int duration_ms)
+void BeatSurfaceEngine::setMidiOutput(int classIndex, bool include, int channelNo, int noteNum, int duration_ms)
 {
-    m_pcLiveAudioStream->setMIDIOutput(classIndex - 1, channelNo, noteNum, duration_ms);
+    m_pcLiveAudioStream->setMIDIOutput(classIndex, include, channelNo, noteNum, duration_ms);
 }
 
 
@@ -151,17 +151,13 @@ void BeatSurfaceEngine::setAudioOutputFile(int index, File audioFile)
     m_pcLiveAudioStream->setAudioOutputFile(index, audioFile);
 }
 
-void BeatSurfaceEngine::setAudioOutputLooping(int index, bool looping)
+
+void BeatSurfaceEngine::setAudioFileParam(int index, bool include, bool looping, bool toggle)
 {
     m_pcLiveAudioStream->setAudioOutputLooping(index, looping);
-}
-
-
-void BeatSurfaceEngine::setAudioOutputToggle(int index, bool toggle)
-{
     m_pcLiveAudioStream->setAudioOutputToggle(index, toggle);
+    m_pcLiveAudioStream->setAudioOutputInclude(index, include);
 }
-
 
 
 
@@ -291,10 +287,4 @@ String BeatSurfaceEngine::getCurrentFeatureVector()
 int BeatSurfaceEngine::getCurrentClassificationResult()
 {
     return m_pcLiveAudioStream->getCurrentClassificationResult();
-}
-
-
-void BeatSurfaceEngine::testButton()
-{
-    m_pcLiveAudioStream->testButton();
 }

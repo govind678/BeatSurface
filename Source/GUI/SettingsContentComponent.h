@@ -45,6 +45,9 @@ public:
     void setNumRows(int newNumRows);
     int getNumRows() override;
     
+    void setIncludeMidi (const int rowNumber, const bool newInclude);
+    bool getIncludeMidi (const int rowNumber);
+    
     int getMidiChannel (const int rowNumber) const;
     void setMidiChannel (const int rowNumber, const int newMidiChannel);
     
@@ -57,13 +60,16 @@ public:
     bool getToggle(const int rowNumber) const;
     void setToggle(const int rowNumber, const bool newToggle);
     
+    void setIncludeAudio (const int rowNumber, const bool newInclude);
+    bool getIncludeAudio (const int rowNumber);
+    
     int getMidiDuration (const int rowNumber) const;
     void setMidiDuration (const int rowNumber, const int newDuration);
     
     void setAudioFilename(const int rowNumber, String filename);
     String getAudioFilename(const int rowNumber);
     
-    void addRow(int classIndex, int midiChannel, int midiNote, int midiDuration, String fileName, bool looping, bool toggle);
+    void addRow(int classIndex, bool includeMIDI, int midiChannel, int midiNote, int midiDuration, bool includeAudio, String fileName, bool looping, bool toggle);
     void deleteRow(int rowIndex);
     
     void clearRows();
@@ -81,9 +87,13 @@ private:
     int             m_iNumClasses;
     
     Array<int>      m_piClasses;
+    
+    Array<bool>     m_pbIncludeMIDI;
     Array<int>      m_piMidiChannels;
     Array<int>      m_piMidiNotes;
     Array<int>      m_piMidiDuration;
+    
+    Array<bool>     m_pbIncludeAudio;
     StringArray     m_psAudioFilenames;
     Array<bool>     m_pbLooping;
     Array<bool>     m_pbToggle;
@@ -135,6 +145,9 @@ private:
     
     ScopedPointer<Label>            tempoLabel;
     ScopedPointer<Label>            meterLabel;
+    
+    ScopedPointer<Label>            trainingTimeinBarsLabel;
+    ScopedPointer<Slider>           trainingTimeinBarsSlider;
     
     ScopedPointer<MidiAudioOutputComponent> midiAudioComponent;
     

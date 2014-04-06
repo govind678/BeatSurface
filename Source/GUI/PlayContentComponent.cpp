@@ -156,6 +156,8 @@ void ToolBarControls::paint(juce::Graphics &g)
 
 void ToolBarControls::resized()
 {
+#if JUCE_MAC || JUCE_LINUX || JUCE_WINDOWS
+    
     audioStreamToggleButton->setBounds(88, 110, 64, 64);
     playLabel->setBounds(88, 110 + 65, 64, 20);
     
@@ -174,6 +176,29 @@ void ToolBarControls::resized()
     
     loadTrainingButton->setBounds (0, 330, 64, 64);
     loadTrainingLabel->setBounds(0, 330 + 65, 64, 20);
+    
+    
+#elif JUCE_IOS || JUCE_ANDROID
+    
+    addClassButton->setBounds(0, 0, 32, 32);
+    addClassLabel-> setBounds(0, 33, 32, 20);
+    
+    deleteClassButton->setBounds(0, 55, 32, 32);
+    deleteClassLabel->setBounds(-1, 55 + 32, 33, 20);
+    
+    audioStreamToggleButton->setBounds(44, 55, 32, 32);
+    playLabel->setBounds(44, 55 + 33, 32, 20);
+    
+    recordToggleButton->setBounds(44, 110, 32, 32);
+    trainClassLabel->setBounds(44, 110 + 33, 32, 20);
+    
+    saveTrainingButton->setBounds (0, 110, 32, 32);
+    saveTrainingLabel->setBounds(0, 110 + 33, 32, 20);
+    
+    loadTrainingButton->setBounds (0, 165, 32, 32);
+    loadTrainingLabel->setBounds(0, 165 + 33, 32, 20);
+    
+#endif
 }
 
 
@@ -188,32 +213,6 @@ void ToolBarControls::resized()
 PlayContentComponent::PlayContentComponent ()
 {
     addAndMakeVisible(toolBarControls = new ToolBarControls());
-    
-    addAndMakeVisible(trainingTimeinBarsSlider = new Slider("trainingTimeSlider"));
-    trainingTimeinBarsSlider->setSliderStyle(Slider::IncDecButtons);
-    trainingTimeinBarsSlider->setIncDecButtonsMode(Slider::incDecButtonsDraggable_AutoDirection);
-    trainingTimeinBarsSlider->setRange(1, 16, 1);
-    trainingTimeinBarsSlider->setTextBoxStyle(Slider::TextBoxAbove, false, 64, 20);
-    trainingTimeinBarsSlider->setColour(TextButton::buttonColourId, Colour (0xFF363E46));
-    trainingTimeinBarsSlider->setColour(TextButton::buttonOnColourId, Colour (0xFF565E66));
-    trainingTimeinBarsSlider->setColour(Label::backgroundColourId, Colour (0xFF565E66));
-    trainingTimeinBarsSlider->setColour(Slider::backgroundColourId, Colour (0xFF565E66));
-    trainingTimeinBarsSlider->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
-    trainingTimeinBarsSlider->setColour (Label::textColourId, Colour (0xff4c5256));
-    trainingTimeinBarsSlider->setColour (TextEditor::textColourId, Colour (0xff3d4248));
-    trainingTimeinBarsSlider->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-    trainingTimeinBarsSlider->setColour (TextEditor::highlightColourId, Colour (0x00000000));
-    trainingTimeinBarsSlider->setValue(4);
-    
-    
-    addAndMakeVisible(trainingTimeinBarsLabel = new Label("trainingTimeLabel", TRANS("Training Time (Bars)")));
-    trainingTimeinBarsLabel->setFont (Font ("Myriad Pro", 9.00f, Font::plain));
-    trainingTimeinBarsLabel->setJustificationType (Justification::centred);
-    trainingTimeinBarsLabel->setEditable (false, false, false);
-    trainingTimeinBarsLabel->setColour (Label::textColourId, Colour (0xFF5C6266));
-    trainingTimeinBarsLabel->setColour (TextEditor::textColourId, Colour (0xFF3D4248));
-    trainingTimeinBarsLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-    trainingTimeinBarsLabel->setColour (TextEditor::highlightColourId, Colour (0x00000000));
     
     
     addAndMakeVisible(waveformLiveScroller = new LiveScrollDisplay(0));
@@ -240,9 +239,6 @@ PlayContentComponent::~PlayContentComponent()
     shapeButtonArray                = nullptr;
     metroDisplay                    = nullptr;
     
-    trainingTimeinBarsLabel         = nullptr;
-    trainingTimeinBarsSlider        = nullptr;
-    
     deleteAllChildren();
 }
 
@@ -258,10 +254,11 @@ void PlayContentComponent::resized()
     waveformLiveScroller->setBounds(0, 0, proportionOfWidth (0.5000f), proportionOfHeight (0.2000f));
     spectrumLiveScroller->setBounds(proportionOfWidth (0.5000f), 0, proportionOfWidth (0.5000f), proportionOfHeight (0.2000f));
     
+#if JUCE_MAC || JUCE_WINDOWS || JUCE_LINUX
     toolBarControls->setBounds(10, proportionOfHeight (0.2000f) + 44, 152, 420);
-    
-    trainingTimeinBarsSlider->setBounds(getWidth() - 64 - 32, getHeight() / 2 - 16, 64, 40);
-    trainingTimeinBarsLabel->setBounds(getWidth() - 128, getHeight() / 2 + 32, 128, 20);
+#elif JUCE_IOS || JUCE_ANDROID
+    toolBarControls->setBounds(5, proportionOfHeight (0.2000f), 120, 210);
+#endif
     
     shapeButtonArray->setBounds(getWidth()/2 - getHeight()/4, getHeight()/2 - getHeight()/4 + 30, getHeight()/2, getHeight()/2);
     metroDisplay->setBounds(getWidth()/2 - (getHeight()/4 + 10), getHeight()/2 - getHeight()/4 + 20, getHeight()/2 + 20, getHeight()/2 + 20);

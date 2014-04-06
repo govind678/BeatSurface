@@ -134,7 +134,7 @@ private:
 TranscriptionComponent::TranscriptionComponent()
 {
     trainingColour      = Colour(0xDDFECBCB);
-    playingColour       = Colour(0xFFEDEDED);
+    playingColour       = Colour(0xDD999999);
     
     
     addAndMakeVisible(table);
@@ -142,6 +142,7 @@ TranscriptionComponent::TranscriptionComponent()
     
     table.setColour (ListBox::outlineColourId, Colours::grey);
     table.setOutlineThickness (1);
+    table.setColour(ListBox::backgroundColourId, Colour());
     
     
     // Add Columns To Table
@@ -164,7 +165,7 @@ TranscriptionComponent::TranscriptionComponent()
     retrainButton->setColour (TextButton::buttonOnColourId, Colour (0xFF9A9A9A));
     
     addAndMakeVisible (clearButton = new TextButton ("clearButton"));
-    clearButton->setButtonText (TRANS("Clear Button"));
+    clearButton->setButtonText (TRANS("Clear Training"));
     clearButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
     clearButton->setColour (TextButton::buttonColourId, Colour (0xFF5B5B5B));
     clearButton->setColour (TextButton::buttonOnColourId, Colour (0xFF9A9A9A));
@@ -188,10 +189,10 @@ void TranscriptionComponent::resized()
 {
     // position our table with a gap around its edge
 //    table.setBoundsInset (BorderSize<int> (8));
-    table.setBounds(50, 10, 910, getHeight() - 40);
+    table.setBounds(100, 10, 900, getHeight() - 40);
     
-    retrainButton->setBounds(1000, 100, 150, 40);
-    clearButton->setBounds(1000, 180, 150, 40);
+    retrainButton->setBounds(getWidth() - 200, 50, 150, 40);
+    clearButton->setBounds(getWidth() - 200, 150, 150, 40);
 }
 
 

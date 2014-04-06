@@ -114,7 +114,7 @@ public:
         double   dSpectralSlope;
         
         double   dSpectralFlux;
-        double   dRootMeanSquare;
+        double   dRootMeanSquare_dB;
     };
     
     
@@ -163,14 +163,19 @@ public:
     void updateDataset(Array<bool> includes, Array<int> classes, bool type);
     void clearDataset();
     
+    void setAudioFilePathsToSave(StringArray filePaths);
+    StringArray getAudioFilePathsToLoad();
+    
     
     //==============================================================================
     // Are these needed?
     
-    vector<float>   getCurrentSpectrum();
-    vector<double>  getCurrentProbabilityEstimates();
-    String          getCurrentFeatureVector();
-    float           getCurrentSpectralCentroid();
+    vector<float>      getCurrentSpectrum();
+    vector<double>      getCurrentProbabilityEstimates();
+    String              getCurrentFeatureVector();
+    double              getCurrentSpectralCentroid();
+    double              getCurrentRMSIndB();
+    
     
     
     
@@ -250,6 +255,8 @@ private:
     vector<int>              m_piEvaluationLabels;
     
     String                   m_psFeatureVector;
+    
+    StringArray              m_psAudioFilePaths;
 
 };
 

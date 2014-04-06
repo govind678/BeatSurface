@@ -11,6 +11,9 @@
 #ifndef AUDIOFEATUREEXTRACTION_H_INCLUDED
 #define AUDIOFEATUREEXTRACTION_H_INCLUDED
 
+#define REF_VOL_DB      1.0F
+
+
 #include <cmath>
 
 
@@ -28,7 +31,7 @@ public:
     
     void extractFeatures(float* currentRealFFT, double* features, int blockSize);
     
-    double rootMeanSquare(const float** inputBuffer, int iNumChannels, int blockSize);
+    double rootMeanSquareIndB(const float** inputBuffer, int blockSize);
 
     
 private:
@@ -55,7 +58,7 @@ private:
     
     //--- Root Mean Square ---//
     double m_dRMS_Sum;
-    double m_dRMS_MixDown;
+    double m_dRMS_dB;
     
     
     int m_iLowBinLimit;

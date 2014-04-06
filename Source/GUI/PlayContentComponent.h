@@ -85,9 +85,6 @@ private:
     
     ScopedPointer<ToolBarControls>              toolBarControls;
     
-    ScopedPointer<Label>            trainingTimeinBarsLabel;
-    ScopedPointer<Slider>           trainingTimeinBarsSlider;
-    
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PlayContentComponent)

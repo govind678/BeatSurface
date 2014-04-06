@@ -149,7 +149,8 @@ SVMTrain::Error_t SVMTrain::setTrainingDataAndTrain(vector<vector<double>> ppdTr
     }
     
     
-    if (iNumFeatures <= 0 || iNumObservations <= 0) {
+    if (iNumFeatures <= 0 || iNumObservations <= 0)
+    {
         std::cout << "@SVMTrain: Error: Invalid Function Parameter" << std::endl;
         return kInvalidFunctionParamError;
     }

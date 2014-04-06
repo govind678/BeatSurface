@@ -62,13 +62,10 @@ public:
     
     void updateDataset(Array<bool> includes, Array<int> classes);
     
-    void setMidiOutput(int classIndex, int channelNo, int noteNum, int duration_ms);
+    void setMidiOutput(int classIndex, bool include, int channelNo, int noteNum, int duration_ms);
     void setAudioOutputFile(int index, File audioFile);
-    void setAudioOutputLooping(int index, bool looping);
-    void setAudioOutputToggle(int index, bool toggle);
+    void setAudioFileParam(int index, bool include, bool looping, bool toggle);
     
-    
-    void testButton();
     
     //==============================================================================
     // Interface Get Methods for Beat Surface Core -> GUI

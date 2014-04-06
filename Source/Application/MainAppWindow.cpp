@@ -22,18 +22,31 @@ MainAppWindow::MainAppWindow()  : DocumentWindow (JUCEApplication::getInstance()
                                                   DocumentWindow::allButtons)
 {
     setUsingNativeTitleBar (true);
+    
+#if JUCE_MAC || JUCE_WINDOWS || JUCE_LINUX
     setResizable (true, false);
-    setResizeLimits (400, 400, 10000, 10000);
-
+    setResizeLimits (200, 200, 10000, 10000);
     setBounds (0, 0, getParentWidth(), getParentHeight());
+    
+#elif JUCE_ANDROID || JUCE_IOS
+    setResizable (false, false);
+//    setResizeLimits (getParentWidth(), getParentHeight(), getParentWidth(), getParentHeight());
+    setTitleBarHeight(0);
+//    setFullScreen(true);
+//    setBounds (0, 0, getParentHeight(), getParentWidth());
+#endif
 
+    
+    std::cout << "Width: " << getParentWidth() << " Height: " << getParentHeight() << std::endl;
     
     mainComponent = new MainComponent;
     setContentOwned(mainComponent, true);
     
-    #if JUCE_MAC
+#if JUCE_MAC
     centreWithSize (getParentWidth(), getParentHeight() - 15);
-    #endif
+#elif JUCE_IOS
+    centreWithSize (getParentHeight(), getParentWidth());
+#endif
     
     addKeyListener (commandManager->getKeyMappings());
     

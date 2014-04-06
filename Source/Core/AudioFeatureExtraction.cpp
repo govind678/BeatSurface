@@ -14,7 +14,7 @@
 AudioFeatureExtraction::AudioFeatureExtraction()
 {
     m_iLowBinLimit                   =   1;
-    m_iHighBinLimit                  =   60;
+    m_iHighBinLimit                  =   80;
     
     m_dFlux_SpectralSum              = 0.0f;
     m_dFlux_SpectralDifference       = 0.0f;
@@ -32,7 +32,6 @@ AudioFeatureExtraction::AudioFeatureExtraction()
     m_dSlope_BinSquareSum            = 0.0f;
     m_dSlope_Delta                   = 8.0f;
     
-    m_dRMS_MixDown                   = 0.0f;
     m_dRMS_Sum                       = 0.0f;
     
     m_iBinSize                       = 0;
@@ -106,20 +105,18 @@ double AudioFeatureExtraction::spectralCentroid(float *currentRealFFT, int block
 
 
 
-double AudioFeatureExtraction::rootMeanSquare(const float **inputBuffer, int iNumChannels, int blockSize)
+double AudioFeatureExtraction::rootMeanSquareIndB(const float **inputBuffer, int blockSize)
 {
     m_dRMS_Sum = 0.0f;
     
     for (int sample=0; sample < blockSize; sample++)
     {
-//        m_fRMS_MixDown = 0.0f;
-        
-//        for (int channel = 0; channel < iNumChannels; channel++) {
-//            m_fRMS_MixDown += inputBuffer[sample][channel] / iNumChannels;
-//        }
         m_dRMS_Sum += inputBuffer[0][sample] * inputBuffer[0][sample];
     }
-    return(sqrtf(m_dRMS_Sum / blockSize));
+    
+    m_dRMS_dB = 20 * log10( (sqrt(m_dRMS_Sum / blockSize)) / REF_VOL_DB);
+    
+    return m_dRMS_dB;
 }
 
 

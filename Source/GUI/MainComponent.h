@@ -88,8 +88,8 @@ public:
     
     void buttonClicked (Button* buttonThatWasClicked);
     void loadAudioFileToPlay (int index);
-    void setAudioFileParam (int index, bool looping, bool toggle);
-    void setMidiOutput(int classIndex, int channelNo, int noteNum, int duration_ms);
+    void setAudioFileParam (int index, bool include, bool looping, bool toggle);
+    void setMidiOutput(int classIndex, bool include, int channelNo, int noteNum, int duration_ms);
     //==============================================================================
     
     
@@ -159,9 +159,6 @@ private:
     
     //--- Audio Device Setup Component Window ---//
     ScopedPointer<AudioSetupDisplay> audioSetup;
-    
-    //--- Metronome Display ---//
-    ScopedPointer<ClockDisplayComponent> clockDisplay;
     
     
     //--- Confidence Progress Bar ---//

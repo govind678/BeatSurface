@@ -17,13 +17,13 @@ namespace CommandIDs {
     static const int AddClass                    = 0x1000;
     static const int DeleteClass                 = 0x1001;
     static const int CurrentClass                = 0x1002;
-        
-    static const int RecordTraining              = 0x1010;
-    static const int DoneTraining                = 0x1011;
-        
-    static const int ToggleAudio                 = 0x1020;
-    static const int ToggleClock                 = 0x1021;
-        
+    
+    static const int IdleMode                    = 0x1010;
+    static const int TrainingMode                = 0x1011;
+    static const int PlayMode                    = 0x1012;
+    
+//    static const int ToggleClock                 = 0x1021;
+    
     static const int Preferences                 = 0x1030;
         
     static const int GoToKioskMode               = 0x1040;

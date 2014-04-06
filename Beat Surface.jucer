@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="T7Inhi" name="Beat Surface" projectType="guiapp" version="1.2.1"
               bundleIdentifier="com.gtcmt.BeatSurface" includeBinaryInAppConfig="1"
-              jucerVersion="3.1.0">
+              jucerVersion="3.1.0" companyName="Georgia Tech Center for Music Technology">
   <MAINGROUP id="zctWvj" name="Beat Surface">
     <GROUP id="{C5E1EDF6-9027-6A90-81F8-E91FC8967D9C}" name="Libraries">
       <GROUP id="{19FC2D2E-C554-7328-26AB-848A5D11BBDA}" name="LibSVM">
@@ -121,9 +121,9 @@
     <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="NfnoQN" bigIcon="RzQmWg">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxSDK="10.9 SDK" osxCompatibility="10.7 SDK" osxArchitecture="Native"
-                       isDebug="1" optimisation="1" targetName="Beat Surface"/>
+                       isDebug="1" optimisation="3" targetName="Beat Surface"/>
         <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="default" osxArchitecture="default"
-                       isDebug="0" optimisation="2" targetName="Beat Surface"/>
+                       isDebug="0" optimisation="3" targetName="Beat Surface"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_audio_basics" path="../../../../Libraries/JUCE/modules"/>
@@ -140,6 +140,29 @@
         <MODULEPATH id="juce_cryptography" path="../../../../Libraries/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
+    <XCODE_IPHONE targetFolder="Builds/iOS" smallIcon="NfnoQN" bigIcon="RzQmWg"
+                  UIFileSharingEnabled="1">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" iosCompatibility="default" isDebug="1" optimisation="3"
+                       targetName="Beat Surface"/>
+        <CONFIGURATION name="Release" iosCompatibility="default" isDebug="0" optimisation="3"
+                       targetName="Beat Surface"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_gui_extra" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../../../Libraries/JUCE/modules"/>
+      </MODULEPATHS>
+    </XCODE_IPHONE>
   </EXPORTFORMATS>
   <MODULES>
     <MODULES id="juce_audio_basics" showAllCode="1" useLocalCopy="0"/>
