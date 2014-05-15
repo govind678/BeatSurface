@@ -196,8 +196,7 @@ bool OnsetClassification::detectOnset(const float** audioBuffer)
     
     //--- Create Adaptive Threshold ---//
     m_sDetectionVariables.dAdaptiveThreshold =  m_sDetectionParameters.dDeltaThreshold
-    +   (m_sAudioFeatures.dSpectralFlux
-         + m_sDetectionVariables.dAdaptiveThreshold) / 2.0f;
+                                                +   ((m_sAudioFeatures.dSpectralFlux + m_sDetectionVariables.dAdaptiveThreshold) / 2.0f);
     
     
     
@@ -298,9 +297,10 @@ int OnsetClassification::classify(const float** audioBuffer)
                                               (2 * m_sDeviceSettings.iBufferSize));
             
             
-            
             //--- Normalize data for Classification ---//
             normalizeVector(m_pdFeatureVector.data(), m_pdNormalizedVector.data());
+            
+            m_sAudioFeatures.dSpectralCentroid = m_pdFeatureVector[0];
             
             int result = m_pcSVMTrainer->classify(m_pdNormalizedVector.data(), m_pdProbabilityEstimates.data());
             
@@ -366,6 +366,7 @@ void OnsetClassification::trainAtClass(const float** audioBuffer, int classLabel
                                       (2 * m_sDeviceSettings.iBufferSize));
     
     
+    m_sAudioFeatures.dSpectralCentroid = m_pdFeatureVector[0];
     
     //--- Printout Features ---//
     //    std::cout << classLabel << ": ";
@@ -669,6 +670,7 @@ int OnsetClassification::saveTraining(File trainingFile)
             {
                 dataToWrite +=  String(m_ppdTrainingData[observation][feature]) + ";";
             }
+            
             
             dataToWrite += "\n";
         }

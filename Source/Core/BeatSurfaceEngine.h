@@ -81,6 +81,9 @@ public:
     int    getCurrentObservation();
     String getCurrentFeatureVector();
     
+    vector<float> getCurrentSpectrum();
+    float getCurrentSpectralCentroid();
+    float getCurrentBlockRMS();
     
 private:
     

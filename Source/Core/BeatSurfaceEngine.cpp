@@ -288,3 +288,18 @@ int BeatSurfaceEngine::getCurrentClassificationResult()
 {
     return m_pcLiveAudioStream->getCurrentClassificationResult();
 }
+
+vector<float> BeatSurfaceEngine::getCurrentSpectrum()
+{
+    return m_pcLiveAudioStream->getCurrentSpectrum();
+}
+
+float BeatSurfaceEngine::getCurrentSpectralCentroid()
+{
+    return m_pcLiveAudioStream->getCurrentSpectralCentroid();
+}
+
+float BeatSurfaceEngine::getCurrentBlockRMS()
+{
+    return ((m_pcLiveAudioStream->getCurrentBlockRMS() * 0.012f) + 0.9f);
+}

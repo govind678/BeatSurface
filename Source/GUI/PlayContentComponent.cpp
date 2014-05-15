@@ -164,6 +164,9 @@ void ToolBarControls::resized()
     recordToggleButton->setBounds(88, 220, 64, 64);
     trainClassLabel->setBounds(88, 220 + 65, 64, 20);
     
+    recordToggleButton->setBounds(88, 220, 64, 64);
+    trainClassLabel->setBounds(88, 220 + 65, 64, 20);
+    
     
     addClassButton->setBounds(0, 0, 64, 64);
     addClassLabel-> setBounds(0, 65, 64, 20);

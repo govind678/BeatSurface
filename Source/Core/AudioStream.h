@@ -16,6 +16,9 @@
 #include "MidiOut.h"
 #include "AudioMixerPlayer.h"
 
+#include <stdio.h>
+#include <vector>
+
 
 class AudioStream : public AudioIODeviceCallback,
                     private Timer
@@ -129,6 +132,10 @@ public:
     double getClassificationConfidence();
     String getCurrentFeatureVector();
     int    getCurrentObservation();
+    std::vector<float> getCurrentSpectrum();
+    float  getCurrentSpectralCentroid();
+    float  getCurrentBlockRMS();
+    
     
     
     void sendKeyPressEvent();

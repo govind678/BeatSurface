@@ -278,7 +278,7 @@ public:
         textLabel.setColour(TextEditor::textColourId, Colour (0xFF000000));
         textLabel.setColour(TextEditor::backgroundColourId, Colour (0xDD999999));
         textLabel.setColour(TextEditor::highlightColourId, Colour (0xFFDDDDDD));
-        textLabel.setBorderSize(0, 0);
+//        textLabel.setBorderSize(0, 0);
     }
     
     void resized() override
@@ -987,7 +987,7 @@ SettingsContentComponent::SettingsContentComponent ()
     tempoNumBox->setColour(TextEditor::textColourId, Colour (0xFF000000));
     tempoNumBox->setColour(TextEditor::backgroundColourId, Colour (0xDD999999));
     tempoNumBox->setColour(TextEditor::highlightColourId, Colour (0xFFDDDDDD));
-    tempoNumBox->setBorderSize(0, 0);
+//    tempoNumBox->setBorderSize(0, 0);
     
     
     addAndMakeVisible (numeratorNumBox = new Label ("numeratorNumBox", TRANS("4")));
@@ -1000,7 +1000,7 @@ SettingsContentComponent::SettingsContentComponent ()
     numeratorNumBox->setColour(TextEditor::textColourId, Colour (0xFF000000));
     numeratorNumBox->setColour(TextEditor::backgroundColourId, Colour (0xDD999999));
     numeratorNumBox->setColour(TextEditor::highlightColourId, Colour (0xFFDDDDDD));
-    numeratorNumBox->setBorderSize(0, 0);
+//    numeratorNumBox->setBorderSize(0, 0);
     
     
     addAndMakeVisible (denominatorNumBox = new Label ("denominatorNumBox", TRANS("4")));
@@ -1013,7 +1013,7 @@ SettingsContentComponent::SettingsContentComponent ()
     denominatorNumBox->setColour(TextEditor::textColourId, Colour (0xFF000000));
     denominatorNumBox->setColour(TextEditor::backgroundColourId, Colour (0xDD999999));
     denominatorNumBox->setColour(TextEditor::highlightColourId, Colour (0xFFDDDDDD));
-    denominatorNumBox->setBorderSize(0, 0);
+//    denominatorNumBox->setBorderSize(0, 0);
     
     
     

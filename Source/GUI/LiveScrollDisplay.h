@@ -36,6 +36,7 @@ public:
         m_iBlockIndex               =   0;
         m_iPointToDisplayInTime     =   0.0f;
         m_iDisplayType              =   displayType;
+        m_iWidth                    =   0;
         
         sharedAudioDeviceManager->getAudioDeviceSetup(deviceSetup);
         
@@ -51,15 +52,26 @@ public:
     
     void getSampleToDraw(float sample)
     {
-        if (m_fPixelsPerBlock > 0)
+//        if (m_fPixelsPerBlock > 0)
+//        {
+//            for (int i=m_fPixelsPerBlock - 1; i > 0; i--)
+//            {
+//                m_fSamples.move(i, i+1);
+//            }
+//            
+////            m_fSamples.insert(0, (sample * m_fDataScaling) + m_iBaseLine);
+//            m_fSamples.insert(0, sample);
+//        }
+        
+        for (int i=1; i < m_iWidth; i++)
         {
-            for (int i=m_fPixelsPerBlock - 1; i > 0; i--)
-            {
-                m_fSamples.move(i, i+1);
-            }
-            
-            m_fSamples.insert(0, (sample * m_fDataScaling) + m_iBaseLine);
+            m_fSamples.move(i, i-1);
         }
+        
+        m_fSamples.insert(m_iWidth-1, sample);
+//        m_iSampleDrawIndex = (m_iSampleDrawIndex + 1) % m_iWidth;
+        
+        
         
         repaint();
     }
@@ -114,7 +126,7 @@ public:
     
     void setPointToDisplayInTime(float value)
     {
-        m_iPointToDisplayInTime = int((value * getWidth()) + 0.5);
+        m_iPointToDisplayInTime = int(value + 0.5);
     }
     
     
@@ -187,6 +199,7 @@ private:
     int     m_iBlockIndex;
     int     m_iDisplayType;
     int     m_iPointToDisplayInTime;
+    int     m_iWidth;
     
     static const int m_iWindowLength_s     = 4;
     
@@ -220,7 +233,7 @@ private:
         
         if (m_iDisplayType == 1)
         {
-            Rectangle<float> pointToDrawInTime(m_iPointToDisplayInTime, getHeight()/2, 10, getHeight());
+            Rectangle<float> pointToDrawInTime(m_iPointToDisplayInTime, getHeight()/2, 5, getHeight());
             g.setColour(Colours::green);
             g.fillRect(pointToDrawInTime);
             
@@ -250,6 +263,7 @@ private:
     void resized()
     {
         updateScrollLineSpacing();
+        m_iWidth    =   getWidth();
     }
     
     

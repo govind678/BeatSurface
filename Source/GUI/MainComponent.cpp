@@ -564,7 +564,7 @@ void MainComponent::timerCallback()
     
     if(guiUpdater->DrawWaveform)
     {
-        playComponent->waveformLiveScroller->getSampleToDraw(guiUpdater->getSampleToDrawWaveform());
+        playComponent->waveformLiveScroller->getSampleToDraw(m_pcBeatSurfaceEngine->getCurrentBlockRMS());
         
 //        float sample = guiUpdater->getSampleToDrawWaveform();
 //        playComponent->liveAudioScroller->pushSample(sample);
@@ -574,8 +574,9 @@ void MainComponent::timerCallback()
     
     if(guiUpdater->DrawSpectrum)
     {
-        playComponent->spectrumLiveScroller->setPointToDisplayInTime(guiUpdater->getSpectralCentroidToDraw());
-        playComponent->spectrumLiveScroller->setArrayToDraw(guiUpdater->getArrayToDrawSpectrum());
+//        playComponent->spectrumLiveScroller->setArrayToDraw(guiUpdater->getArrayToDrawSpectrum());
+        playComponent->spectrumLiveScroller->setArrayToDraw(m_pcBeatSurfaceEngine->getCurrentSpectrum());
+        playComponent->spectrumLiveScroller->setPointToDisplayInTime(m_pcBeatSurfaceEngine->getCurrentSpectralCentroid());
         guiUpdater->DrawSpectrum = false;
     }
     

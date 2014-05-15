@@ -188,6 +188,7 @@ void AudioStream::audioDeviceIOCallback( const float** inputChannelData,
             {
                 m_pcOnsetClassifier->trainAtClass(inputChannelData, m_iCurrentClassIndexToTrain);
                 guiUpdater->displayTrainingOnset();
+                guiUpdater->drawSpectrum();
             }
         
         
@@ -222,6 +223,7 @@ void AudioStream::audioDeviceIOCallback( const float** inputChannelData,
                     }
                     
                     guiUpdater->displayPlayingOnset();
+                    guiUpdater->drawSpectrum();
                     
                 }
             }
@@ -250,6 +252,8 @@ void AudioStream::audioDeviceIOCallback( const float** inputChannelData,
             outputChannelData[channel][sample] = 0.0f;
         }
     }
+    
+    guiUpdater->drawWaveformSample();
     
 }
 
@@ -459,6 +463,20 @@ int AudioStream::getCurrentClassificationResult()
 }
 
 
+std::vector<float> AudioStream::getCurrentSpectrum()
+{
+    return m_pcOnsetClassifier->getCurrentSpectrum();
+}
+
+float AudioStream::getCurrentSpectralCentroid()
+{
+    return m_pcOnsetClassifier->getCurrentSpectralCentroid();
+}
+
+float AudioStream::getCurrentBlockRMS()
+{
+    return m_pcOnsetClassifier->getCurrentRMSIndB();
+}
 
 
 //==============================================================================
@@ -525,5 +543,5 @@ void AudioStream::timerCallback()
 
 void AudioStream::sendKeyPressEvent()
 {
-    KeyPress slideChange = KeyPress(KeyPress::rightKey);
+//    KeyPress slideChange = KeyPress(KeyPress::rightKey);
 }

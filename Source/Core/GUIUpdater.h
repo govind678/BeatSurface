@@ -55,19 +55,14 @@ public:
     
     //==============================================================================
     // Draw Waveform
-    void drawWaveformWithSample(float sample);
-    float getSampleToDrawWaveform();
+    void drawWaveformSample();
     //==============================================================================
     
     
     
     //==============================================================================
     // Draw Spectrum
-    void drawSpectrum(vector<float> spectrumArray);
-    vector<float> getArrayToDrawSpectrum();
-    
-    void drawSpectralCentroid(float spectralCentroid);
-    float getSpectralCentroidToDraw();
+    void drawSpectrum();
     //==============================================================================
     
     
@@ -92,11 +87,7 @@ public:
     
 private:
     
-    float           m_fCurrentWaveformSampleToDraw;
-    float           m_fCurrentSpectralCentroidToDraw;
     int             m_iNumClasses;
-    
-    vector<float>   m_pfCurrentSpectrum;
  
 };
 

@@ -26,7 +26,7 @@
 
 
 #define MAX_DECAY_WINDOW_BLOCKS     25          // For Block Size of 512 ~ 250 ms
-#define MIN_DECAY_WINDOW_BLOCKS     2
+#define MIN_DECAY_WINDOW_BLOCKS     2           // For Block Size of 512 ~ 
 #define MAX_DELTA_THRESHOLD         4.0F
 #define MIN_DELTA_THRESHOLD         0.6F
 #define MAX_BUFFER_SIZE             2048
@@ -170,7 +170,7 @@ public:
     //==============================================================================
     // Are these needed?
     
-    vector<float>      getCurrentSpectrum();
+    vector<float>       getCurrentSpectrum();
     vector<double>      getCurrentProbabilityEstimates();
     String              getCurrentFeatureVector();
     double              getCurrentSpectralCentroid();
