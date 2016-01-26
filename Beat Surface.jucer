@@ -1,182 +1,200 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="T7Inhi" name="Beat Surface" projectType="guiapp" version="1.2.1"
-              bundleIdentifier="com.gtcmt.BeatSurface" includeBinaryInAppConfig="1"
-              jucerVersion="3.1.0" companyName="Georgia Tech Center for Music Technology">
-  <MAINGROUP id="zctWvj" name="Beat Surface">
-    <GROUP id="{C5E1EDF6-9027-6A90-81F8-E91FC8967D9C}" name="Libraries">
-      <GROUP id="{19FC2D2E-C554-7328-26AB-848A5D11BBDA}" name="LibSVM">
-        <FILE id="RaZ6yl" name="svm.cpp" compile="1" resource="0" file="../../../../Libraries/libsvm-3.17/svm.cpp"/>
-        <FILE id="SVZePT" name="svm.h" compile="0" resource="0" file="../../../../Libraries/libsvm-3.17/svm.h"/>
+<JUCERPROJECT id="lNPkLw" name="Beat Surface" projectType="guiapp" version="1.2.1"
+              bundleIdentifier="com.gtcmt.beatsurface" includeBinaryInAppConfig="1"
+              jucerVersion="4.1.0" companyName="Georgia Tech Center for Music Technology">
+  <MAINGROUP id="uDRYcg" name="Beat Surface">
+    <GROUP id="{81B58B5D-8A37-0022-749B-679E3306B70A}" name="Dependencies">
+      <GROUP id="{4087827D-96D5-777E-E435-7061E31C9DCE}" name="AudioFFT">
+        <FILE id="O6xMAi" name="AudioFFT.cpp" compile="1" resource="0" file="Dependencies/AudioFFT/AudioFFT.cpp"/>
+        <FILE id="aid0XG" name="AudioFFT.h" compile="0" resource="0" file="Dependencies/AudioFFT/AudioFFT.h"/>
       </GROUP>
-      <GROUP id="{05ED4376-4E5E-723E-B8D5-8609B747C59C}" name="AudioFFT">
-        <FILE id="Ay7xND" name="AudioFFT.cpp" compile="1" resource="0" file="../../../../Libraries/AudioFFT/AudioFFT.cpp"/>
-        <FILE id="Xs7I2Z" name="AudioFFT.h" compile="0" resource="0" file="../../../../Libraries/AudioFFT/AudioFFT.h"/>
-      </GROUP>
-    </GROUP>
-    <GROUP id="{5C5E7385-DA24-FB72-7125-B97D44E90AD3}" name="Media">
-      <GROUP id="{7F6AE4F0-665B-C5C9-2283-F2C7FB06AA54}" name="Sounds">
-        <FILE id="oxedMB" name="Tick.wav" compile="0" resource="1" file="Media/Sounds/Tick.wav"/>
-        <FILE id="oe6wzV" name="Tock.wav" compile="0" resource="1" file="Media/Sounds/Tock.wav"/>
-      </GROUP>
-      <GROUP id="{0A687860-FFEF-C395-896C-FC0D266D3DA1}" name="Images">
-        <FILE id="qLG2wr" name="AddClass128.png" compile="0" resource="1" file="Media/Images/AddClass128.png"/>
-        <FILE id="T9U3ko" name="DeleteClass128.png" compile="0" resource="1"
-              file="Media/Images/DeleteClass128.png"/>
-        <FILE id="NfnoQN" name="Icon128.png" compile="0" resource="1" file="Media/Images/Icon128.png"/>
-        <FILE id="RzQmWg" name="Icon256.png" compile="0" resource="1" file="Media/Images/Icon256.png"/>
-        <FILE id="VtNzGF" name="Load128.png" compile="0" resource="1" file="Media/Images/Load128.png"/>
-        <FILE id="i1lgFM" name="Play128.png" compile="0" resource="1" file="Media/Images/Play128.png"/>
-        <FILE id="wqJvv7" name="RecordOff128.png" compile="0" resource="1"
-              file="Media/Images/RecordOff128.png"/>
-        <FILE id="TH4XsX" name="RecordOn128.png" compile="0" resource="1" file="Media/Images/RecordOn128.png"/>
-        <FILE id="etQPAN" name="Save128.png" compile="0" resource="1" file="Media/Images/Save128.png"/>
-        <FILE id="EHjc9v" name="Stop128.png" compile="0" resource="1" file="Media/Images/Stop128.png"/>
+      <GROUP id="{389A9303-185B-AECC-DDD5-018C94C4B16C}" name="libSVM">
+        <FILE id="wL60C9" name="svm.cpp" compile="1" resource="0" file="Dependencies/libSVM/svm.cpp"/>
+        <FILE id="QkNgNq" name="svm.h" compile="0" resource="0" file="Dependencies/libSVM/svm.h"/>
       </GROUP>
     </GROUP>
-    <GROUP id="{B878E2BD-26C4-0822-E726-0161391D0C5D}" name="Source">
-      <GROUP id="{90EDCA3C-7988-E36F-5431-7A7F16DD8D73}" name="Application">
-        <FILE id="GK18pV" name="BeatSurfaceHeader.h" compile="0" resource="0"
+    <GROUP id="{79439961-22E1-AEC7-057F-BD5EB3A04CE3}" name="Resources">
+      <GROUP id="{80107C4B-8E67-429E-4ED8-A9AF098172F2}" name="Images">
+        <FILE id="DQu6HZ" name="AddClass128.png" compile="0" resource="1" file="Resources/Images/AddClass128.png"/>
+        <FILE id="ZqZEUK" name="ButtonTemplate.psd" compile="0" resource="1"
+              file="Resources/Images/ButtonTemplate.psd"/>
+        <FILE id="pR02VR" name="DeleteClass128.png" compile="0" resource="1"
+              file="Resources/Images/DeleteClass128.png"/>
+        <FILE id="SfmJNc" name="Icon128.png" compile="0" resource="1" file="Resources/Images/Icon128.png"/>
+        <FILE id="mEsvSn" name="Icon256.png" compile="0" resource="1" file="Resources/Images/Icon256.png"/>
+        <FILE id="E1jLHy" name="Icon512.icns" compile="0" resource="1" file="Resources/Images/Icon512.icns"/>
+        <FILE id="to3oJC" name="Icon512.png" compile="0" resource="1" file="Resources/Images/Icon512.png"/>
+        <FILE id="iQLLTA" name="Icon1024.png" compile="0" resource="1" file="Resources/Images/Icon1024.png"/>
+        <FILE id="NAYXW6" name="Load128.png" compile="0" resource="1" file="Resources/Images/Load128.png"/>
+        <FILE id="E2uS9T" name="Logo.icns" compile="0" resource="1" file="Resources/Images/Logo.icns"/>
+        <FILE id="VPm3eu" name="Logo.jpg" compile="0" resource="1" file="Resources/Images/Logo.jpg"/>
+        <FILE id="ENVXPi" name="Logo.png" compile="0" resource="1" file="Resources/Images/Logo.png"/>
+        <FILE id="PEWBG6" name="Logo.psd" compile="0" resource="1" file="Resources/Images/Logo.psd"/>
+        <FILE id="czCWE1" name="Play128.png" compile="0" resource="1" file="Resources/Images/Play128.png"/>
+        <FILE id="J5rZRc" name="RecordOff128.png" compile="0" resource="1"
+              file="Resources/Images/RecordOff128.png"/>
+        <FILE id="tlcu8B" name="RecordOn128.png" compile="0" resource="1" file="Resources/Images/RecordOn128.png"/>
+        <FILE id="ufcRs6" name="Save128.png" compile="0" resource="1" file="Resources/Images/Save128.png"/>
+        <FILE id="DLE6Xw" name="Stop128.png" compile="0" resource="1" file="Resources/Images/Stop128.png"/>
+      </GROUP>
+      <GROUP id="{E82C5A67-5BF5-7941-2602-2A05BB8BC465}" name="Sounds">
+        <FILE id="Y0qwSq" name="Tick.wav" compile="0" resource="1" file="Resources/Sounds/Tick.wav"/>
+        <FILE id="ZuAz20" name="Tock.wav" compile="0" resource="1" file="Resources/Sounds/Tock.wav"/>
+      </GROUP>
+    </GROUP>
+    <GROUP id="{F5EE07F9-FB76-200C-49D2-0BDEF2E424DF}" name="Source">
+      <GROUP id="{A230E1A9-73C8-3BA9-F760-457469DCEF40}" name="Application">
+        <FILE id="AX91Am" name="BeatSurfaceHeader.h" compile="0" resource="0"
               file="Source/Application/BeatSurfaceHeader.h"/>
-        <FILE id="lBlGLc" name="CommandIDs.h" compile="0" resource="0" file="Source/Application/CommandIDs.h"/>
-        <FILE id="aRYezr" name="Main.cpp" compile="1" resource="0" file="Source/Application/Main.cpp"/>
-        <FILE id="FE4zE3" name="MainAppWindow.cpp" compile="1" resource="0"
+        <FILE id="ZlH6ZW" name="CommandIDs.h" compile="0" resource="0" file="Source/Application/CommandIDs.h"/>
+        <FILE id="RSHqJ0" name="Main.cpp" compile="1" resource="0" file="Source/Application/Main.cpp"/>
+        <FILE id="ToRje0" name="MainAppWindow.cpp" compile="1" resource="0"
               file="Source/Application/MainAppWindow.cpp"/>
-        <FILE id="sTOChO" name="MainAppWindow.h" compile="0" resource="0" file="Source/Application/MainAppWindow.h"/>
+        <FILE id="dp3lRk" name="MainAppWindow.h" compile="0" resource="0" file="Source/Application/MainAppWindow.h"/>
       </GROUP>
-      <GROUP id="{45B460D2-47D2-1412-7E80-A6248BBE8AE5}" name="Core">
-        <FILE id="jqMAd0" name="AudioFeatureExtraction.cpp" compile="1" resource="0"
+      <GROUP id="{50BC76A5-5035-FE22-1106-8DBD472D1856}" name="Core">
+        <FILE id="DIrvuQ" name="AudioFeatureExtraction.cpp" compile="1" resource="0"
               file="Source/Core/AudioFeatureExtraction.cpp"/>
-        <FILE id="TxVKFb" name="AudioFeatureExtraction.h" compile="0" resource="0"
+        <FILE id="FHwMfl" name="AudioFeatureExtraction.h" compile="0" resource="0"
               file="Source/Core/AudioFeatureExtraction.h"/>
-        <FILE id="pvPwjY" name="AudioStream.cpp" compile="1" resource="0" file="Source/Core/AudioStream.cpp"/>
-        <FILE id="AGsuRt" name="AudioStream.h" compile="0" resource="0" file="Source/Core/AudioStream.h"/>
-        <FILE id="cvTHxU" name="BeatSurfaceEngine.cpp" compile="1" resource="0"
+        <FILE id="SHUCma" name="AudioStream.cpp" compile="1" resource="0" file="Source/Core/AudioStream.cpp"/>
+        <FILE id="yjK6kc" name="AudioStream.h" compile="0" resource="0" file="Source/Core/AudioStream.h"/>
+        <FILE id="ei7obA" name="BeatSurfaceEngine.cpp" compile="1" resource="0"
               file="Source/Core/BeatSurfaceEngine.cpp"/>
-        <FILE id="WI7UaO" name="BeatSurfaceEngine.h" compile="0" resource="0"
+        <FILE id="AdjAtV" name="BeatSurfaceEngine.h" compile="0" resource="0"
               file="Source/Core/BeatSurfaceEngine.h"/>
-        <FILE id="So0NW1" name="GUIUpdater.cpp" compile="1" resource="0" file="Source/Core/GUIUpdater.cpp"/>
-        <FILE id="Bqxrd3" name="GUIUpdater.h" compile="0" resource="0" file="Source/Core/GUIUpdater.h"/>
-        <FILE id="JmzQzt" name="OnsetClassification.cpp" compile="1" resource="0"
+        <FILE id="Ir3Yyc" name="GUIUpdater.cpp" compile="1" resource="0" file="Source/Core/GUIUpdater.cpp"/>
+        <FILE id="HLSJLt" name="GUIUpdater.h" compile="0" resource="0" file="Source/Core/GUIUpdater.h"/>
+        <FILE id="gBitHq" name="OnsetClassification.cpp" compile="1" resource="0"
               file="Source/Core/OnsetClassification.cpp"/>
-        <FILE id="XN7S3I" name="OnsetClassification.h" compile="0" resource="0"
+        <FILE id="h5LbMP" name="OnsetClassification.h" compile="0" resource="0"
               file="Source/Core/OnsetClassification.h"/>
       </GROUP>
-      <GROUP id="{F858431D-FC61-03B6-AE1E-C71EDF504811}" name="GUI">
-        <FILE id="K7E3ng" name="AudioLiveScrollDisplay.h" compile="0" resource="0"
+      <GROUP id="{0F9D1B7B-8F07-205D-F243-42527A6AB386}" name="GUI">
+        <FILE id="tz5iLd" name="AudioLiveScrollDisplay.h" compile="0" resource="0"
               file="Source/GUI/AudioLiveScrollDisplay.h"/>
-        <FILE id="CXyHeZ" name="CustomShapeButton.cpp" compile="1" resource="0"
+        <FILE id="MpabXe" name="CustomShapeButton.cpp" compile="1" resource="0"
               file="Source/GUI/CustomShapeButton.cpp"/>
-        <FILE id="Zi0xXd" name="CustomShapeButton.h" compile="0" resource="0"
+        <FILE id="JB8Mwi" name="CustomShapeButton.h" compile="0" resource="0"
               file="Source/GUI/CustomShapeButton.h"/>
-        <FILE id="uUDSgY" name="LiveScrollAudioDisplay.h" compile="0" resource="0"
+        <FILE id="d3pgov" name="LiveScrollAudioDisplay.h" compile="0" resource="0"
               file="Source/GUI/LiveScrollAudioDisplay.h"/>
-        <FILE id="Wf6T0R" name="LiveScrollDisplay.h" compile="0" resource="0"
+        <FILE id="V0nWrL" name="LiveScrollDisplay.h" compile="0" resource="0"
               file="Source/GUI/LiveScrollDisplay.h"/>
-        <FILE id="CvG8QL" name="MainComponent.cpp" compile="1" resource="0"
+        <FILE id="uhtNbJ" name="MainComponent.cpp" compile="1" resource="0"
               file="Source/GUI/MainComponent.cpp"/>
-        <FILE id="HRmnHi" name="MainComponent.h" compile="0" resource="0" file="Source/GUI/MainComponent.h"/>
-        <FILE id="B9AmbF" name="PlayContentComponent.cpp" compile="1" resource="0"
+        <FILE id="ALL5Bl" name="MainComponent.h" compile="0" resource="0" file="Source/GUI/MainComponent.h"/>
+        <FILE id="gt2cCr" name="PlayContentComponent.cpp" compile="1" resource="0"
               file="Source/GUI/PlayContentComponent.cpp"/>
-        <FILE id="R98dWF" name="PlayContentComponent.h" compile="0" resource="0"
+        <FILE id="bSMdy3" name="PlayContentComponent.h" compile="0" resource="0"
               file="Source/GUI/PlayContentComponent.h"/>
-        <FILE id="acxAMN" name="SettingsContentComponent.cpp" compile="1" resource="0"
+        <FILE id="Qy217y" name="SettingsContentComponent.cpp" compile="1" resource="0"
               file="Source/GUI/SettingsContentComponent.cpp"/>
-        <FILE id="JnLl20" name="SettingsContentComponent.h" compile="0" resource="0"
+        <FILE id="CdIDOm" name="SettingsContentComponent.h" compile="0" resource="0"
               file="Source/GUI/SettingsContentComponent.h"/>
-        <FILE id="t6O4sZ" name="TranscriptionComponent.cpp" compile="1" resource="0"
+        <FILE id="GHGIKJ" name="TranscriptionComponent.cpp" compile="1" resource="0"
               file="Source/GUI/TranscriptionComponent.cpp"/>
-        <FILE id="nrOY6x" name="TranscriptionComponent.h" compile="0" resource="0"
+        <FILE id="j8tOkO" name="TranscriptionComponent.h" compile="0" resource="0"
               file="Source/GUI/TranscriptionComponent.h"/>
       </GROUP>
-      <GROUP id="{B056DD55-77D0-5AE7-268D-B7219D0CBDB4}" name="Output">
-        <FILE id="e5vV3H" name="AudioMixerPlayer.cpp" compile="1" resource="0"
-              file="Source/Output/AudioMixerPlayer.cpp"/>
-        <FILE id="aMuWAk" name="AudioMixerPlayer.h" compile="0" resource="0"
-              file="Source/Output/AudioMixerPlayer.h"/>
-        <FILE id="eBqGuK" name="AudioFilePlayer.cpp" compile="1" resource="0"
+      <GROUP id="{65B47B0A-4387-0207-D049-9BB08C06BFC5}" name="Output">
+        <FILE id="nxpXnF" name="AudioFilePlayer.cpp" compile="1" resource="0"
               file="Source/Output/AudioFilePlayer.cpp"/>
-        <FILE id="C88ldL" name="AudioFilePlayer.h" compile="0" resource="0"
+        <FILE id="nKI100" name="AudioFilePlayer.h" compile="0" resource="0"
               file="Source/Output/AudioFilePlayer.h"/>
-        <FILE id="BL71V3" name="GlobalClock.cpp" compile="1" resource="0" file="Source/Output/GlobalClock.cpp"/>
-        <FILE id="RC4t2s" name="GlobalClock.h" compile="0" resource="0" file="Source/Output/GlobalClock.h"/>
-        <FILE id="lTFi8e" name="MidiOut.cpp" compile="1" resource="0" file="Source/Output/MidiOut.cpp"/>
-        <FILE id="ZanIpS" name="MidiOut.h" compile="0" resource="0" file="Source/Output/MidiOut.h"/>
+        <FILE id="m51FT5" name="AudioMixerPlayer.cpp" compile="1" resource="0"
+              file="Source/Output/AudioMixerPlayer.cpp"/>
+        <FILE id="uueWgb" name="AudioMixerPlayer.h" compile="0" resource="0"
+              file="Source/Output/AudioMixerPlayer.h"/>
+        <FILE id="sbXjUV" name="GlobalClock.cpp" compile="1" resource="0" file="Source/Output/GlobalClock.cpp"/>
+        <FILE id="kFyW25" name="GlobalClock.h" compile="0" resource="0" file="Source/Output/GlobalClock.h"/>
+        <FILE id="g4G3t3" name="MidiOut.cpp" compile="1" resource="0" file="Source/Output/MidiOut.cpp"/>
+        <FILE id="vCcTlo" name="MidiOut.h" compile="0" resource="0" file="Source/Output/MidiOut.h"/>
       </GROUP>
-      <GROUP id="{781E0B90-9159-1D25-110C-D617A00F2DF7}" name="Wrappers">
-        <GROUP id="{8830BC45-008C-567F-126A-862E82B737ED}" name="SVM">
-          <FILE id="QPvs48" name="SVMTrain.cpp" compile="1" resource="0" file="Source/Wrappers/SVM/SVMTrain.cpp"/>
-          <FILE id="wOeVCT" name="SVMTrain.h" compile="0" resource="0" file="Source/Wrappers/SVM/SVMTrain.h"/>
-        </GROUP>
-        <GROUP id="{4CD5A1CE-6B60-CCE8-8F9F-3EEC88B5F21F}" name="FFT">
-          <FILE id="MoF3sW" name="ShortTermFourierTransform.cpp" compile="1"
+      <GROUP id="{A33CAA6B-F324-9ED8-E167-21C99E3FC93B}" name="Wrappers">
+        <GROUP id="{249FA7AC-17FF-79C6-FAB5-80A524A2AB1F}" name="FFT">
+          <FILE id="Ba0Rez" name="ShortTermFourierTransform.cpp" compile="1"
                 resource="0" file="Source/Wrappers/FFT/ShortTermFourierTransform.cpp"/>
-          <FILE id="dOITLX" name="ShortTermFourierTransform.h" compile="0" resource="0"
+          <FILE id="AQvfzl" name="ShortTermFourierTransform.h" compile="0" resource="0"
                 file="Source/Wrappers/FFT/ShortTermFourierTransform.h"/>
         </GROUP>
+        <GROUP id="{0B6516F3-3360-FF3C-2943-766BAAF1CC00}" name="SVM">
+          <FILE id="dN0SgL" name="SVMTrain.cpp" compile="1" resource="0" file="Source/Wrappers/SVM/SVMTrain.cpp"/>
+          <FILE id="LVwPuA" name="SVMTrain.h" compile="0" resource="0" file="Source/Wrappers/SVM/SVMTrain.h"/>
+        </GROUP>
       </GROUP>
+    </GROUP>
+    <GROUP id="{DDC0BA64-AA82-59A4-954A-DD6ABD8F5235}" name="Training">
+      <FILE id="JShfIL" name="BodyHits4.txt" compile="0" resource="1" file="Training/BodyHits4.txt"/>
+      <FILE id="DOkc2g" name="ENST.txt" compile="0" resource="1" file="Training/ENST.txt"/>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="NfnoQN" bigIcon="RzQmWg">
+    <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="mEsvSn" bigIcon="to3oJC">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" osxSDK="10.9 SDK" osxCompatibility="10.7 SDK" osxArchitecture="Native"
-                       isDebug="1" optimisation="3" targetName="Beat Surface"/>
+        <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="default" osxArchitecture="default"
+                       isDebug="1" optimisation="1" targetName="BeatSurface"/>
         <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="default" osxArchitecture="default"
-                       isDebug="0" optimisation="3" targetName="Beat Surface"/>
+                       isDebug="0" optimisation="3" targetName="BeatSurface"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_audio_basics" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_core" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_video" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../Libraries/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
-    <XCODE_IPHONE targetFolder="Builds/iOS" smallIcon="NfnoQN" bigIcon="RzQmWg"
-                  UIFileSharingEnabled="1">
+    <XCODE_IPHONE targetFolder="Builds/iOS">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" iosCompatibility="default" isDebug="1" optimisation="3"
-                       targetName="Beat Surface"/>
+        <CONFIGURATION name="Debug" iosCompatibility="default" isDebug="1" optimisation="1"
+                       targetName="BeatSurface"/>
         <CONFIGURATION name="Release" iosCompatibility="default" isDebug="0" optimisation="3"
-                       targetName="Beat Surface"/>
+                       targetName="BeatSurface"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_gui_extra" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_core" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../../../Libraries/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_video" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../Libraries/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../Libraries/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
   </EXPORTFORMATS>
   <MODULES>
-    <MODULES id="juce_audio_basics" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="juce_audio_devices" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="juce_audio_formats" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="juce_audio_processors" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="juce_audio_utils" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="juce_core" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="juce_cryptography" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="juce_data_structures" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="juce_events" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="juce_graphics" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="juce_gui_basics" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_cryptography" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="1"/>
+    <MODULE id="juce_video" showAllCode="1" useLocalCopy="1"/>
   </MODULES>
-  <JUCEOPTIONS JUCE_USE_MP3AUDIOFORMAT="enabled"/>
+  <JUCEOPTIONS/>
 </JUCERPROJECT>
