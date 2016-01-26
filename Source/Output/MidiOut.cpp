@@ -11,7 +11,6 @@
 
 #include "MidiOut.h"
 
-
 MidiOut::MidiOut()
 {
     
@@ -81,3 +80,4 @@ void MidiOut::timerCallback()
     sendMidiOut(channelNo, noteNo, 0);
     stopTimer();
 }
+

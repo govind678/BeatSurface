@@ -14,8 +14,10 @@
 #include "JuceHeader.h"
 
 
-class MidiOut :     public MidiOutput,
-                    public MidiMessage,
+//class MidiOut :     public MidiOutput,
+//                    public MidiMessage,
+//                    private Timer
+class MidiOut :     public MidiMessage,
                     private Timer
 
 {
@@ -40,7 +42,6 @@ private:
     
     void timerCallback();
 };
-
 
 
 
