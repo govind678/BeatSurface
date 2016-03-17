@@ -1,9 +1,9 @@
 BeatSurface
 ===========
 
-Currently implementing a Real Time Detection and Classification System of Percussive Onsets.
+An application to detect, classify and transcribe percussive onsets (transients).
 
-Targets: Mac OSX GUI application, Onset Classification Static Library
+Targets: Mac OSX GUI application, iOS Application
 
 
 Dependencies: 
